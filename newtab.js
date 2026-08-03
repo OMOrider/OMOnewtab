@@ -94,8 +94,8 @@ function renderWeather(w) {
     + '<span class="w-caret"><svg viewBox="0 0 16 16"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></span>';
   box.classList.remove('hidden');
 
-  // 7 天预报：渲染好但默认收起，点击天气行展开
-  const week = el('weatherWeek');
+  // 7 天预报：渲染进右侧面板，点击天气行时打开
+  const body = el('weatherPanelBody');
   const days = w.daily.time;
   const codes = w.daily.weather_code;
   const maxs = w.daily.temperature_2m_max;
@@ -105,16 +105,15 @@ function renderWeather(w) {
     const d = new Date(days[i] + 'T00:00:00');
     const name = i === 0 ? '今天' : WEEK[d.getDay()];
     const md = (d.getMonth() + 1) + '/' + d.getDate();
-    html += '<div class="ww-day' + (i === 0 ? ' today' : '') + '">'
-      + '<div class="ww-name">' + name + '</div>'
-      + '<div class="ww-date">' + md + '</div>'
-      + '<div class="ww-ico">' + wmoIcon(codes[i]) + '</div>'
-      + '<div class="ww-temp"><span class="max">' + Math.round(maxs[i]) + '°</span>'
-      + '<span class="min">' + Math.round(mins[i]) + '°</span></div>'
+    html += '<div class="wp-row' + (i === 0 ? ' today' : '') + '">'
+      + '<span class="wp-name">' + name + '</span>'
+      + '<span class="wp-date">' + md + '</span>'
+      + '<span class="wp-ico">' + wmoIcon(codes[i]) + '</span>'
+      + '<span class="wp-temp"><span class="max">' + Math.round(maxs[i]) + '°</span>'
+      + '<span class="min">' + Math.round(mins[i]) + '°</span></span>'
       + '</div>';
   }
-  week.innerHTML = html;
-  week.classList.add('hidden');
+  body.innerHTML = html;
 }
 
 /* 骨架屏：先占位再替换，避免页面跳动 */
@@ -126,7 +125,8 @@ function showWeatherSkeleton() {
 
 function hideWeather() {
   el('weather').classList.add('hidden');
-  el('weatherWeek').classList.add('hidden');
+  el('weather').classList.remove('open');
+  el('weatherPanel').classList.add('hidden');
 }
 
 /* 本地缓存：30 分钟内秒开，后台静默刷新 */
@@ -675,12 +675,27 @@ function bindEvents() {
   });
   updateClear();
 
-  // 天气行：点击原地展开/收起 7 天预报
+  // 天气行：点击打开右侧 7 天预报面板
   const weatherLine = el('weather');
-  weatherLine.title = '点击展开 / 收起 7 天预报';
-  weatherLine.addEventListener('click', () => {
+  const weatherPanel = el('weatherPanel');
+  weatherLine.title = '点击查看 7 天预报';
+  const closeWeatherPanel = () => {
+    weatherLine.classList.remove('open');
+    weatherPanel.classList.add('hidden');
+  };
+  weatherLine.addEventListener('click', e => {
+    e.stopPropagation();
     const open = weatherLine.classList.toggle('open');
-    el('weatherWeek').classList.toggle('hidden', !open);
+    weatherPanel.classList.toggle('hidden', !open);
+  });
+  el('weatherClose').addEventListener('click', e => {
+    e.stopPropagation();
+    closeWeatherPanel();
+  });
+  document.addEventListener('click', e => {
+    if (weatherPanel.classList.contains('hidden')) return;
+    if (e.target.closest('#weatherPanel') || e.target.closest('#weather')) return;
+    closeWeatherPanel();
   });
 
   el('btnNew').addEventListener('click', () => openNew(null, false));

@@ -88,37 +88,62 @@ body {
 
 .weather.open .w-caret svg { transform: rotate(180deg); }
 
-/* 7 天预报条 */
-.weather-week {
-  display: grid;
-  grid-template-columns: repeat(7, 1fr);
-  gap: 6px;
-  margin-top: 18px;
-}
-
-.ww-day {
+/* 7 天预报侧边面板 */
+.weather-panel {
+  position: fixed;
+  right: 20px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 300px;
+  max-height: 78vh;
+  overflow-y: auto;
   background: var(--card);
   border: 1px solid var(--border);
-  border-radius: 10px;
-  padding: 9px 4px 8px;
-  text-align: center;
+  border-radius: 12px;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.14);
+  padding: 14px 12px 8px;
+  z-index: 950;
 }
 
-.ww-day.today {
-  border-color: var(--primary);
-  background: rgba(24, 95, 165, 0.05);
+.weather-panel:not(.hidden) { animation: wpIn .18s ease; }
+
+@keyframes wpIn {
+  from { opacity: 0; transform: translateY(-50%) translateX(18px); }
+  to   { opacity: 1; transform: translateY(-50%) translateX(0); }
 }
 
-.ww-name { font-size: 12px; font-weight: 500; }
-.ww-day.today .ww-name { color: var(--primary); }
-.ww-date { font-size: 11px; color: var(--text-sub); opacity: 0.85; margin-top: 1px; }
-.ww-ico { display: flex; justify-content: center; margin: 5px 0 3px; }
-.ww-ico svg { width: 20px; height: 20px; }
-.ww-ico .w-ico.sun svg { color: #e8a33d; }
-.ww-ico .w-ico svg { color: #6b7280; }
-.ww-temp { font-size: 12px; }
-.ww-temp .max { color: var(--text); font-weight: 500; }
-.ww-temp .min { color: var(--text-sub); margin-left: 3px; }
+.wp-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 4px;
+  padding: 0 2px;
+}
+
+.wp-title { font-size: 13px; font-weight: 500; color: var(--text); }
+
+.wp-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 6px;
+  border-bottom: 1px solid var(--border);
+}
+
+.wp-row:last-child { border-bottom: none; }
+
+.wp-row.today { background: rgba(24, 95, 165, 0.05); border-radius: 8px; }
+
+.wp-name { width: 52px; font-size: 13px; }
+.wp-row.today .wp-name { color: var(--primary); font-weight: 500; }
+.wp-date { width: 36px; font-size: 11px; color: var(--text-sub); }
+.wp-ico { display: inline-flex; }
+.wp-ico svg { width: 18px; height: 18px; }
+.wp-ico .w-ico.sun svg { color: #e8a33d; }
+.wp-ico .w-ico svg { color: #6b7280; }
+.wp-temp { margin-left: auto; font-size: 13px; }
+.wp-temp .max { font-weight: 500; }
+.wp-temp .min { color: var(--text-sub); margin-left: 5px; }
 
 /* 天气骨架屏（加载占位，避免跳动） */
 .sk-pill {
@@ -128,28 +153,6 @@ body {
   border-radius: 7px;
   background: #e7eaee;
 }
-
-.sk-line {
-  height: 11px;
-  border-radius: 6px;
-  background: #e7eaee;
-  margin: 0 auto;
-}
-
-.sk-block {
-  width: 22px;
-  height: 22px;
-  border-radius: 6px;
-  background: #e7eaee;
-  margin: 6px auto 4px;
-}
-
-@keyframes skpulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.45; }
-}
-
-.ww-day.sk * { animation: skpulse 1.2s ease-in-out infinite; }
 
 .search-wrap {
   position: relative;

@@ -14,7 +14,6 @@
         <div id="clock" class="clock">--:--:--</div>
         <div id="date" class="date"></div>
         <div id="weather" class="weather hidden"></div>
-        <div id="weatherWeek" class="weather-week hidden"></div>
         <div class="search-wrap">
           <input id="search" class="search" type="text"
                  placeholder="输入网址或搜索词，回车直达…"
@@ -51,6 +50,17 @@
     <button type="button" data-target="pageWork" class="active" title="工作页"></button>
     <button type="button" data-target="pagePrivate" title="私人页"></button>
   </nav>
+
+  <!-- 7 天预报侧边面板 -->
+  <aside id="weatherPanel" class="weather-panel hidden">
+    <div class="wp-head">
+      <span class="wp-title">7 天预报</span>
+      <button id="weatherClose" class="icon-btn" type="button" title="关闭" aria-label="关闭">
+        <svg viewBox="0 0 16 16"><path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+      </button>
+    </div>
+    <div id="weatherPanelBody" class="wp-body"></div>
+  </aside>
 
   <div id="ctxMenu" class="ctx-menu hidden"></div>
 
