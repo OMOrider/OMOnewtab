@@ -552,62 +552,60 @@ html::-webkit-scrollbar { display: none; }  /* Edge/Chrome 隐藏滚动条 */
   .page-work { align-items: flex-start; }
 }
 
-/* 工作工具（启动器风格：圆角图标 + 小字名称，无边框卡片） */
+/* 工作工具（列表形式：小图标 + 名称，与收藏夹风格一致） */
 .tool-block { margin-top: 0; text-align: center; }
 
 .tool-head {
   display: flex;
   align-items: center;
   justify-content: center;
-  margin: 12px 4px 16px;
+  margin: 12px 4px 14px;
 }
 
-.tool-dock {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(104px, 1fr));
-  justify-items: center;
-  align-items: start;
-  gap: 18px 16px;
-  max-width: 680px;
+.tool-list {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  max-width: 420px;
   margin: 0 auto;
 }
 
 .tool-item {
   display: flex;
-  flex-direction: column;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
+  padding: 8px 12px;
+  border-radius: 8px;
   text-decoration: none;
   color: var(--text);
 }
+
+.tool-item:hover { background: var(--hover); }
 
 .tool-tile {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 56px;
-  height: 56px;
-  border-radius: 16px;
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
   color: #fff;
-  font-size: 24px;
+  font-size: 14px;
   font-weight: 500;
   line-height: 1;
   user-select: none;
+  flex-shrink: 0;
 }
 
 .tool-name {
   font-size: 14px;
-  line-height: 1.4;
-  color: var(--text-sub);
-  text-align: center;
+  color: var(--text);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  max-width: 100%;
-  transition: color .12s;
 }
 
-.tool-item:hover .tool-name { color: var(--text); }
+.tool-item:hover .tool-name { color: var(--primary); }
 
 /* 左侧页面指示点（竖排，随状态区） */
 .page-dots {
