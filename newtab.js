@@ -607,19 +607,16 @@ function makeSyncCard(node) {
   card.className = 'tool-item';
   card.href = node.url;
   card.title = node.url;
+  const name = node.title || hostname(node.url) || node.url;
+  // 统一彩色字母图标，保证与内置工具完全对齐（网站 favicon 内容常不在正中）
   const tile = document.createElement('span');
-  tile.className = 'tool-tile tile-img';
-  const img = document.createElement('img');
-  img.className = 'bm-ico';
-  img.alt = '';
-  img.loading = 'lazy';
-  img.src = faviconSrc(node.url);
-  img.addEventListener('error', () => fallbackToCdn(img, node.url), { once: true });
-  tile.appendChild(img);
-  const name = document.createElement('span');
-  name.className = 'tool-name';
-  name.textContent = node.title || hostname(node.url) || node.url;
-  card.append(tile, name);
+  tile.className = 'tool-tile';
+  tile.style.background = colorFor(node.url || name);
+  tile.textContent = (name[0] || '?').toUpperCase();
+  const label = document.createElement('span');
+  label.className = 'tool-name';
+  label.textContent = name;
+  card.append(tile, label);
   card.addEventListener('click', e => { e.preventDefault(); window.open(node.url, '_blank'); });
   return card;
 }

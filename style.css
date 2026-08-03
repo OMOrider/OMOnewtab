@@ -591,21 +591,6 @@ html::-webkit-scrollbar { display: none; }  /* Edge/Chrome 隐藏滚动条 */
   user-select: none;
 }
 
-/* 同步收藏夹的工具：favicon 图标 */
-.tool-tile.tile-img {
-  background: #fff;
-  border: 1px solid var(--border);
-}
-
-.tool-tile.tile-img img { width: 34px; height: 34px; }
-
-.tool-tile.tile-img .bm-ico-fallback {
-  width: 100%;
-  height: 100%;
-  border-radius: 17px;
-  font-size: 22px;
-}
-
 .tool-name {
   font-size: 14px;
   line-height: 1.4;
