@@ -530,14 +530,16 @@ html::-webkit-scrollbar { display: none; }  /* Edge/Chrome 隐藏滚动条 */
   padding: 40px 24px 48px;
 }
 
+.page-work .page-inner { max-width: 1080px; }
+
 .page-work { align-items: center; }
 .page-private { align-items: flex-start; }
 
-/* 三区布局：左右预留（右侧为面板弹出区），内容居中 */
+/* 三区布局：左右预留（右侧为面板弹出区），中间内容居中且占比最大 */
 .cols {
   display: grid;
-  grid-template-columns: 190px 1fr 190px;
-  gap: 28px;
+  grid-template-columns: 200px 1fr 200px;
+  gap: 32px;
   align-items: start;
 }
 
