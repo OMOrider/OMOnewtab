@@ -518,6 +518,17 @@ function bindEvents() {
     window.open(resolveUrl(q), '_blank');   // 在新标签页打开，当前页保持不动
   });
 
+  // 搜索框清空按钮（有文字才显示）
+  const clearBtn = el('searchClear');
+  const updateClear = () => clearBtn.classList.toggle('hidden', el('search').value.length === 0);
+  el('search').addEventListener('input', updateClear);
+  clearBtn.addEventListener('click', () => {
+    el('search').value = '';
+    updateClear();
+    el('search').focus();
+  });
+  updateClear();
+
   el('btnNew').addEventListener('click', () => openNew(null, false));
 
   el('fldType').addEventListener('change', () => {

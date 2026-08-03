@@ -51,13 +51,18 @@ body {
   color: var(--text-sub);
 }
 
-.search {
-  display: block;
+.search-wrap {
+  position: relative;
   width: 100%;
   max-width: 560px;
   margin: 24px auto 0;
+}
+
+.search {
+  display: block;
+  width: 100%;
   height: 44px;
-  padding: 0 18px;
+  padding: 0 42px 0 18px;
   font-size: 15px;
   border: 1px solid var(--border);
   border-radius: 22px;
@@ -71,6 +76,27 @@ body {
   border-color: var(--primary);
   box-shadow: 0 0 0 3px rgba(24, 95, 165, 0.12);
 }
+
+.search-clear {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 24px;
+  height: 24px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--text-sub);
+  cursor: pointer;
+  transition: background .12s, color .12s;
+}
+
+.search-clear:hover { background: rgba(0, 0, 0, 0.07); color: var(--text); }
+.search-clear svg { width: 13px; height: 13px; }
 
 /* ===== 列表头 ===== */
 .list-head {
