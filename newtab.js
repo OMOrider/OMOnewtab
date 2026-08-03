@@ -467,6 +467,8 @@ function renderWorkTools() {
 
 function setupPageNav() {
   const nav = el('pageNav');
+  const pageWork = el('pageWork');
+  const pagePrivate = el('pagePrivate');
   nav.querySelectorAll('button').forEach(btn => {
     btn.addEventListener('click', () => {
       el(btn.dataset.target).scrollIntoView({ behavior: 'smooth' });
@@ -481,8 +483,29 @@ function setupPageNav() {
       }
     });
   }, { threshold: 0.4 });
-  obs.observe(el('pageWork'));
-  obs.observe(el('pagePrivate'));
+  obs.observe(pageWork);
+  obs.observe(pagePrivate);
+
+  // 翻页式滑动：滚一下整页跳转（页内长列表仍可正常滚动）
+  let lock = false;
+  window.addEventListener('wheel', e => {
+    if (lock || Math.abs(e.deltaY) < 8) return;
+    const y = window.scrollY;
+    const p2Top = pagePrivate.offsetTop;
+    if (y < 30 && e.deltaY > 0) {            // 工作页顶部，向下滚 → 翻到私人页
+      e.preventDefault();
+      jump(pagePrivate);
+    } else if (Math.abs(y - p2Top) < 40 && e.deltaY < 0) {  // 私人页顶部，向上滚 → 翻回工作页
+      e.preventDefault();
+      jump(pageWork);
+    }
+  }, { passive: false });
+
+  function jump(target) {
+    lock = true;
+    target.scrollIntoView({ behavior: 'smooth' });
+    setTimeout(() => { lock = false; }, 700);
+  }
 }
 
 /* ---------- 事件绑定 ---------- */
