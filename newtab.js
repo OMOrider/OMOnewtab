@@ -589,7 +589,7 @@ function renderWorkTools() {
   grid.innerHTML = '';
   for (const t of WORK_TOOLS) {
     const card = document.createElement('a');
-    card.className = 'tool-card';
+    card.className = 'tool-item';
     card.href = t.url;
     card.title = t.url;
     const tile = document.createElement('span');
@@ -607,7 +607,7 @@ function renderWorkTools() {
 /* 同步收藏夹「工具A」：以收藏夹内容为准，自动刷新 */
 function makeSyncCard(node) {
   const card = document.createElement('a');
-  card.className = 'tool-card';
+  card.className = 'tool-item';
   card.href = node.url;
   card.title = node.url;
   const tile = document.createElement('span');

@@ -550,76 +550,77 @@ html::-webkit-scrollbar { display: none; }  /* Edge/Chrome 隐藏滚动条 */
   .page-work { align-items: flex-start; }
 }
 
-/* 工作工具 */
-.tool-block { margin-top: 0; }
+/* 工作工具（启动器风格：圆角图标 + 小字名称，无边框卡片） */
+.tool-block { margin-top: 0; text-align: center; }
 
 .tool-head {
   display: flex;
   align-items: center;
-  margin: 8px 4px 8px;
+  justify-content: center;
+  margin: 8px 4px 10px;
 }
 
-.tool-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(92px, 1fr));
-  gap: 10px;
+.tool-dock {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 20px;
 }
 
-.tool-card {
+.tool-item {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 6px;
-  padding: 12px 6px 10px;
-  background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: 10px;
+  gap: 7px;
   text-decoration: none;
   color: var(--text);
-  transition: border-color .12s, box-shadow .12s;
+  transition: transform .12s;
 }
 
-.tool-card:hover {
-  border-color: var(--primary);
-  box-shadow: 0 0 0 3px rgba(24, 95, 165, 0.08);
-}
+.tool-item:hover { transform: translateY(-2px); }
 
 .tool-tile {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 34px;
-  height: 34px;
-  border-radius: 9px;
+  width: 42px;
+  height: 42px;
+  border-radius: 13px;
   color: #fff;
-  font-size: 15px;
+  font-size: 18px;
   font-weight: 500;
   user-select: none;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
 }
 
-/* 同步收藏夹的工具卡片：favicon 图标 */
+/* 同步收藏夹的工具：favicon 图标 */
 .tool-tile.tile-img {
   background: #fff;
   border: 1px solid var(--border);
+  box-shadow: none;
 }
 
-.tool-tile.tile-img img { width: 20px; height: 20px; }
+.tool-tile.tile-img img { width: 24px; height: 24px; }
 
 .tool-tile.tile-img .bm-ico-fallback {
   width: 100%;
   height: 100%;
-  border-radius: 8px;
-  font-size: 14px;
+  border-radius: 12px;
+  font-size: 16px;
 }
 
 .tool-name {
-  font-size: 13px;
+  font-size: 12px;
+  color: var(--text-sub);
   text-align: center;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  max-width: 100%;
+  max-width: 84px;
+  transition: color .12s;
 }
+
+.tool-item:hover .tool-name { color: var(--text); }
 
 /* 左侧页面指示点（竖排，随状态区） */
 .page-dots {
