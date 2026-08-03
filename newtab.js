@@ -45,6 +45,64 @@ const SVG = {
   trash: '<svg viewBox="0 0 16 16"><path d="M3 4h10M6.5 4V2.9c0-.5.4-.9.9-.9h1.2c.5 0 .9.4.9.9V4M4.5 4l.6 8.9c0 .6.5 1.1 1.1 1.1h3.6c.6 0 1.1-.5 1.1-1.1L11.5 4" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/></svg>'
 };
 
+/* ---------- 天气（Open-Meteo，免费免 Key） ----------
+ * WEATHER_CITY 改成你的城市名即可 */
+const WEATHER_CITY = '湖州';
+
+const WMO_ICONS = {
+  sun: '<span class="w-ico sun"><svg viewBox="0 0 16 16"><circle cx="8" cy="8" r="3" fill="currentColor"/><path d="M8 1v2M8 13v2M1 8h2M13 8h2M2.9 2.9l1.4 1.4M11.7 11.7l1.4 1.4M13.1 2.9l-1.4 1.4M4.3 11.7l-1.4 1.4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg></span>',
+  cloud: '<span class="w-ico"><svg viewBox="0 0 16 16"><path d="M4.5 12.5h7a2.5 2.5 0 0 0 .4-4.97 3.5 3.5 0 0 0-6.8-.6A2.8 2.8 0 0 0 4.5 12.5z" fill="currentColor" opacity="0.85"/></svg></span>',
+  rain: '<span class="w-ico"><svg viewBox="0 0 16 16"><path d="M4.5 12.5h7a2.5 2.5 0 0 0 .4-4.97 3.5 3.5 0 0 0-6.8-.6A2.8 2.8 0 0 0 4.5 12.5z" fill="currentColor" opacity="0.85"/><path d="M5 9.5v1.8M8 9.5v1.8M11 9.5v1.8" stroke="currentColor" stroke-width="1.1" stroke-linecap="round"/></svg></span>',
+  snow: '<span class="w-ico"><svg viewBox="0 0 16 16"><path d="M4.5 12.5h7a2.5 2.5 0 0 0 .4-4.97 3.5 3.5 0 0 0-6.8-.6A2.8 2.8 0 0 0 4.5 12.5z" fill="currentColor" opacity="0.85"/><path d="M6.5 8.6v2M9.5 8.6v2M8 8.2v2" stroke="currentColor" stroke-width="1" stroke-linecap="round"/></svg></span>',
+  thunder: '<span class="w-ico"><svg viewBox="0 0 16 16"><path d="M4.5 12.5h7a2.5 2.5 0 0 0 .4-4.97 3.5 3.5 0 0 0-6.8-.6A2.8 2.8 0 0 0 4.5 12.5z" fill="currentColor" opacity="0.85"/><path d="M8 8.2l-1.5 2.3h1.8L7.4 13l2.4-2.6H8z" fill="currentColor"/></svg></span>',
+  fog: '<span class="w-ico"><svg viewBox="0 0 16 16"><path d="M4.5 12.5h7a2.5 2.5 0 0 0 .4-4.97 3.5 3.5 0 0 0-6.8-.6A2.8 2.8 0 0 0 4.5 12.5z" fill="currentColor" opacity="0.85"/><path d="M4 9.5h8M5 8h6" stroke="currentColor" stroke-width="1.1" stroke-linecap="round"/></svg></span>'
+};
+
+const WMO_TEXT = {
+  0: '晴', 1: '晴间多云', 2: '多云', 3: '阴',
+  45: '雾', 48: '雾凇', 51: '毛毛雨', 53: '毛毛雨', 55: '毛毛雨',
+  56: '冻雨', 57: '冻雨', 61: '小雨', 63: '中雨', 65: '大雨',
+  66: '冻雨', 67: '冻雨', 71: '小雪', 73: '中雪', 75: '大雪', 77: '雪粒',
+  80: '阵雨', 81: '阵雨', 82: '强阵雨', 85: '阵雪', 86: '阵雪',
+  95: '雷阵雨', 96: '雷阵雨', 99: '强雷暴'
+};
+
+function wmoIcon(code) {
+  if (code === 0 || code === 1) return WMO_ICONS.sun;
+  if (code === 2 || code === 3) return WMO_ICONS.cloud;
+  if (code >= 45 && code <= 48) return WMO_ICONS.fog;
+  if ((code >= 51 && code <= 67) || (code >= 80 && code <= 82)) return WMO_ICONS.rain;
+  if (code >= 71 && code <= 77 || code >= 85 && code <= 86) return WMO_ICONS.snow;
+  if (code >= 95) return WMO_ICONS.thunder;
+  return WMO_ICONS.cloud;
+}
+
+async function fetchWeather() {
+  const box = el('weather');
+  try {
+    const geoRes = await fetch('https://geocoding-api.open-meteo.com/v1/search?name='
+      + encodeURIComponent(WEATHER_CITY) + '&count=1&language=zh');
+    const geo = await geoRes.json();
+    const place = geo.results && geo.results[0];
+    if (!place) throw new Error('city not found');
+    const wRes = await fetch('https://api.open-meteo.com/v1/forecast?latitude=' + place.latitude
+      + '&longitude=' + place.longitude
+      + '&current=temperature_2m,relative_humidity_2m,apparent_temperature,weather_code&timezone=auto');
+    const w = await wRes.json();
+    const cur = w.current;
+    const code = cur.weather_code;
+    box.innerHTML = wmoIcon(code)
+      + '<span class="w-city">' + esc(place.name) + '</span>'
+      + '<span class="w-temp">' + Math.round(cur.temperature_2m) + '°C</span>'
+      + '<span>' + (WMO_TEXT[code] || '未知') + '</span>'
+      + '<span class="w-sub">体感 ' + Math.round(cur.apparent_temperature) + '° · 湿度 '
+      + Math.round(cur.relative_humidity_2m) + '%</span>';
+    box.classList.remove('hidden');
+  } catch (e) {
+    box.classList.add('hidden');   // 天气加载失败时不显示，不影响页面
+  }
+}
+
 /* ---------- 时钟 / 日期 ---------- */
 const WEEK = ['日', '一', '二', '三', '四', '五', '六'];
 
@@ -585,4 +643,5 @@ setInterval(updateClock, 1000);
 bindEvents();
 renderWorkTools();
 setupPageNav();
+fetchWeather();
 renderTree();

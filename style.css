@@ -53,6 +53,24 @@ body {
   color: var(--text-sub);
 }
 
+/* 天气 */
+.weather {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  margin-top: 12px;
+  font-size: 13px;
+  color: var(--text-sub);
+}
+
+.weather .w-ico { display: inline-flex; align-items: center; }
+.weather .w-ico svg { width: 15px; height: 15px; }
+.weather .w-ico.sun svg { color: #e8a33d; }
+.weather .w-ico svg { color: #6b7280; }
+.weather .w-temp { font-weight: 500; color: var(--text); }
+.weather .w-city { font-weight: 500; }
+.weather .w-sub { opacity: 0.85; }
+
 .search-wrap {
   position: relative;
   width: 100%;
