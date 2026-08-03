@@ -563,10 +563,13 @@ html::-webkit-scrollbar { display: none; }  /* Edge/Chrome 隐藏滚动条 */
 }
 
 .tool-dock {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 26px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(56px, 1fr));
+  justify-items: center;
+  align-items: start;
+  gap: 14px 10px;
+  max-width: 560px;
+  margin: 0 auto;
 }
 
 .tool-item {
