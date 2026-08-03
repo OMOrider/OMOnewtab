@@ -466,25 +466,8 @@ function renderWorkTools() {
 }
 
 function setupPageNav() {
-  const nav = el('pageNav');
   const pageWork = el('pageWork');
   const pagePrivate = el('pagePrivate');
-  nav.querySelectorAll('button').forEach(btn => {
-    btn.addEventListener('click', () => {
-      el(btn.dataset.target).scrollIntoView({ behavior: 'smooth' });
-    });
-  });
-  // 滚动时高亮当前页
-  const obs = new IntersectionObserver(entries => {
-    entries.forEach(en => {
-      if (en.isIntersecting) {
-        nav.querySelectorAll('button').forEach(b =>
-          b.classList.toggle('active', b.dataset.target === en.target.id));
-      }
-    });
-  }, { threshold: 0.4 });
-  obs.observe(pageWork);
-  obs.observe(pagePrivate);
 
   // 翻页式滑动：滚一下整页跳转（页内长列表仍可正常滚动）
   let lock = false;

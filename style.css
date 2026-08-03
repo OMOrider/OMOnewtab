@@ -458,33 +458,3 @@ html {
   text-overflow: ellipsis;
   max-width: 100%;
 }
-
-/* 底部浮动页签导航 */
-.page-nav {
-  position: fixed;
-  bottom: 24px;
-  left: 50%;
-  transform: translateX(-50%);
-  display: flex;
-  gap: 4px;
-  background: rgba(255, 255, 255, 0.92);
-  border: 1px solid var(--border);
-  border-radius: 20px;
-  padding: 4px;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
-  z-index: 900;
-}
-
-.page-nav button {
-  border: none;
-  background: transparent;
-  padding: 6px 18px;
-  border-radius: 16px;
-  font-size: 13px;
-  cursor: pointer;
-  color: var(--text-sub);
-  transition: background .12s, color .12s;
-}
-
-.page-nav button:hover { color: var(--text); }
-.page-nav button.active { background: var(--primary); color: #fff; }
