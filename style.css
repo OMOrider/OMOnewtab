@@ -40,7 +40,8 @@ body {
 }
 
 .clock {
-  font-family: "Alibaba PuHuiTi 3.0", "Maple Mono NF CN", "Segoe UI",
+  font-family: "Alibaba PuHuiTi 3.0 75S", "Alibaba PuHuiTi 3.0 55R",
+               "Alibaba PuHuiTi 3.0", "Maple Mono NF CN", "Segoe UI",
                "Microsoft YaHei", sans-serif;
   font-size: 76px;
   font-weight: 600;
