@@ -90,9 +90,11 @@ function renderWeather(w) {
     + '<span class="w-temp">' + Math.round(cur.temperature_2m) + '°C</span>'
     + '<span>' + (WMO_TEXT[code] || '未知') + '</span>'
     + '<span class="w-sub">体感 ' + Math.round(cur.apparent_temperature) + '° · 湿度 '
-    + Math.round(cur.relative_humidity_2m) + '%</span>';
+    + Math.round(cur.relative_humidity_2m) + '%</span>'
+    + '<span class="w-caret"><svg viewBox="0 0 16 16"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></span>';
   box.classList.remove('hidden');
 
+  // 7 天预报：渲染好但默认收起，点击天气行展开
   const week = el('weatherWeek');
   const days = w.daily.time;
   const codes = w.daily.weather_code;
@@ -112,7 +114,7 @@ function renderWeather(w) {
       + '</div>';
   }
   week.innerHTML = html;
-  week.classList.remove('hidden');
+  week.classList.add('hidden');
 }
 
 /* 骨架屏：先占位再替换，避免页面跳动 */
@@ -120,17 +122,6 @@ function showWeatherSkeleton() {
   const box = el('weather');
   box.innerHTML = '<span class="w-city">' + esc(WEATHER_CITY) + '</span><span class="sk-pill"></span>';
   box.classList.remove('hidden');
-  let html = '';
-  for (let i = 0; i < 7; i++) {
-    html += '<div class="ww-day sk">'
-      + '<div class="sk-line" style="width:26px"></div>'
-      + '<div class="sk-line" style="width:30px;margin-top:5px"></div>'
-      + '<div class="sk-block"></div>'
-      + '<div class="sk-line" style="width:36px;margin-top:4px"></div>'
-      + '</div>';
-  }
-  el('weatherWeek').innerHTML = html;
-  el('weatherWeek').classList.remove('hidden');
 }
 
 function hideWeather() {
@@ -683,6 +674,14 @@ function bindEvents() {
     el('search').focus();
   });
   updateClear();
+
+  // 天气行：点击原地展开/收起 7 天预报
+  const weatherLine = el('weather');
+  weatherLine.title = '点击展开 / 收起 7 天预报';
+  weatherLine.addEventListener('click', () => {
+    const open = weatherLine.classList.toggle('open');
+    el('weatherWeek').classList.toggle('hidden', !open);
+  });
 
   el('btnNew').addEventListener('click', () => openNew(null, false));
 
