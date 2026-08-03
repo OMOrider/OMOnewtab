@@ -91,7 +91,7 @@ function renderWeather(w) {
     + '<span>' + (WMO_TEXT[code] || '未知') + '</span>'
     + '<span class="w-sub">体感 ' + Math.round(cur.apparent_temperature) + '° · 湿度 '
     + Math.round(cur.relative_humidity_2m) + '%</span>'
-    + '<span class="w-caret"><svg viewBox="0 0 16 16"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></span>';
+    + '<span class="w-caret"><svg viewBox="0 0 16 16"><path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></span>';
   box.classList.remove('hidden');
 
   // 7 天预报：渲染进右侧面板，点击天气行时打开
