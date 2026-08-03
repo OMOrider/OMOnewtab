@@ -403,13 +403,6 @@ html {
 .page-work { align-items: center; }
 .page-private { align-items: flex-start; }
 
-.page-hint {
-  margin-top: 48px;
-  text-align: center;
-  color: var(--text-sub);
-  font-size: 13px;
-}
-
 /* 工作工具 */
 .tool-block { margin-top: 10px; }
 
