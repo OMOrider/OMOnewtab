@@ -469,6 +469,24 @@ function setupPageNav() {
   const pageWork = el('pageWork');
   const pagePrivate = el('pagePrivate');
 
+  // 底部指示点：点击跳页，滚动时高亮当前页
+  const nav = el('pageNav');
+  nav.querySelectorAll('button').forEach(btn => {
+    btn.addEventListener('click', () => {
+      el(btn.dataset.target).scrollIntoView({ behavior: 'smooth' });
+    });
+  });
+  const obs = new IntersectionObserver(entries => {
+    entries.forEach(en => {
+      if (en.isIntersecting) {
+        nav.querySelectorAll('button').forEach(b =>
+          b.classList.toggle('active', b.dataset.target === en.target.id));
+      }
+    });
+  }, { threshold: 0.4 });
+  obs.observe(pageWork);
+  obs.observe(pagePrivate);
+
   // 翻页式滑动：滚一下整页跳转（页内长列表仍可正常滚动）
   let lock = false;
   window.addEventListener('wheel', e => {

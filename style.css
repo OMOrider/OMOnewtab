@@ -458,3 +458,29 @@ html {
   text-overflow: ellipsis;
   max-width: 100%;
 }
+
+/* 底部页面指示点（低调） */
+.page-dots {
+  position: fixed;
+  bottom: 22px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 8px;
+  padding: 6px 10px;
+  z-index: 900;
+}
+
+.page-dots button {
+  width: 7px;
+  height: 7px;
+  border: none;
+  border-radius: 50%;
+  padding: 0;
+  background: #c9cdd3;
+  cursor: pointer;
+  transition: background .15s, transform .15s;
+}
+
+.page-dots button:hover { transform: scale(1.3); }
+.page-dots button.active { background: var(--primary); }
