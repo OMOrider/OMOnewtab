@@ -38,7 +38,7 @@ body {
 }
 
 .clock {
-  font-size: 64px;
+  font-size: 76px;
   font-weight: 600;
   letter-spacing: 1px;
   font-variant-numeric: tabular-nums;
@@ -46,8 +46,8 @@ body {
 }
 
 .date {
-  margin-top: 8px;
-  font-size: 15px;
+  margin-top: 10px;
+  font-size: 16px;
   color: var(--text-sub);
 }
 
@@ -55,9 +55,9 @@ body {
 .weather {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
-  margin-top: 16px;
-  font-size: 14px;
+  gap: 9px;
+  margin-top: 18px;
+  font-size: 15px;
   color: var(--text-sub);
   cursor: pointer;
   user-select: none;
@@ -162,9 +162,9 @@ body {
 .search {
   display: block;
   width: 100%;
-  height: 48px;
-  padding: 0 46px 0 20px;
-  font-size: 16px;
+  height: 52px;
+  padding: 0 48px 0 22px;
+  font-size: 17px;
   border: 1px solid var(--border);
   border-radius: 22px;
   background: var(--card);
@@ -208,7 +208,7 @@ body {
 }
 
 .list-title {
-  font-size: 14px;
+  font-size: 15px;
   font-weight: 500;
   color: var(--text-sub);
 }
@@ -228,8 +228,8 @@ body {
   display: flex;
   align-items: center;
   gap: 8px;
-  height: 42px;
-  padding: 0 12px;
+  height: 46px;
+  padding: 0 14px;
   cursor: pointer;
   user-select: none;
   border-bottom: 1px solid var(--border);
@@ -249,7 +249,7 @@ body {
 
 .bm-section-head .name {
   font-weight: 500;
-  font-size: 14px;
+  font-size: 15px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -268,9 +268,9 @@ body {
 .bm-row {
   display: flex;
   align-items: center;
-  gap: 10px;
-  height: 38px;
-  padding: 0 10px;
+  gap: 11px;
+  height: 42px;
+  padding: 0 12px;
   border-radius: 6px;
   cursor: pointer;
 }
@@ -278,9 +278,9 @@ body {
 .bm-row:hover { background: var(--hover); }
 
 .bm-ico {
-  width: 18px;
-  height: 18px;
-  border-radius: 3px;
+  width: 20px;
+  height: 20px;
+  border-radius: 4px;
   flex-shrink: 0;
   object-fit: contain;
 }
@@ -289,10 +289,10 @@ body {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 18px;
-  height: 18px;
-  border-radius: 4px;
-  font-size: 11px;
+  width: 20px;
+  height: 20px;
+  border-radius: 5px;
+  font-size: 12px;
   font-weight: 500;
   color: #fff;
   flex-shrink: 0;
@@ -300,7 +300,7 @@ body {
 }
 
 .bm-title {
-  font-size: 14px;
+  font-size: 15px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -308,7 +308,7 @@ body {
 }
 
 .bm-domain {
-  font-size: 13px;
+  font-size: 14px;
   color: var(--text-sub);
   white-space: nowrap;
   overflow: hidden;
@@ -351,16 +351,16 @@ body {
   text-align: center;
   color: var(--text-sub);
   padding: 40px 0;
-  font-size: 14px;
+  font-size: 15px;
 }
 
 /* 嵌套文件夹 */
 .bm-folder-row {
   display: flex;
   align-items: center;
-  gap: 8px;
-  height: 38px;
-  padding: 0 10px;
+  gap: 9px;
+  height: 42px;
+  padding: 0 12px;
   border-radius: 6px;
   cursor: pointer;
 }
@@ -378,7 +378,7 @@ body {
 .bm-folder-row.collapsed .chevron { transform: rotate(-90deg); }
 
 .bm-folder-row .name {
-  font-size: 14px;
+  font-size: 15px;
   font-weight: 500;
   white-space: nowrap;
   overflow: hidden;
@@ -417,7 +417,7 @@ body {
 .btn-primary:hover { background: var(--primary-hover); }
 .btn-plain { background: transparent; color: var(--text-sub); }
 .btn-plain:hover { background: rgba(0, 0, 0, 0.06); color: var(--text); }
-.btn-sm { padding: 6px 14px; font-size: 13px; }
+.btn-sm { padding: 7px 16px; font-size: 14px; }
 
 /* ===== 右键菜单 ===== */
 .ctx-menu {
@@ -527,7 +527,7 @@ html::-webkit-scrollbar { display: none; }  /* Edge/Chrome 隐藏滚动条 */
 .page-inner {
   width: 100%;
   max-width: 760px;
-  padding: 56px 24px 80px;
+  padding: 64px 24px 88px;
 }
 
 .page-work .page-inner { max-width: 1080px; }
@@ -557,21 +557,21 @@ html::-webkit-scrollbar { display: none; }  /* Edge/Chrome 隐藏滚动条 */
   display: flex;
   align-items: center;
   justify-content: center;
-  margin: 10px 4px 14px;
+  margin: 12px 4px 16px;
 }
 
 .tool-dock {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
-  gap: 28px;
+  gap: 32px;
 }
 
 .tool-item {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 9px;
+  gap: 10px;
   text-decoration: none;
   color: var(--text);
   transition: transform .12s;
@@ -583,14 +583,14 @@ html::-webkit-scrollbar { display: none; }  /* Edge/Chrome 隐藏滚动条 */
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 54px;
-  height: 54px;
-  border-radius: 16px;
+  width: 62px;
+  height: 62px;
+  border-radius: 18px;
   color: #fff;
-  font-size: 24px;
+  font-size: 28px;
   font-weight: 500;
   user-select: none;
-  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
 }
 
 /* 同步收藏夹的工具：favicon 图标 */
@@ -600,23 +600,23 @@ html::-webkit-scrollbar { display: none; }  /* Edge/Chrome 隐藏滚动条 */
   box-shadow: none;
 }
 
-.tool-tile.tile-img img { width: 30px; height: 30px; }
+.tool-tile.tile-img img { width: 34px; height: 34px; }
 
 .tool-tile.tile-img .bm-ico-fallback {
   width: 100%;
   height: 100%;
-  border-radius: 15px;
-  font-size: 20px;
+  border-radius: 17px;
+  font-size: 22px;
 }
 
 .tool-name {
-  font-size: 13px;
+  font-size: 14px;
   color: var(--text-sub);
   text-align: center;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  max-width: 96px;
+  max-width: 108px;
   transition: color .12s;
 }
 
