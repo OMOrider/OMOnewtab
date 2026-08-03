@@ -596,6 +596,7 @@ function renderWorkTools() {
     name.className = 'tool-name';
     name.textContent = t.name;
     card.append(tile, name);
+    card.addEventListener('click', e => { e.preventDefault(); window.open(t.url, '_blank'); });
     grid.appendChild(card);
   }
 }
@@ -619,6 +620,7 @@ function makeSyncCard(node) {
   name.className = 'tool-name';
   name.textContent = node.title || hostname(node.url) || node.url;
   card.append(tile, name);
+  card.addEventListener('click', e => { e.preventDefault(); window.open(node.url, '_blank'); });
   return card;
 }
 
