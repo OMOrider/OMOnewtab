@@ -9,7 +9,7 @@ os.makedirs(OUT, exist_ok=True)
 
 BG = (24, 95, 165)          # #185FA5
 FG = (255, 255, 255)
-LETTER = "N"
+LETTER = "O"
 
 FONT_CANDIDATES = [
     r"C:\Windows\Fonts\arialbd.ttf",

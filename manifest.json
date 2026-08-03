@@ -1,6 +1,6 @@
 {
   "manifest_version": 3,
-  "name": "我的新标签页",
+  "name": "OMOnewtab",
   "version": "1.0.0",
   "description": "紧凑收藏夹列表 + 搜索 + 时钟，直接管理浏览器原生收藏夹",
   "icons": {
