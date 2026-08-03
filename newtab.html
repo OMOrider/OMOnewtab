@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>新标签页</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="wrap">
+    <header class="hero">
+      <div id="clock" class="clock">--:--:--</div>
+      <div id="date" class="date"></div>
+      <input id="search" class="search" type="text"
+             placeholder="输入网址或搜索词，回车直达…"
+             autocomplete="off" spellcheck="false">
+    </header>
+
+    <div class="list-head">
+      <span class="list-title">收藏夹</span>
+      <button id="btnNew" class="btn btn-primary btn-sm" type="button">+ 新建</button>
+    </div>
+    <div id="bookmarkList" class="bm-list"></div>
+    <div id="emptyHint" class="empty-hint hidden">这里空空如也，点右上角「+ 新建」或空白处右键添加收藏</div>
+  </div>
+
+  <div id="ctxMenu" class="ctx-menu hidden"></div>
+
+  <div id="modalMask" class="modal-mask hidden">
+    <div class="modal">
+      <h3 id="modalTitle">新建收藏</h3>
+      <div class="form-row" id="modalTypeRow">
+        <label for="fldType">类型</label>
+        <select id="fldType">
+          <option value="bookmark">书签</option>
+          <option value="folder">文件夹</option>
+        </select>
+      </div>
+      <div class="form-row">
+        <label for="fldTitle">名称</label>
+        <input id="fldTitle" type="text" placeholder="收藏名称">
+      </div>
+      <div class="form-row" id="urlRow">
+        <label for="fldUrl">网址</label>
+        <input id="fldUrl" type="text" placeholder="https://example.com">
+      </div>
+      <div class="form-row" id="parentRow">
+        <label for="fldParent">位置</label>
+        <select id="fldParent"></select>
+      </div>
+      <div class="modal-actions">
+        <button id="btnCancel" class="btn btn-plain" type="button">取消</button>
+        <button id="btnSave" class="btn btn-primary" type="button">保存</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="newtab.js"></script>
+</body>
+</html>
