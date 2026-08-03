@@ -564,11 +564,11 @@ html::-webkit-scrollbar { display: none; }  /* Edge/Chrome 隐藏滚动条 */
 
 .tool-dock {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(104px, 1fr));
   justify-items: center;
   align-items: start;
-  gap: 16px 12px;
-  max-width: 560px;
+  gap: 18px 16px;
+  max-width: 680px;
   margin: 0 auto;
 }
 
@@ -603,7 +603,7 @@ html::-webkit-scrollbar { display: none; }  /* Edge/Chrome 隐藏滚动条 */
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  max-width: 108px;
+  max-width: 100%;
   transition: color .12s;
 }
 
