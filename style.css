@@ -606,15 +606,16 @@ html::-webkit-scrollbar { display: none; }  /* Edge/Chrome 隐藏滚动条 */
   max-width: 100%;
 }
 
-/* 底部页面指示点（低调） */
+/* 左侧页面指示点（竖排，随状态区） */
 .page-dots {
   position: fixed;
-  bottom: 22px;
-  left: 50%;
-  transform: translateX(-50%);
+  left: 22px;
+  top: 50%;
+  transform: translateY(-50%);
   display: flex;
-  gap: 8px;
-  padding: 6px 10px;
+  flex-direction: column;
+  gap: 12px;
+  padding: 10px 8px;
   z-index: 900;
 }
 
