@@ -597,6 +597,21 @@ html::-webkit-scrollbar { display: none; }  /* Edge/Chrome 隐藏滚动条 */
   flex-shrink: 0;
 }
 
+/* favicon 图标样式 */
+.tool-tile.tile-img {
+  background: #fff;
+  border: 1px solid var(--border);
+}
+
+.tool-tile.tile-img img { width: 24px; height: 24px; }
+
+.tool-tile.tile-img .bm-ico-fallback {
+  width: 100%;
+  height: 100%;
+  border-radius: 11px;
+  font-size: 16px;
+}
+
 .tool-name {
   font-size: 14px;
   color: var(--text);

@@ -580,45 +580,40 @@ function showMenu(x, y, items) {
 function hideMenu() { ctxMenu.classList.add('hidden'); }
 
 /* ---------- 工作页：固定工具 + 上下翻页导航 ---------- */
+function makeToolItem(url, name) {
+  const card = document.createElement('a');
+  card.className = 'tool-item';
+  card.href = url;
+  card.title = url;
+  // favicon 图标（加载失败自动回退字母块）
+  const tile = document.createElement('span');
+  tile.className = 'tool-tile tile-img';
+  const img = document.createElement('img');
+  img.className = 'bm-ico';
+  img.alt = '';
+  img.loading = 'lazy';
+  img.src = faviconSrc(url);
+  img.addEventListener('error', () => fallbackToCdn(img, url), { once: true });
+  tile.appendChild(img);
+  const label = document.createElement('span');
+  label.className = 'tool-name';
+  label.textContent = name;
+  card.append(tile, label);
+  card.addEventListener('click', e => { e.preventDefault(); window.open(url, '_blank'); });
+  return card;
+}
+
 function renderWorkTools() {
   const grid = el('workTools');
   grid.innerHTML = '';
   for (const t of WORK_TOOLS) {
-    const card = document.createElement('a');
-    card.className = 'tool-item';
-    card.href = t.url;
-    card.title = t.url;
-    const tile = document.createElement('span');
-    tile.className = 'tool-tile';
-    tile.style.background = t.color || colorFor(t.url);
-    tile.textContent = (t.name || '?')[0];
-    const name = document.createElement('span');
-    name.className = 'tool-name';
-    name.textContent = t.name;
-    card.append(tile, name);
-    card.addEventListener('click', e => { e.preventDefault(); window.open(t.url, '_blank'); });
-    grid.appendChild(card);
+    grid.appendChild(makeToolItem(t.url, t.name));
   }
 }
 
 /* 同步收藏夹「工具A」：以收藏夹内容为准，自动刷新 */
 function makeSyncCard(node) {
-  const card = document.createElement('a');
-  card.className = 'tool-item';
-  card.href = node.url;
-  card.title = node.url;
-  const name = node.title || hostname(node.url) || node.url;
-  // 统一彩色字母图标，保证与内置工具完全对齐（网站 favicon 内容常不在正中）
-  const tile = document.createElement('span');
-  tile.className = 'tool-tile';
-  tile.style.background = colorFor(node.url || name);
-  tile.textContent = (name[0] || '?').toUpperCase();
-  const label = document.createElement('span');
-  label.className = 'tool-name';
-  label.textContent = name;
-  card.append(tile, label);
-  card.addEventListener('click', e => { e.preventDefault(); window.open(node.url, '_blank'); });
-  return card;
+  return makeToolItem(node.url, node.title || hostname(node.url) || node.url);
 }
 
 function findFolder(node, name) {
