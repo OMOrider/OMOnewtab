@@ -1,6 +1,8 @@
 /* ===== 基础 ===== */
 * { margin: 0; padding: 0; box-sizing: border-box; }
 
+button, input, select { font-family: inherit; }
+
 :root {
   --bg: #f6f8fb;
   --card: #ffffff;
@@ -19,7 +21,7 @@ html, body {
 }
 
 body {
-  font-family: "Segoe UI", "Microsoft YaHei", "PingFang SC", system-ui, sans-serif;
+  font-family: "Maple Mono NF CN", "Segoe UI", "Microsoft YaHei", "PingFang SC", system-ui, sans-serif;
   background: linear-gradient(180deg, #eef3fa 0%, #f6f8fb 320px);
   color: var(--text);
   font-size: 14px;
