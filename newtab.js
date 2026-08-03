@@ -491,7 +491,7 @@ function bindEvents() {
     if (e.key !== 'Enter' || e.isComposing) return;
     const q = el('search').value.trim();
     if (!q) return;
-    window.location.href = resolveUrl(q);
+    window.open(resolveUrl(q), '_blank');   // 在新标签页打开，当前页保持不动
   });
 
   el('btnNew').addEventListener('click', () => openNew(null, false));
