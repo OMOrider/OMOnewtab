@@ -81,8 +81,32 @@ function wmoIcon(code) {
   return WMO_ICONS.cloud;
 }
 
+function renderWeatherWeek(w) {
+  const week = el('weatherWeek');
+  const days = w.daily.time;
+  const codes = w.daily.weather_code;
+  const maxs = w.daily.temperature_2m_max;
+  const mins = w.daily.temperature_2m_min;
+  let html = '';
+  for (let i = 0; i < days.length; i++) {
+    const d = new Date(days[i] + 'T00:00:00');
+    const name = i === 0 ? '今天' : WEEK[d.getDay()];
+    const md = (d.getMonth() + 1) + '/' + d.getDate();
+    html += '<div class="ww-day' + (i === 0 ? ' today' : '') + '">'
+      + '<div class="ww-name">' + name + '</div>'
+      + '<div class="ww-date">' + md + '</div>'
+      + '<div class="ww-ico">' + wmoIcon(codes[i]) + '</div>'
+      + '<div class="ww-temp"><span class="max">' + Math.round(maxs[i]) + '°</span>'
+      + '<span class="min">' + Math.round(mins[i]) + '°</span></div>'
+      + '</div>';
+  }
+  week.innerHTML = html;
+  week.classList.remove('hidden');
+}
+
 async function fetchWeather() {
   const box = el('weather');
+  const week = el('weatherWeek');
   let lat = WEATHER_FALLBACK.lat;
   let lon = WEATHER_FALLBACK.lon;
   try {
@@ -97,7 +121,8 @@ async function fetchWeather() {
   try {
     const wRes = await fetch('https://api.open-meteo.com/v1/forecast?latitude=' + lat
       + '&longitude=' + lon
-      + '&current=temperature_2m,relative_humidity_2m,apparent_temperature,weather_code&timezone=auto');
+      + '&current=temperature_2m,relative_humidity_2m,apparent_temperature,weather_code'
+      + '&daily=weather_code,temperature_2m_max,temperature_2m_min&forecast_days=7&timezone=auto');
     const w = await wRes.json();
     const cur = w.current;
     const code = cur.weather_code;
@@ -108,9 +133,11 @@ async function fetchWeather() {
       + '<span class="w-sub">体感 ' + Math.round(cur.apparent_temperature) + '° · 湿度 '
       + Math.round(cur.relative_humidity_2m) + '%</span>';
     box.classList.remove('hidden');
+    renderWeatherWeek(w);
   } catch (e) {
     console.error('天气：获取天气数据失败', e);
-    box.classList.add('hidden');   // 天气加载失败时不显示，不影响页面
+    box.classList.add('hidden');
+    week.classList.add('hidden');
   }
 }
 

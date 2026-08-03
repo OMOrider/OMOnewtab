@@ -37,10 +37,10 @@ body {
   padding: 56px 24px 80px;
 }
 
-.hero { text-align: center; margin-bottom: 28px; }
+.hero { text-align: center; margin-bottom: 12px; }
 
 .clock {
-  font-size: 60px;
+  font-size: 46px;
   font-weight: 500;
   letter-spacing: 2px;
   font-variant-numeric: tabular-nums;
@@ -49,7 +49,7 @@ body {
 
 .date {
   margin-top: 4px;
-  font-size: 15px;
+  font-size: 13px;
   color: var(--text-sub);
 }
 
@@ -58,7 +58,7 @@ body {
   display: inline-flex;
   align-items: center;
   gap: 7px;
-  margin-top: 12px;
+  margin-top: 6px;
   font-size: 13px;
   color: var(--text-sub);
 }
@@ -71,17 +71,49 @@ body {
 .weather .w-city { font-weight: 500; }
 .weather .w-sub { opacity: 0.85; }
 
+/* 7 天预报条 */
+.weather-week {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 6px;
+  margin-top: 18px;
+}
+
+.ww-day {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 9px 4px 8px;
+  text-align: center;
+}
+
+.ww-day.today {
+  border-color: var(--primary);
+  background: rgba(24, 95, 165, 0.05);
+}
+
+.ww-name { font-size: 12px; font-weight: 500; }
+.ww-day.today .ww-name { color: var(--primary); }
+.ww-date { font-size: 11px; color: var(--text-sub); opacity: 0.85; margin-top: 1px; }
+.ww-ico { display: flex; justify-content: center; margin: 5px 0 3px; }
+.ww-ico svg { width: 20px; height: 20px; }
+.ww-ico .w-ico.sun svg { color: #e8a33d; }
+.ww-ico .w-ico svg { color: #6b7280; }
+.ww-temp { font-size: 12px; }
+.ww-temp .max { color: var(--text); font-weight: 500; }
+.ww-temp .min { color: var(--text-sub); margin-left: 3px; }
+
 .search-wrap {
   position: relative;
   width: 100%;
   max-width: 560px;
-  margin: 24px auto 0;
+  margin: 14px auto 0;
 }
 
 .search {
   display: block;
   width: 100%;
-  height: 44px;
+  height: 40px;
   padding: 0 42px 0 18px;
   font-size: 15px;
   border: 1px solid var(--border);
@@ -446,33 +478,33 @@ html::-webkit-scrollbar { display: none; }  /* Edge/Chrome 隐藏滚动条 */
 .page-inner {
   width: 100%;
   max-width: 760px;
-  padding: 56px 24px 96px;
+  padding: 40px 24px 48px;
 }
 
 .page-work { align-items: center; }
 .page-private { align-items: flex-start; }
 
 /* 工作工具 */
-.tool-block { margin-top: 10px; }
+.tool-block { margin-top: 4px; }
 
 .tool-head {
   display: flex;
   align-items: center;
-  margin: 8px 4px 10px;
+  margin: 8px 4px 8px;
 }
 
 .tool-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(92px, 1fr));
-  gap: 12px;
+  gap: 10px;
 }
 
 .tool-card {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 8px;
-  padding: 16px 8px 14px;
+  gap: 6px;
+  padding: 12px 6px 10px;
   background: var(--card);
   border: 1px solid var(--border);
   border-radius: 10px;
@@ -490,11 +522,11 @@ html::-webkit-scrollbar { display: none; }  /* Edge/Chrome 隐藏滚动条 */
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 40px;
-  height: 40px;
-  border-radius: 10px;
+  width: 34px;
+  height: 34px;
+  border-radius: 9px;
   color: #fff;
-  font-size: 18px;
+  font-size: 15px;
   font-weight: 500;
   user-select: none;
 }
