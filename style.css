@@ -573,7 +573,7 @@ html::-webkit-scrollbar { display: none; }  /* Edge/Chrome 隐藏滚动条 */
 .tool-item {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 14px;
   padding: 8px 12px;
   border-radius: 8px;
   text-decoration: none;
@@ -586,11 +586,11 @@ html::-webkit-scrollbar { display: none; }  /* Edge/Chrome 隐藏滚动条 */
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 30px;
-  height: 30px;
-  border-radius: 8px;
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
   color: #fff;
-  font-size: 14px;
+  font-size: 18px;
   font-weight: 500;
   line-height: 1;
   user-select: none;
