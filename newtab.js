@@ -37,6 +37,11 @@ const WORK_TOOLS = [
   { name: '翻译',     url: 'https://fanyi.baidu.com',      color: '#854F0B' }
 ];
 
+/* 工作页自动同步的收藏夹名称：
+ * 在浏览器收藏夹中建一个同名文件夹并放入常用工具，
+ * 工作页就会自动显示其中内容；找不到该文件夹时回退到上面的固定列表 */
+const WORK_FOLDER = '工具A';
+
 /* ---------- SVG 图标（静态标记，无内联脚本） ---------- */
 const SVG = {
   chevron: '<svg viewBox="0 0 16 16"><path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>',
@@ -599,6 +604,50 @@ function renderWorkTools() {
   }
 }
 
+/* 同步收藏夹「工具A」：以收藏夹内容为准，自动刷新 */
+function makeSyncCard(node) {
+  const card = document.createElement('a');
+  card.className = 'tool-card';
+  card.href = node.url;
+  card.title = node.url;
+  const tile = document.createElement('span');
+  tile.className = 'tool-tile tile-img';
+  const img = document.createElement('img');
+  img.className = 'bm-ico';
+  img.alt = '';
+  img.loading = 'lazy';
+  img.src = faviconSrc(node.url);
+  img.addEventListener('error', () => fallbackToCdn(img, node.url), { once: true });
+  tile.appendChild(img);
+  const name = document.createElement('span');
+  name.className = 'tool-name';
+  name.textContent = node.title || hostname(node.url) || node.url;
+  card.append(tile, name);
+  return card;
+}
+
+function findFolder(node, name) {
+  for (const c of (node.children || [])) {
+    if (!c.url && (c.title || '').trim() === name) return c;
+    const r = findFolder(c, name);
+    if (r) return r;
+  }
+  return null;
+}
+
+function renderWorkFolder() {
+  const grid = el('workTools');
+  if (!bookmarksTree) {
+    chrome.bookmarks.getTree().then(t => { bookmarksTree = t[0]; renderWorkFolder(); });
+    return;
+  }
+  const folder = findFolder(bookmarksTree, WORK_FOLDER);
+  const items = folder && folder.children ? folder.children.filter(c => c.url) : [];
+  if (!items.length) { renderWorkTools(); return; }   // 文件夹不存在/为空 → 回退固定列表
+  grid.innerHTML = '';
+  items.forEach(c => grid.appendChild(makeSyncCard(c)));
+}
+
 function setupPageNav() {
   const pageWork = el('pageWork');
   const pagePrivate = el('pagePrivate');
@@ -728,7 +777,7 @@ function bindEvents() {
   let timer = null;
   const schedule = () => {
     clearTimeout(timer);
-    timer = setTimeout(renderTree, 250);
+    timer = setTimeout(() => { renderTree(); renderWorkFolder(); }, 250);
   };
   chrome.bookmarks.onCreated.addListener(schedule);
   chrome.bookmarks.onRemoved.addListener(schedule);
@@ -740,7 +789,7 @@ function bindEvents() {
 updateClock();
 setInterval(updateClock, 1000);
 bindEvents();
-renderWorkTools();
+renderWorkFolder();
 setupPageNav();
 fetchWeather();
 renderTree();
