@@ -1,6 +1,14 @@
 /* ===== 基础 ===== */
 * { margin: 0; padding: 0; box-sizing: border-box; }
 
+/* 时钟专用字体：普惠体 75S 子集（仅数字/冒号/空格），随插件分发，不依赖系统字体 */
+@font-face {
+  font-family: "PuHuiClock";
+  src: url("fonts/clock.woff2") format("woff2");
+  font-weight: 600;
+  font-display: swap;
+}
+
 button, input, select { font-family: inherit; }
 
 :root {
@@ -40,8 +48,7 @@ body {
 }
 
 .clock {
-  font-family: "Alibaba PuHuiTi 3.0 75S", "Alibaba PuHuiTi 3.0 55R",
-               "Alibaba PuHuiTi 3.0", "Maple Mono NF CN", "Segoe UI",
+  font-family: "PuHuiClock", "Maple Mono NF CN", "Segoe UI",
                "Microsoft YaHei", sans-serif;
   font-size: 76px;
   font-weight: 600;
