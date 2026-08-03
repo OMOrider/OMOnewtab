@@ -38,7 +38,7 @@ body {
 }
 
 .clock {
-  font-size: 40px;
+  font-size: 48px;
   font-weight: 600;
   letter-spacing: 1px;
   font-variant-numeric: tabular-nums;
@@ -156,7 +156,7 @@ body {
   position: relative;
   width: 100%;
   max-width: 560px;
-  margin: 0 0 18px;
+  margin: 0 auto 18px;
 }
 
 .search {
@@ -533,20 +533,18 @@ html::-webkit-scrollbar { display: none; }  /* Edge/Chrome 隐藏滚动条 */
 .page-work { align-items: center; }
 .page-private { align-items: flex-start; }
 
-/* 三区布局：左状态 / 中交互 / 右弹出 */
+/* 三区布局：左右预留（右侧为面板弹出区），内容居中 */
 .cols {
   display: grid;
-  grid-template-columns: 190px 1fr;
+  grid-template-columns: 190px 1fr 190px;
   gap: 28px;
   align-items: start;
 }
 
-.col-left { text-align: left; }
-.col-main { min-width: 0; }
+.col-main { min-width: 0; text-align: center; }
 
 @media (max-width: 860px) {
   .cols { grid-template-columns: 1fr; gap: 18px; }
-  .col-left { text-align: center; }
   .page-work { align-items: flex-start; }
 }
 

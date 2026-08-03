@@ -7,16 +7,15 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <!-- 第一页：工作（左状态 / 中交互 / 右侧弹出面板） -->
+  <!-- 第一页：工作（三区结构，内容居中，右侧弹出面板） -->
   <section id="pageWork" class="page page-work">
     <div class="page-inner">
       <div class="cols">
-        <aside class="col col-left">
+        <aside class="col col-left"></aside>
+        <main class="col col-main">
           <div id="clock" class="clock">--:--:--</div>
           <div id="date" class="date"></div>
           <div id="weather" class="weather hidden"></div>
-        </aside>
-        <main class="col col-main">
           <div class="search-wrap">
             <input id="search" class="search" type="text"
                    placeholder="输入网址或搜索词，回车直达…"
@@ -32,6 +31,7 @@
             <div id="workTools" class="tool-grid"></div>
           </div>
         </main>
+        <aside class="col col-right"></aside>
       </div>
     </div>
   </section>
