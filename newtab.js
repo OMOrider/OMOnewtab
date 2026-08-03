@@ -24,6 +24,19 @@ function colorFor(seed) {
   return palette[h % palette.length];
 }
 
+/* ---------- 工作页固定工具 ----------
+ * 想换成你们的工作工具，改这个数组即可：
+ * { name: 显示名称, url: 网址, color: 图标底色（可省略，自动取色） }
+ */
+const WORK_TOOLS = [
+  { name: '邮箱',     url: 'https://mail.qq.com',          color: '#185FA5' },
+  { name: '日历',     url: 'https://calendar.tencent.com', color: '#0F6E56' },
+  { name: '会议',     url: 'https://meeting.tencent.com',  color: '#7F77DD' },
+  { name: '文档',     url: 'https://docs.qq.com',          color: '#3B6D11' },
+  { name: '企业微信', url: 'https://work.weixin.qq.com',   color: '#993C1D' },
+  { name: '翻译',     url: 'https://fanyi.baidu.com',      color: '#854F0B' }
+];
+
 /* ---------- SVG 图标（静态标记，无内联脚本） ---------- */
 const SVG = {
   chevron: '<svg viewBox="0 0 16 16"><path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>',
@@ -431,6 +444,47 @@ function showMenu(x, y, items) {
 
 function hideMenu() { ctxMenu.classList.add('hidden'); }
 
+/* ---------- 工作页：固定工具 + 上下翻页导航 ---------- */
+function renderWorkTools() {
+  const grid = el('workTools');
+  grid.innerHTML = '';
+  for (const t of WORK_TOOLS) {
+    const card = document.createElement('a');
+    card.className = 'tool-card';
+    card.href = t.url;
+    card.title = t.url;
+    const tile = document.createElement('span');
+    tile.className = 'tool-tile';
+    tile.style.background = t.color || colorFor(t.url);
+    tile.textContent = (t.name || '?')[0];
+    const name = document.createElement('span');
+    name.className = 'tool-name';
+    name.textContent = t.name;
+    card.append(tile, name);
+    grid.appendChild(card);
+  }
+}
+
+function setupPageNav() {
+  const nav = el('pageNav');
+  nav.querySelectorAll('button').forEach(btn => {
+    btn.addEventListener('click', () => {
+      el(btn.dataset.target).scrollIntoView({ behavior: 'smooth' });
+    });
+  });
+  // 滚动时高亮当前页
+  const obs = new IntersectionObserver(entries => {
+    entries.forEach(en => {
+      if (en.isIntersecting) {
+        nav.querySelectorAll('button').forEach(b =>
+          b.classList.toggle('active', b.dataset.target === en.target.id));
+      }
+    });
+  }, { threshold: 0.4 });
+  obs.observe(el('pageWork'));
+  obs.observe(el('pagePrivate'));
+}
+
 /* ---------- 事件绑定 ---------- */
 function bindEvents() {
   el('search').addEventListener('keydown', e => {
@@ -482,4 +536,6 @@ function bindEvents() {
 updateClock();
 setInterval(updateClock, 1000);
 bindEvents();
+renderWorkTools();
+setupPageNav();
 renderTree();
