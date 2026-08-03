@@ -566,7 +566,7 @@ html::-webkit-scrollbar { display: none; }  /* Edge/Chrome 隐藏滚动条 */
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
-  gap: 32px;
+  gap: 26px;
 }
 
 .tool-item {
@@ -582,12 +582,13 @@ html::-webkit-scrollbar { display: none; }  /* Edge/Chrome 隐藏滚动条 */
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 62px;
-  height: 62px;
-  border-radius: 18px;
+  width: 56px;
+  height: 56px;
+  border-radius: 16px;
   color: #fff;
-  font-size: 28px;
+  font-size: 24px;
   font-weight: 500;
+  line-height: 1;
   user-select: none;
 }
 
