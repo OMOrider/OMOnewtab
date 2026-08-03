@@ -487,25 +487,37 @@ function setupPageNav() {
   obs.observe(pageWork);
   obs.observe(pagePrivate);
 
-  // 翻页式滑动：滚一下整页跳转（页内长列表仍可正常滚动）
+  // 翻页式滑动：滚一下（累计约 30px）整页跳转，页内长列表仍可正常滚动
   let lock = false;
+  let acc = 0;
   window.addEventListener('wheel', e => {
-    if (lock || Math.abs(e.deltaY) < 8) return;
+    if (lock) return;
     const y = window.scrollY;
     const p2Top = pagePrivate.offsetTop;
-    if (y < 30 && e.deltaY > 0) {            // 工作页顶部，向下滚 → 翻到私人页
+    const atWorkTop = y < 60;                       // 工作页顶部附近
+    const atPrivTop = Math.abs(y - p2Top) < 60;     // 私人页顶部附近
+    if (!atWorkTop && !atPrivTop) { acc = 0; return; }  // 列表内部 → 正常滚动
+
+    acc += e.deltaY;
+    if (Math.abs(acc) < 30) return;
+
+    if (acc > 0 && atWorkTop) {           // 工作页顶部向下滚 → 翻到私人页
       e.preventDefault();
+      acc = 0;
       jump(pagePrivate);
-    } else if (Math.abs(y - p2Top) < 40 && e.deltaY < 0) {  // 私人页顶部，向上滚 → 翻回工作页
+    } else if (acc < 0 && atPrivTop) {    // 私人页顶部向上滚 → 翻回工作页
       e.preventDefault();
+      acc = 0;
       jump(pageWork);
+    } else {
+      acc = 0;                            // 方向不对，丢弃
     }
   }, { passive: false });
 
   function jump(target) {
     lock = true;
     target.scrollIntoView({ behavior: 'smooth' });
-    setTimeout(() => { lock = false; }, 700);
+    setTimeout(() => { lock = false; }, 500);
   }
 }
 
