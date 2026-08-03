@@ -37,18 +37,16 @@ body {
   padding: 56px 24px 80px;
 }
 
-.hero { text-align: center; margin-bottom: 12px; }
-
 .clock {
-  font-size: 54px;
+  font-size: 40px;
   font-weight: 600;
-  letter-spacing: 2px;
+  letter-spacing: 1px;
   font-variant-numeric: tabular-nums;
   color: var(--text);
 }
 
 .date {
-  margin-top: 4px;
+  margin-top: 6px;
   font-size: 13px;
   color: var(--text-sub);
 }
@@ -58,7 +56,7 @@ body {
   display: inline-flex;
   align-items: center;
   gap: 7px;
-  margin-top: 6px;
+  margin-top: 12px;
   font-size: 13px;
   color: var(--text-sub);
   cursor: pointer;
@@ -158,7 +156,7 @@ body {
   position: relative;
   width: 100%;
   max-width: 560px;
-  margin: 14px auto 0;
+  margin: 0 0 18px;
 }
 
 .search {
@@ -535,8 +533,25 @@ html::-webkit-scrollbar { display: none; }  /* Edge/Chrome 隐藏滚动条 */
 .page-work { align-items: center; }
 .page-private { align-items: flex-start; }
 
+/* 三区布局：左状态 / 中交互 / 右弹出 */
+.cols {
+  display: grid;
+  grid-template-columns: 190px 1fr;
+  gap: 28px;
+  align-items: start;
+}
+
+.col-left { text-align: left; }
+.col-main { min-width: 0; }
+
+@media (max-width: 860px) {
+  .cols { grid-template-columns: 1fr; gap: 18px; }
+  .col-left { text-align: center; }
+  .page-work { align-items: flex-start; }
+}
+
 /* 工作工具 */
-.tool-block { margin-top: 4px; }
+.tool-block { margin-top: 0; }
 
 .tool-head {
   display: flex;

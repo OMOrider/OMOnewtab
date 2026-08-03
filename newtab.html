@@ -7,28 +7,31 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <!-- 第一页：工作 -->
+  <!-- 第一页：工作（左状态 / 中交互 / 右侧弹出面板） -->
   <section id="pageWork" class="page page-work">
     <div class="page-inner">
-      <header class="hero">
-        <div id="clock" class="clock">--:--:--</div>
-        <div id="date" class="date"></div>
-        <div id="weather" class="weather hidden"></div>
-        <div class="search-wrap">
-          <input id="search" class="search" type="text"
-                 placeholder="输入网址或搜索词，回车直达…"
-                 autocomplete="off" spellcheck="false">
-          <button id="searchClear" class="search-clear hidden" type="button" title="清空">
-            <svg viewBox="0 0 16 16"><path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
-          </button>
-        </div>
-      </header>
-
-      <div class="tool-block">
-        <div class="tool-head">
-          <span class="list-title">工作工具</span>
-        </div>
-        <div id="workTools" class="tool-grid"></div>
+      <div class="cols">
+        <aside class="col col-left">
+          <div id="clock" class="clock">--:--:--</div>
+          <div id="date" class="date"></div>
+          <div id="weather" class="weather hidden"></div>
+        </aside>
+        <main class="col col-main">
+          <div class="search-wrap">
+            <input id="search" class="search" type="text"
+                   placeholder="输入网址或搜索词，回车直达…"
+                   autocomplete="off" spellcheck="false">
+            <button id="searchClear" class="search-clear hidden" type="button" title="清空">
+              <svg viewBox="0 0 16 16"><path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+            </button>
+          </div>
+          <div class="tool-block">
+            <div class="tool-head">
+              <span class="list-title">工作工具</span>
+            </div>
+            <div id="workTools" class="tool-grid"></div>
+          </div>
+        </main>
       </div>
     </div>
   </section>
