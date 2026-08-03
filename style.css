@@ -576,10 +576,7 @@ html::-webkit-scrollbar { display: none; }  /* Edge/Chrome 隐藏滚动条 */
   gap: 10px;
   text-decoration: none;
   color: var(--text);
-  transition: transform .12s;
 }
-
-.tool-item:hover { transform: translateY(-2px); }
 
 .tool-tile {
   display: inline-flex;
@@ -592,14 +589,12 @@ html::-webkit-scrollbar { display: none; }  /* Edge/Chrome 隐藏滚动条 */
   font-size: 28px;
   font-weight: 500;
   user-select: none;
-  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
 }
 
 /* 同步收藏夹的工具：favicon 图标 */
 .tool-tile.tile-img {
   background: #fff;
   border: 1px solid var(--border);
-  box-shadow: none;
 }
 
 .tool-tile.tile-img img { width: 34px; height: 34px; }
@@ -613,6 +608,7 @@ html::-webkit-scrollbar { display: none; }  /* Edge/Chrome 隐藏滚动条 */
 
 .tool-name {
   font-size: 14px;
+  line-height: 1.4;
   color: var(--text-sub);
   text-align: center;
   white-space: nowrap;
