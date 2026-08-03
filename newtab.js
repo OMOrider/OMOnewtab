@@ -46,8 +46,12 @@ const SVG = {
 };
 
 /* ---------- 天气（Open-Meteo，免费免 Key） ----------
- * WEATHER_CITY 改成你的城市名即可 */
+ * WEATHER_CITY    页面上显示的城市名（改成你的城市）
+ * WEATHER_SEARCH  城市的拼音（Open-Meteo 不支持中文查询，必须填拼音）
+ * WEATHER_FALLBACK 查不到坐标时的兜底坐标（当前为湖州） */
 const WEATHER_CITY = '湖州';
+const WEATHER_SEARCH = 'huzhou';
+const WEATHER_FALLBACK = { lat: 30.8703, lon: 120.0933 };
 
 const WMO_ICONS = {
   sun: '<span class="w-ico sun"><svg viewBox="0 0 16 16"><circle cx="8" cy="8" r="3" fill="currentColor"/><path d="M8 1v2M8 13v2M1 8h2M13 8h2M2.9 2.9l1.4 1.4M11.7 11.7l1.4 1.4M13.1 2.9l-1.4 1.4M4.3 11.7l-1.4 1.4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg></span>',
@@ -79,26 +83,33 @@ function wmoIcon(code) {
 
 async function fetchWeather() {
   const box = el('weather');
+  let lat = WEATHER_FALLBACK.lat;
+  let lon = WEATHER_FALLBACK.lon;
   try {
     const geoRes = await fetch('https://geocoding-api.open-meteo.com/v1/search?name='
-      + encodeURIComponent(WEATHER_CITY) + '&count=1&language=zh');
+      + encodeURIComponent(WEATHER_SEARCH) + '&count=1');
     const geo = await geoRes.json();
     const place = geo.results && geo.results[0];
-    if (!place) throw new Error('city not found');
-    const wRes = await fetch('https://api.open-meteo.com/v1/forecast?latitude=' + place.latitude
-      + '&longitude=' + place.longitude
+    if (place) { lat = place.latitude; lon = place.longitude; }
+  } catch (e) {
+    console.error('天气：城市定位失败，使用默认坐标', e);
+  }
+  try {
+    const wRes = await fetch('https://api.open-meteo.com/v1/forecast?latitude=' + lat
+      + '&longitude=' + lon
       + '&current=temperature_2m,relative_humidity_2m,apparent_temperature,weather_code&timezone=auto');
     const w = await wRes.json();
     const cur = w.current;
     const code = cur.weather_code;
     box.innerHTML = wmoIcon(code)
-      + '<span class="w-city">' + esc(place.name) + '</span>'
+      + '<span class="w-city">' + esc(WEATHER_CITY) + '</span>'
       + '<span class="w-temp">' + Math.round(cur.temperature_2m) + '°C</span>'
       + '<span>' + (WMO_TEXT[code] || '未知') + '</span>'
       + '<span class="w-sub">体感 ' + Math.round(cur.apparent_temperature) + '° · 湿度 '
       + Math.round(cur.relative_humidity_2m) + '%</span>';
     box.classList.remove('hidden');
   } catch (e) {
+    console.error('天气：获取天气数据失败', e);
     box.classList.add('hidden');   // 天气加载失败时不显示，不影响页面
   }
 }
