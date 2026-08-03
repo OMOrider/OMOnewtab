@@ -430,13 +430,9 @@ function renderTree() {
   });
 }
 
-function openNode(node, e) {
+function openNode(node) {
   if (!node.url) return;
-  if (e.ctrlKey || e.metaKey || e.button === 1) {
-    window.open(node.url, '_blank');
-  } else {
-    window.location.href = node.url;
-  }
+  window.open(node.url, '_blank');   // 点击收藏始终在新标签页打开，当前页保持不动
 }
 
 /* ---------- 增删改 ---------- */
