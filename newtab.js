@@ -81,7 +81,18 @@ function wmoIcon(code) {
   return WMO_ICONS.cloud;
 }
 
-function renderWeatherWeek(w) {
+function renderWeather(w) {
+  const cur = w.current;
+  const code = cur.weather_code;
+  const box = el('weather');
+  box.innerHTML = wmoIcon(code)
+    + '<span class="w-city">' + esc(WEATHER_CITY) + '</span>'
+    + '<span class="w-temp">' + Math.round(cur.temperature_2m) + '°C</span>'
+    + '<span>' + (WMO_TEXT[code] || '未知') + '</span>'
+    + '<span class="w-sub">体感 ' + Math.round(cur.apparent_temperature) + '° · 湿度 '
+    + Math.round(cur.relative_humidity_2m) + '%</span>';
+  box.classList.remove('hidden');
+
   const week = el('weatherWeek');
   const days = w.daily.time;
   const codes = w.daily.weather_code;
@@ -104,9 +115,54 @@ function renderWeatherWeek(w) {
   week.classList.remove('hidden');
 }
 
-async function fetchWeather() {
+/* 骨架屏：先占位再替换，避免页面跳动 */
+function showWeatherSkeleton() {
   const box = el('weather');
-  const week = el('weatherWeek');
+  box.innerHTML = '<span class="w-city">' + esc(WEATHER_CITY) + '</span><span class="sk-pill"></span>';
+  box.classList.remove('hidden');
+  let html = '';
+  for (let i = 0; i < 7; i++) {
+    html += '<div class="ww-day sk">'
+      + '<div class="sk-line" style="width:26px"></div>'
+      + '<div class="sk-line" style="width:30px;margin-top:5px"></div>'
+      + '<div class="sk-block"></div>'
+      + '<div class="sk-line" style="width:36px;margin-top:4px"></div>'
+      + '</div>';
+  }
+  el('weatherWeek').innerHTML = html;
+  el('weatherWeek').classList.remove('hidden');
+}
+
+function hideWeather() {
+  el('weather').classList.add('hidden');
+  el('weatherWeek').classList.add('hidden');
+}
+
+/* 本地缓存：30 分钟内秒开，后台静默刷新 */
+const WEATHER_CACHE_KEY = 'newtab_weather_cache';
+const WEATHER_CACHE_TTL = 30 * 60 * 1000;
+
+function getCachedWeather() {
+  try {
+    const raw = localStorage.getItem(WEATHER_CACHE_KEY);
+    if (!raw) return null;
+    const c = JSON.parse(raw);
+    if (Date.now() - c.ts > WEATHER_CACHE_TTL) return null;
+    return c.data;
+  } catch (e) { return null; }
+}
+
+function setCachedWeather(w) {
+  try {
+    localStorage.setItem(WEATHER_CACHE_KEY, JSON.stringify({ ts: Date.now(), data: w }));
+  } catch (e) { /* 缓存失败不影响 */ }
+}
+
+async function fetchWeather() {
+  showWeatherSkeleton();
+  const cached = getCachedWeather();
+  if (cached) renderWeather(cached);
+
   let lat = WEATHER_FALLBACK.lat;
   let lon = WEATHER_FALLBACK.lon;
   try {
@@ -124,20 +180,11 @@ async function fetchWeather() {
       + '&current=temperature_2m,relative_humidity_2m,apparent_temperature,weather_code'
       + '&daily=weather_code,temperature_2m_max,temperature_2m_min&forecast_days=7&timezone=auto');
     const w = await wRes.json();
-    const cur = w.current;
-    const code = cur.weather_code;
-    box.innerHTML = wmoIcon(code)
-      + '<span class="w-city">' + esc(WEATHER_CITY) + '</span>'
-      + '<span class="w-temp">' + Math.round(cur.temperature_2m) + '°C</span>'
-      + '<span>' + (WMO_TEXT[code] || '未知') + '</span>'
-      + '<span class="w-sub">体感 ' + Math.round(cur.apparent_temperature) + '° · 湿度 '
-      + Math.round(cur.relative_humidity_2m) + '%</span>';
-    box.classList.remove('hidden');
-    renderWeatherWeek(w);
+    renderWeather(w);
+    setCachedWeather(w);
   } catch (e) {
     console.error('天气：获取天气数据失败', e);
-    box.classList.add('hidden');
-    week.classList.add('hidden');
+    if (!cached) hideWeather();
   }
 }
 
