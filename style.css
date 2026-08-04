@@ -563,7 +563,17 @@ html::-webkit-scrollbar { display: none; }  /* Edge/Chrome 隐藏滚动条 */
   padding: 64px 24px 88px;
 }
 
-.page-work .page-inner { max-width: 1080px; }
+/* 工作页：通栏对称布局，DeepSeek 卡片贴屏幕左侧（与第二页侧边栏对齐），中间内容居中 */
+.page-work .page-inner {
+  max-width: none;
+  padding: 64px 64px 88px;     /* 左右对称，保证中间内容完美居中 */
+}
+.page-work .cols { grid-template-columns: 260px minmax(0, 1fr) 260px; }
+.page-work .col-main {
+  max-width: 760px;
+  margin: 0 auto;              /* 时钟/搜索/工具在中间轨道内居中 */
+  width: 100%;
+}
 
 /* 私人页：通栏布局，工具B 贴屏幕左侧，收藏夹在剩余空间居中 */
 .page-private .page-inner {
