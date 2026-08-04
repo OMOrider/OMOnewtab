@@ -4,7 +4,7 @@
  * ============================================================ */
 
 /* 构建标记：显示在页面右下角，用于确认浏览器跑的是最新代码 */
-const BUILD = '20260805-24';
+const BUILD = '20260805-25';
 
 /* ---------- 小工具 ---------- */
 function el(id) { return document.getElementById(id); }
@@ -127,8 +127,9 @@ function renderWeatherItboy(d) {
     const f = days[i];
     const isToday = f.ymd === todayStr;
     const md = (f.ymd || '').slice(5).replace('-', '/');
-    const max = parseInt(f.high) || 0;
-    const min = parseInt(f.low) || 0;
+    // itboy 的 high/low 形如「高温 34℃」「低温 27℃」，需提取数字
+    const max = parseInt(String(f.high).replace(/[^\d]/g, '')) || 0;
+    const min = parseInt(String(f.low).replace(/[^\d]/g, '')) || 0;
     html += '<div class="wp-row' + (isToday ? ' today' : '') + '">'
       + '<span class="wp-name">' + (isToday ? '今天' : esc(f.week || '')) + '</span>'
       + '<span class="wp-date">' + md + '</span>'
