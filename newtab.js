@@ -4,7 +4,7 @@
  * ============================================================ */
 
 /* 构建标记：显示在页面右下角，用于确认浏览器跑的是最新代码 */
-const BUILD = '20260805-20';
+const BUILD = '20260805-21';
 
 /* ---------- 小工具 ---------- */
 function el(id) { return document.getElementById(id); }
@@ -137,7 +137,8 @@ function showWeatherSkeleton() {
 function hideWeather() {
   el('weather').classList.add('hidden');
   el('weather').classList.remove('open');
-  el('weatherPanel').classList.add('hidden');
+  const w = el('weatherWrap');
+  if (w) w.classList.remove('open');
 }
 
 /* 本地缓存：30 分钟内秒开，后台静默刷新 */
@@ -358,16 +359,6 @@ function dsInit() {
     wrap.classList.remove('open');
   });
   setInterval(dsFetch, 24 * 60 * 60 * 1000);   // 页面常驻时每天兜底刷新一次（新开标签页另有 24h 过期判断）
-}
-
-/* 侧边面板（7天天气等）关闭：先播放淡出动画再隐藏 */
-function closePanel(panel) {
-  if (panel.classList.contains('hidden') || panel.classList.contains('closing')) return;
-  panel.classList.add('closing');
-  setTimeout(() => {
-    panel.classList.remove('closing');
-    panel.classList.add('hidden');
-  }, 160);
 }
 
 /* ---------- 时钟 / 日期 ---------- */
@@ -1047,31 +1038,14 @@ function bindSearch(input) {
 function bindEvents() {
   document.querySelectorAll('.search').forEach(bindSearch);
 
-  // 天气行：点击打开右侧 7 天预报面板（关闭带淡出动画）
+  // 天气行：点击在下方就地展开 7 天预报（向下挤压下方元素）
   const weatherLine = el('weather');
-  const weatherPanel = el('weatherPanel');
-  weatherLine.title = '点击查看 7 天预报';
-  const closeWeatherPanel = () => {
-    weatherLine.classList.remove('open');
-    closePanel(weatherPanel);
-  };
+  const weatherWrap = el('weatherWrap');
+  weatherLine.title = '点击展开 / 收起 7 天预报';
   weatherLine.addEventListener('click', e => {
     e.stopPropagation();
-    if (weatherPanel.classList.contains('hidden')) {
-      weatherLine.classList.add('open');
-      weatherPanel.classList.remove('hidden');
-    } else {
-      closeWeatherPanel();
-    }
-  });
-  el('weatherClose').addEventListener('click', e => {
-    e.stopPropagation();
-    closeWeatherPanel();
-  });
-  document.addEventListener('click', e => {
-    if (weatherPanel.classList.contains('hidden')) return;
-    if (e.target.closest('#weatherPanel') || e.target.closest('#weather')) return;
-    closeWeatherPanel();
+    const open = weatherLine.classList.toggle('open');
+    weatherWrap.classList.toggle('open', open);
   });
 
   el('btnNew').addEventListener('click', () => openNew(null, false));
