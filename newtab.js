@@ -4,7 +4,7 @@
  * ============================================================ */
 
 /* 构建标记：显示在页面右下角，用于确认浏览器跑的是最新代码 */
-const BUILD = '20260805-6';
+const BUILD = '20260805-7';
 
 /* ===== 调试模式：可视化滚轮判定区域（定位问题后移除） =====
  * 绿色带 = 侧边栏区域（滚轮不翻页）
@@ -51,6 +51,8 @@ function initWheelDebug() {
   }
   updateBand();
   window.addEventListener('resize', updateBand);
+  // 初始可见性：绿色带只属于第二页（第一页没有侧边栏区域）
+  band.style.display = window.scrollY >= pPriv().offsetTop / 2 ? 'block' : 'none';
 
   function log(msg) {
     const box = document.getElementById('dbLog');
