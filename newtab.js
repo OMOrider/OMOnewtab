@@ -4,7 +4,7 @@
  * ============================================================ */
 
 /* 构建标记：显示在页面右下角，用于确认浏览器跑的是最新代码 */
-const BUILD = '20260805-23';
+const BUILD = '20260805-24';
 
 /* ---------- 小工具 ---------- */
 function el(id) { return document.getElementById(id); }
@@ -56,11 +56,12 @@ const SVG = {
   trash: '<svg viewBox="0 0 16 16"><path d="M3 4h10M6.5 4V2.9c0-.5.4-.9.9-.9h1.2c.5 0 .9.4.9.9V4M4.5 4l.6 8.9c0 .6.5 1.1 1.1 1.1h3.6c.6 0 1.1-.5 1.1-1.1L11.5 4" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/></svg>'
 };
 
-/* ---------- 天气（Open-Meteo，免费免 Key） ----------
- * WEATHER_CITY    页面上显示的城市名（改成你的城市）
- * WEATHER_SEARCH  城市的拼音（Open-Meteo 不支持中文查询，必须填拼音）
- * WEATHER_FALLBACK 查不到坐标时的兜底坐标（当前为湖州） */
+/* ---------- 天气 ----------
+ * 主源：中国天气网数据（itboy 免费 JSON，中文、国内权威）
+ * WEATHER_CITY_ID 城市代码（湖州 101210201，其他城市见 weather.com.cn 页面 URL）
+ * 失败时自动回退 Open-Meteo（WEATHER_SEARCH / WEATHER_FALLBACK） */
 const WEATHER_CITY = '湖州';
+const WEATHER_CITY_ID = '101210201';
 const WEATHER_SEARCH = 'huzhou';
 const WEATHER_FALLBACK = { lat: 30.8703, lon: 120.0933 };
 
@@ -90,6 +91,54 @@ function wmoIcon(code) {
   if (code >= 71 && code <= 77 || code >= 85 && code <= 86) return WMO_ICONS.snow;
   if (code >= 95) return WMO_ICONS.thunder;
   return WMO_ICONS.cloud;
+}
+
+/* 中文天气类型 → 图标 */
+function typeIcon(t) {
+  const s = t || '';
+  if (s.indexOf('雷') >= 0) return WMO_ICONS.thunder;
+  if (s.indexOf('雨') >= 0) return WMO_ICONS.rain;
+  if (s.indexOf('雪') >= 0) return WMO_ICONS.snow;
+  if (s.indexOf('雾') >= 0) return WMO_ICONS.fog;
+  if (s.indexOf('晴') >= 0) return WMO_ICONS.sun;
+  return WMO_ICONS.cloud;
+}
+
+/* 中国天气网数据（itboy）渲染 */
+function renderWeatherItboy(d) {
+  const data = d.data;
+  const box = el('weather');
+  const cur = data.forecast && data.forecast[0] ? data.forecast[0] : null;
+  const type = cur ? cur.type : '';
+  const tempText = data.wendu ? Math.round(Number(data.wendu)) + '°C' : '';
+  box.innerHTML = typeIcon(type)
+    + '<span class="w-city">' + esc(WEATHER_CITY) + '</span>'
+    + '<span class="w-temp">' + tempText + '</span>'
+    + '<span>' + esc(type || '未知') + '</span>'
+    + '<span class="w-sub">湿度 ' + esc(data.shidu || '--') + (cur && cur.fx ? ' · ' + esc(cur.fx) : '') + '</span>';
+  box.classList.remove('hidden');
+
+  // 7 天预报：天气行下方就地展开
+  const body = el('weatherPanelBody');
+  const todayStr = new Date().toISOString().slice(0, 10);   // YYYY-MM-DD
+  let html = '';
+  const days = (data.forecast || []).slice(0, 7);
+  for (let i = 0; i < days.length; i++) {
+    const f = days[i];
+    const isToday = f.ymd === todayStr;
+    const md = (f.ymd || '').slice(5).replace('-', '/');
+    const max = parseInt(f.high) || 0;
+    const min = parseInt(f.low) || 0;
+    html += '<div class="wp-row' + (isToday ? ' today' : '') + '">'
+      + '<span class="wp-name">' + (isToday ? '今天' : esc(f.week || '')) + '</span>'
+      + '<span class="wp-date">' + md + '</span>'
+      + '<span class="wp-ico">' + typeIcon(f.type) + '</span>'
+      + '<span class="wp-text">' + esc(f.type || '未知') + '</span>'
+      + '<span class="wp-temp"><span class="max">' + max + '°</span>'
+      + '<span class="min">' + min + '°</span></span>'
+      + '</div>';
+  }
+  body.innerHTML = html;
 }
 
 function renderWeather(w) {
@@ -164,20 +213,37 @@ function setCachedWeather(w) {
 async function fetchWeather() {
   showWeatherSkeleton();
   const cached = getCachedWeather();
-  if (cached) renderWeather(cached);
-
-  let lat = WEATHER_FALLBACK.lat;
-  let lon = WEATHER_FALLBACK.lon;
-  try {
-    const geoRes = await fetch('https://geocoding-api.open-meteo.com/v1/search?name='
-      + encodeURIComponent(WEATHER_SEARCH) + '&count=1');
-    const geo = await geoRes.json();
-    const place = geo.results && geo.results[0];
-    if (place) { lat = place.latitude; lon = place.longitude; }
-  } catch (e) {
-    console.error('天气：城市定位失败，使用默认坐标', e);
+  if (cached) {
+    if (cached.data && cached.data.forecast) renderWeatherItboy(cached);
+    else renderWeather(cached);
   }
+
+  // 主源：中国天气网数据（itboy）
   try {
+    const r = await fetch('http://t.weather.itboy.net/api/weather/city/' + WEATHER_CITY_ID, { cache: 'no-store' });
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    const d = await r.json();
+    if (!d || d.status !== 200 || !d.data || !d.data.forecast) throw new Error('响应异常');
+    renderWeatherItboy(d);
+    setCachedWeather(d);
+    return;
+  } catch (e) {
+    console.error('天气：itboy 获取失败，回退 Open-Meteo', e);
+  }
+
+  // 回退源：Open-Meteo
+  try {
+    let lat = WEATHER_FALLBACK.lat;
+    let lon = WEATHER_FALLBACK.lon;
+    try {
+      const geoRes = await fetch('https://geocoding-api.open-meteo.com/v1/search?name='
+        + encodeURIComponent(WEATHER_SEARCH) + '&count=1');
+      const geo = await geoRes.json();
+      const place = geo.results && geo.results[0];
+      if (place) { lat = place.latitude; lon = place.longitude; }
+    } catch (e2) {
+      console.error('天气：城市定位失败，使用默认坐标', e2);
+    }
     const wRes = await fetch('https://api.open-meteo.com/v1/forecast?latitude=' + lat
       + '&longitude=' + lon
       + '&current=temperature_2m,relative_humidity_2m,apparent_temperature,weather_code'
@@ -185,8 +251,8 @@ async function fetchWeather() {
     const w = await wRes.json();
     renderWeather(w);
     setCachedWeather(w);
-  } catch (e) {
-    console.error('天气：获取天气数据失败', e);
+  } catch (e3) {
+    console.error('天气：获取天气数据失败', e3);
     if (!cached) hideWeather();
   }
 }
