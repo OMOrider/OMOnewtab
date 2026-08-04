@@ -688,6 +688,20 @@ function setupPageNav() {
   let acc = 0;
   window.addEventListener('wheel', e => {
     if (lock) return;
+
+    // 滚轮目标在可滚动容器内（工具B侧边栏、7天天气面板等）且该方向还能滚 → 交给容器自己滚，不翻页
+    let node = e.target;
+    while (node && node !== document.body) {
+      const st = getComputedStyle(node);
+      if ((st.overflowY === 'auto' || st.overflowY === 'scroll') && node.scrollHeight > node.clientHeight) {
+        const canUp = node.scrollTop > 0 && e.deltaY < 0;
+        const canDown = node.scrollTop < node.scrollHeight - node.clientHeight - 1 && e.deltaY > 0;
+        if (canUp || canDown) return;
+        break;   // 容器已滚到头 → 允许翻页逻辑接管
+      }
+      node = node.parentElement;
+    }
+
     const y = window.scrollY;
     const p2Top = pagePrivate.offsetTop;
     const atWorkTop = y < 60;                       // 工作页顶部附近
