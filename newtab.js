@@ -3,6 +3,9 @@
  * 管理浏览器原生收藏夹（chrome.bookmarks），Manifest V3
  * ============================================================ */
 
+/* 构建标记：显示在页面右下角，用于确认浏览器跑的是最新代码 */
+const BUILD = '20260805-2';
+
 /* ---------- 小工具 ---------- */
 function el(id) { return document.getElementById(id); }
 
@@ -867,3 +870,10 @@ renderPrivateFolder();
 setupPageNav();
 fetchWeather();
 renderTree();
+
+/* 页面右下角构建标记（验证是否为最新代码） */
+const foot = document.createElement('div');
+foot.className = 'foot-build';
+foot.textContent = 'OMOnewtab ' + BUILD;
+document.body.appendChild(foot);
+console.log('[OMOnewtab] build', BUILD);

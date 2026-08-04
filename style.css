@@ -742,3 +742,16 @@ html::-webkit-scrollbar { display: none; }  /* Edge/Chrome 隐藏滚动条 */
 
 .page-dots button:hover { transform: scale(1.3); }
 .page-dots button.active { background: var(--primary); }
+
+/* 右下角构建标记（低调，用于确认代码版本） */
+.foot-build {
+  position: fixed;
+  right: 14px;
+  bottom: 10px;
+  font-size: 10px;
+  color: var(--text-sub);
+  opacity: 0.35;
+  user-select: none;
+  z-index: 800;
+  pointer-events: none;
+}
