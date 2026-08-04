@@ -163,14 +163,8 @@ body {
 
 .wp-row:hover { background: rgba(24, 95, 165, 0.05); }
 
-/* 今天：均匀浅蓝高亮（不用渐变，避免深色块造成视觉偏上/偏左） */
-.wp-row.today {
-  background: rgba(24, 95, 165, 0.06);
-}
-
-.wp-row.today:hover {
-  background: rgba(24, 95, 165, 0.10);
-}
+/* 今天：无背景色，仅文字蓝色加粗高亮（保持列表纯净） */
+.wp-row.today { }
 
 .wp-name { width: 52px; font-size: 13px; font-weight: 500; }
 .wp-row.today .wp-name { color: var(--primary); font-weight: 600; }
