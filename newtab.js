@@ -4,7 +4,7 @@
  * ============================================================ */
 
 /* 构建标记：显示在页面右下角，用于确认浏览器跑的是最新代码 */
-const BUILD = '20260805-4';
+const BUILD = '20260805-5';
 
 /* ===== 调试模式：可视化滚轮判定区域（定位问题后移除） =====
  * 绿色带 = 侧边栏区域（滚轮不翻页）
@@ -57,11 +57,21 @@ function initWheelDebug() {
     const div = document.createElement('div');
     div.textContent = new Date().toTimeString().slice(0, 8) + ' ' + msg;
     box.prepend(div);
-    while (box.children.length > 6) box.lastChild.remove();
+    while (box.children.length > 8) box.lastChild.remove();
   }
   window.__dbLog = log;
 
-  // 鼠标位置 → 实时判定
+  // 页面滚动日志：任何非翻页导致的滚动都会被记录（原生机制铁证）
+  let lastY = window.scrollY;
+  window.addEventListener('scroll', () => {
+    const y = window.scrollY;
+    if (Math.abs(y - lastY) < 2) return;
+    lastY = y;
+    log('滚动 → y=' + y + (y >= pPriv().offsetTop / 2 ? ' [私人页]' : ' [工作页]'));
+    band.style.display = y >= pPriv().offsetTop / 2 ? 'block' : 'none';  // 绿色带只在私人页生效
+  }, { passive: true });
+
+  // 鼠标位置 → 实时判定（与主逻辑完全一致：水平带仅私人页生效）
   document.addEventListener('mousemove', e => {
     const onPriv = window.scrollY >= pPriv().offsetTop / 2;
     const inSide = !!e.target.closest('.page-private .col-left');
@@ -71,6 +81,7 @@ function initWheelDebug() {
     if (inSide) s = '⛔ 侧边栏元素内 — 不翻页';
     else if (onPriv && inBand) s = '⛔ 侧边栏区域(空白) — 不翻页';
     else if (onPriv) s = '🔄 翻页区 — 向上滚 → 回第1页';
+    else if (inBand) s = '🔄 工作页左侧 — 翻页区(带不生效)';
     else s = '🔄 翻页区 — 向下滚 → 去第2页';
     document.getElementById('dbStatus').textContent =
       s + ' | x=' + Math.round(e.clientX) + ' 目标=' + (e.target.className || e.target.tagName).toString().slice(0, 24);
@@ -792,10 +803,23 @@ function setupPageNav() {
     if (e.target.closest('.page-private .col-left')) e.stopImmediatePropagation();
   }, { capture: true, passive: true });
 
+  // 侧边栏水平带 rect：缓存一份，与调试可视化共用（避免视觉与逻辑不一致），resize 时刷新
+  let sideRect = null;
+  const refreshSideRect = () => {
+    const c = pagePrivate.querySelector('.col-left');
+    sideRect = c ? c.getBoundingClientRect() : null;
+  };
+  refreshSideRect();
+  window.addEventListener('resize', refreshSideRect);
+
   // 纯翻页模式：滚轮只做整页翻转（页面永远停在两页之一）
   let lock = false;
   window.addEventListener('wheel', e => {
     if (lock) { if (window.__dbLog) window.__dbLog('锁定期，忽略'); return; }
+
+    const y = window.scrollY;
+    const p2Top = pagePrivate.offsetTop;
+    const onPriv = y >= p2Top / 2;             // 当前是否在私人页
 
     // 可滚动容器（收藏列表/天气面板等）该方向还能滚 → 交给容器自己滚，不翻页
     let scrollable = null;
@@ -815,19 +839,13 @@ function setupPageNav() {
       if (scrollable.closest('.page-private .col-left')) { if (window.__dbLog) window.__dbLog('拦截：工具B滚到头'); return; }
       // 其他容器滚到头 → 继续走翻页
     } else if (e.target.closest('.page-private .col-left') ||
-               (() => {
-                 const leftCol = pagePrivate.querySelector('.col-left');
-                 if (!leftCol) return false;
-                 const r = leftCol.getBoundingClientRect();
-                 return e.clientX >= r.left - 8 && e.clientX <= r.right + 8;
-               })()) {
-      if (window.__dbLog) window.__dbLog('拦截：侧边栏区域');
+               (onPriv && sideRect &&
+                e.clientX >= sideRect.left - 8 && e.clientX <= sideRect.right + 8)) {
+      if (window.__dbLog) window.__dbLog('拦截：侧边栏区域(x=' + Math.round(e.clientX) + ')');
       return;                                  // 工具B水平带（含空白）不翻页
     }
 
     // 当前所在页 → 决定翻页方向
-    const y = window.scrollY;
-    const p2Top = pagePrivate.offsetTop;
     if (y < p2Top / 2) {                       // 在工作页 → 向下滚翻到私人页
       if (e.deltaY > 0) { if (window.__dbLog) window.__dbLog('★ 触发翻页 → 第2页'); e.preventDefault(); jump(pagePrivate); }
     } else {                                   // 在私人页 → 向上滚翻回工作页

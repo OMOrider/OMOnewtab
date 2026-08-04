@@ -546,7 +546,6 @@ body {
 
 /* ===== 双页布局（工作页 / 私人页，上下翻页） ===== */
 html {
-  scroll-snap-type: y proximity;
   scrollbar-width: none;          /* Firefox 隐藏滚动条 */
 }
 
@@ -554,7 +553,6 @@ html::-webkit-scrollbar { display: none; }  /* Edge/Chrome 隐藏滚动条 */
 
 .page {
   min-height: 100vh;
-  scroll-snap-align: start;
   display: flex;
   justify-content: center;
 }
