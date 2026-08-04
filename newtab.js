@@ -4,7 +4,7 @@
  * ============================================================ */
 
 /* 构建标记：显示在页面右下角，用于确认浏览器跑的是最新代码 */
-const BUILD = '20260805-22';
+const BUILD = '20260805-23';
 
 /* ---------- 小工具 ---------- */
 function el(id) { return document.getElementById(id); }
@@ -119,6 +119,7 @@ function renderWeather(w) {
       + '<span class="wp-name">' + name + '</span>'
       + '<span class="wp-date">' + md + '</span>'
       + '<span class="wp-ico">' + wmoIcon(codes[i]) + '</span>'
+      + '<span class="wp-text">' + (WMO_TEXT[codes[i]] || '未知') + '</span>'
       + '<span class="wp-temp"><span class="max">' + Math.round(maxs[i]) + '°</span>'
       + '<span class="min">' + Math.round(mins[i]) + '°</span></span>'
       + '</div>';
