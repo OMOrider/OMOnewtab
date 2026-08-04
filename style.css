@@ -578,6 +578,13 @@ html::-webkit-scrollbar { display: none; }  /* Edge/Chrome 隐藏滚动条 */
   overflow-y: auto;
   scrollbar-width: none;             /* Firefox 隐藏滚动条 */
   padding-right: 2px;
+  /* 上下边缘渐隐，滚动时不突兀 */
+  -webkit-mask-image: linear-gradient(to bottom,
+      transparent 0, #000 26px,
+      #000 calc(100% - 26px), transparent 100%);
+  mask-image: linear-gradient(to bottom,
+      transparent 0, #000 26px,
+      #000 calc(100% - 26px), transparent 100%);
 }
 
 .page-private .col-left::-webkit-scrollbar { display: none; }  /* Edge/Chrome 隐藏滚动条 */
