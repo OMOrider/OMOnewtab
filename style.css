@@ -163,13 +163,13 @@ body {
 
 .wp-row:hover { background: rgba(24, 95, 165, 0.05); }
 
-/* 今天：柔和渐变高亮（左侧蓝色竖条已移除，仅靠渐变与文字色区分） */
+/* 今天：均匀浅蓝高亮（不用渐变，避免深色块造成视觉偏上/偏左） */
 .wp-row.today {
-  background: linear-gradient(90deg, rgba(24, 95, 165, 0.10), rgba(24, 95, 165, 0.03));
+  background: rgba(24, 95, 165, 0.06);
 }
 
 .wp-row.today:hover {
-  background: linear-gradient(90deg, rgba(24, 95, 165, 0.14), rgba(24, 95, 165, 0.06));
+  background: rgba(24, 95, 165, 0.10);
 }
 
 .wp-name { width: 52px; font-size: 13px; font-weight: 500; }
