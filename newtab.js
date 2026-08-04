@@ -4,7 +4,7 @@
  * ============================================================ */
 
 /* 构建标记：显示在页面右下角，用于确认浏览器跑的是最新代码 */
-const BUILD = '20260805-5';
+const BUILD = '20260805-6';
 
 /* ===== 调试模式：可视化滚轮判定区域（定位问题后移除） =====
  * 绿色带 = 侧边栏区域（滚轮不翻页）
@@ -791,17 +791,16 @@ function setupPageNav() {
   obs.observe(pageWork);
   obs.observe(pagePrivate);
 
-  // 工具B侧边栏本体：源头截断滚轮事件（不冒泡到翻页逻辑），栏内原生滚动不受影响
-  const leftCol = pagePrivate.querySelector('.col-left');
-  if (leftCol) {
-    leftCol.addEventListener('wheel', e => e.stopPropagation(), { passive: true });
-  }
-
-  // 捕获阶段保险：侧边栏内的一切滚轮事件在到达翻页逻辑前直接终止
-  // （捕获先于冒泡，即使冒泡拦截因浏览器怪癖失效也兜得住）
+  // 侧边栏滚轮统一处理（捕获阶段）：源头截断 + 滚到头时取消默认行为
+  // （关键：不 preventDefault 时浏览器会把滚动「链式传导」到页面，绕过所有 JS 逻辑）
   window.addEventListener('wheel', e => {
-    if (e.target.closest('.page-private .col-left')) e.stopImmediatePropagation();
-  }, { capture: true, passive: true });
+    const side = e.target.closest('.page-private .col-left');
+    if (!side) return;
+    e.stopImmediatePropagation();
+    const canUp = side.scrollTop > 0 && e.deltaY < 0;
+    const canDown = side.scrollTop < side.scrollHeight - side.clientHeight - 1 && e.deltaY > 0;
+    if (!canUp && !canDown) e.preventDefault();   // 滚到头：禁止滚动链，页面不跟着动
+  }, { capture: true, passive: false });
 
   // 侧边栏水平带 rect：缓存一份，与调试可视化共用（避免视觉与逻辑不一致），resize 时刷新
   let sideRect = null;
@@ -836,20 +835,26 @@ function setupPageNav() {
       const canUp = scrollable.scrollTop > 0 && e.deltaY < 0;
       const canDown = scrollable.scrollTop < scrollable.scrollHeight - scrollable.clientHeight - 1 && e.deltaY > 0;
       if (canUp || canDown) { if (window.__dbLog) window.__dbLog('拦截：容器内滚动'); return; }
-      if (scrollable.closest('.page-private .col-left')) { if (window.__dbLog) window.__dbLog('拦截：工具B滚到头'); return; }
+      if (scrollable.closest('.page-private .col-left')) {
+        if (window.__dbLog) window.__dbLog('拦截：工具B滚到头');
+        e.preventDefault();   // 禁止滚动链
+        return;
+      }
       // 其他容器滚到头 → 继续走翻页
     } else if (e.target.closest('.page-private .col-left') ||
                (onPriv && sideRect &&
                 e.clientX >= sideRect.left - 8 && e.clientX <= sideRect.right + 8)) {
       if (window.__dbLog) window.__dbLog('拦截：侧边栏区域(x=' + Math.round(e.clientX) + ')');
+      e.preventDefault();   // 禁止滚动链：空白区域也不能带动页面
       return;                                  // 工具B水平带（含空白）不翻页
     }
 
-    // 当前所在页 → 决定翻页方向
+    // 当前所在页 → 决定翻页方向（先锁定页面：任何方向都不允许原生滚动）
+    e.preventDefault();
     if (y < p2Top / 2) {                       // 在工作页 → 向下滚翻到私人页
-      if (e.deltaY > 0) { if (window.__dbLog) window.__dbLog('★ 触发翻页 → 第2页'); e.preventDefault(); jump(pagePrivate); }
+      if (e.deltaY > 0) { if (window.__dbLog) window.__dbLog('★ 触发翻页 → 第2页'); jump(pagePrivate); }
     } else {                                   // 在私人页 → 向上滚翻回工作页
-      if (e.deltaY < 0) { if (window.__dbLog) window.__dbLog('★ 触发翻页 → 第1页'); e.preventDefault(); jump(pageWork); }
+      if (e.deltaY < 0) { if (window.__dbLog) window.__dbLog('★ 触发翻页 → 第1页'); jump(pageWork); }
     }
   }, { passive: false });
 
