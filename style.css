@@ -561,7 +561,7 @@ html::-webkit-scrollbar { display: none; }  /* Edge/Chrome 隐藏滚动条 */
 /* 私人页：通栏布局，工具B 贴屏幕左侧，收藏夹在剩余空间居中 */
 .page-private .page-inner {
   max-width: none;
-  padding: 64px 28px 88px;
+  padding: 64px 28px 88px 64px;   /* 左侧留出翻页指示点位置 */
 }
 .page-private .cols { grid-template-columns: 200px minmax(0, 1fr) 200px; }
 .page-private .col-main {
