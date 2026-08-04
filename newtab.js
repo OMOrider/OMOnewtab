@@ -4,7 +4,7 @@
  * ============================================================ */
 
 /* 构建标记：显示在页面右下角，用于确认浏览器跑的是最新代码 */
-const BUILD = '20260805-9';
+const BUILD = '20260805-10';
 
 /* ---------- 小工具 ---------- */
 function el(id) { return document.getElementById(id); }
@@ -697,14 +697,24 @@ function syncSearchToCurrentPage(silent) {
   else syncSearchAnchor(want === el('anchorPrivate') ? el('pagePrivate') : el('pageWork'));
 }
 
-// 页面滚动导致所在页变化时（非翻页逻辑的滚动，如恢复位置/键盘滚动），静默同步搜索框
+// 页面滚动导致所在页变化时（非翻页逻辑的滚动，如恢复位置/键盘滚动），静默同步搜索框；
+// 同时兜底：任何非翻页滚动若停在两页之间，自动吸回最近的页顶（纯翻页模式不允许多余位置）
 let lastSide = null;
+let snapTimer = null;
 window.addEventListener('scroll', () => {
   const side = currentPageSide();
   if (side !== lastSide) {
     lastSide = side;
     syncSearchToCurrentPage(true);
   }
+  if (window.__isJumping) return;              // 翻页动画中不干预
+  clearTimeout(snapTimer);
+  snapTimer = setTimeout(() => {
+    const p2 = el('pagePrivate').offsetTop;
+    const y = window.scrollY;
+    const target = y < p2 / 2 ? 0 : p2;
+    if (Math.abs(y - target) > 2) window.scrollTo(0, target);
+  }, 120);
 }, { passive: true });
 
 function setupPageNav() {
@@ -797,11 +807,13 @@ function setupPageNav() {
   function jump(target) {
     syncSearchAnchor(target, JUMP_MS);
     lock = true;
+    window.__isJumping = true;
     const htmlEl = document.documentElement;
     const startY = window.scrollY;
     const endY = target.offsetTop;
     const t0 = performance.now();
     htmlEl.style.scrollSnapType = 'none';      // 动画期间禁用吸附，落点精确
+    htmlEl.style.overflowAnchor = 'none';      // 禁用滚动锚定，防止布局变化被浏览器微调
     function step(now) {
       const p = Math.min(1, (now - t0) / JUMP_MS);
       const e = 1 - Math.pow(1 - p, 3);        // easeOutCubic，与搜索框一致
@@ -809,8 +821,11 @@ function setupPageNav() {
       if (p < 1) {
         requestAnimationFrame(step);
       } else {
+        window.scrollTo(0, target.offsetTop);  // 最终帧用最新测量值，落点绝对精确
         htmlEl.style.scrollSnapType = '';
+        htmlEl.style.overflowAnchor = '';
         lock = false;
+        window.__isJumping = false;
       }
     }
     requestAnimationFrame(step);
