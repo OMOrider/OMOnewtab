@@ -255,6 +255,17 @@ body {
   color: var(--text-sub);
   transition: transform .12s;
   flex-shrink: 0;
+  transform-origin: center;      /* 以箭头中心为旋转原点 */
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.bm-section-head .chevron svg,
+.bm-folder-row .chevron svg {
+  width: 12px;
+  height: 12px;
+  display: block;
 }
 
 .bm-section-head.arrow-down .chevron,
@@ -386,6 +397,10 @@ body {
   color: var(--text-sub);
   transition: transform .12s;
   flex-shrink: 0;
+  transform-origin: center;      /* 以箭头中心为旋转原点 */
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .bm-folder-row .name {
