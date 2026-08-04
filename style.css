@@ -88,21 +88,28 @@ body {
 
 .weather .w-ico { display: inline-flex; align-items: center; }
 .weather .w-ico svg { width: 15px; height: 15px; }
-.weather .w-ico.sun svg { color: #e8a33d; }
-.weather .w-ico svg { color: #6b7280; }
+
+/* 天气图标类型配色（天气行与 7 天预报共用） */
+.w-ico.sun svg { color: #e8a33d; }
+.w-ico.cloud svg { color: #8a94a6; }
+.w-ico.rain svg { color: #4a90d9; }
+.w-ico.snow svg { color: #6fb3d9; }
+.w-ico.thunder svg { color: #c7741e; }
+.w-ico.fog svg { color: #9aa4b2; }
 .weather .w-temp { font-weight: 500; color: var(--text); }
 .weather.open .w-temp { color: var(--primary); }
 .weather .w-city { font-weight: 500; }
 .weather .w-sub { opacity: 0.85; }
 
-/* 7 天预报：天气行下方就地展开（向下挤压下方元素） */
+/* 7 天预报：天气行下方就地展开（向下挤压下方元素），卡片质感 */
 .weather-wrap {
   max-width: 600px;
-  margin: 10px auto 0;
-  background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 0 12px;
+  margin: 12px auto 0;
+  background: linear-gradient(180deg, #ffffff 0%, #fbfcfe 100%);
+  border: 1px solid rgba(226, 231, 238, 0.9);
+  border-radius: 14px;
+  box-shadow: 0 8px 28px rgba(30, 50, 80, 0.08), 0 1px 4px rgba(30, 50, 80, 0.05);
+  padding: 4px 12px 10px;
   overflow: hidden;
   max-height: 0;
   opacity: 0;
@@ -111,7 +118,7 @@ body {
 }
 
 .weather-wrap.open {
-  max-height: 340px;
+  max-height: 380px;
   opacity: 1;
   transform: translateY(0);
 }
@@ -147,27 +154,36 @@ body {
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 9px 6px;
-  border-bottom: 1px solid var(--border);
+  padding: 8px 10px;
+  margin: 2px 0;
+  border: none;
+  border-radius: 10px;
+  transition: background .15s;
 }
 
-.wp-row:last-child { border-bottom: none; }
+.wp-row:hover { background: rgba(24, 95, 165, 0.05); }
 
-.wp-row.today { background: rgba(24, 95, 165, 0.05); border-radius: 8px; }
+/* 今天：渐变高亮 + 左侧蓝色竖条 */
+.wp-row.today {
+  background: linear-gradient(90deg, rgba(24, 95, 165, 0.10), rgba(24, 95, 165, 0.03));
+  box-shadow: inset 3px 0 0 var(--primary);
+}
 
-.wp-name { width: 52px; font-size: 13px; }
-.wp-row.today .wp-name { color: var(--primary); font-weight: 500; }
-.wp-date { width: 36px; font-size: 11px; color: var(--text-sub); }
+.wp-row.today:hover {
+  background: linear-gradient(90deg, rgba(24, 95, 165, 0.14), rgba(24, 95, 165, 0.06));
+}
+
+.wp-name { width: 52px; font-size: 13px; font-weight: 500; }
+.wp-row.today .wp-name { color: var(--primary); font-weight: 600; }
+.wp-date { width: 38px; font-size: 11px; color: var(--text-sub); }
 .wp-ico { display: inline-flex; }
-.wp-ico svg { width: 18px; height: 18px; }
-.wp-ico .w-ico.sun svg { color: #e8a33d; }
-.wp-ico .w-ico svg { color: #6b7280; }
+.wp-ico svg { width: 20px; height: 20px; }
 .wp-text { font-size: 12px; color: var(--text-sub); white-space: nowrap; }
 .wp-row.today .wp-text { color: var(--primary); }
 
-.wp-temp { margin-left: auto; font-size: 13px; }
-.wp-temp .max { font-weight: 500; }
-.wp-temp .min { color: var(--text-sub); margin-left: 5px; }
+.wp-temp { margin-left: auto; font-size: 13px; font-variant-numeric: tabular-nums; }
+.wp-temp .max { font-weight: 600; }
+.wp-temp .min { color: var(--text-sub); margin-left: 6px; }
 
 /* 天气骨架屏（加载占位，避免跳动） */
 .sk-pill {

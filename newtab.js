@@ -4,7 +4,7 @@
  * ============================================================ */
 
 /* 构建标记：显示在页面右下角，用于确认浏览器跑的是最新代码 */
-const BUILD = '20260805-28';
+const BUILD = '20260805-29';
 
 /* ---------- 小工具 ---------- */
 function el(id) { return document.getElementById(id); }
@@ -67,11 +67,11 @@ const WEATHER_FALLBACK = { lat: 30.8703, lon: 120.0933 };
 
 const WMO_ICONS = {
   sun: '<span class="w-ico sun"><svg viewBox="0 0 16 16"><circle cx="8" cy="8" r="3" fill="currentColor"/><path d="M8 1v2M8 13v2M1 8h2M13 8h2M2.9 2.9l1.4 1.4M11.7 11.7l1.4 1.4M13.1 2.9l-1.4 1.4M4.3 11.7l-1.4 1.4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg></span>',
-  cloud: '<span class="w-ico"><svg viewBox="0 0 16 16"><path d="M4.5 12.5h7a2.5 2.5 0 0 0 .4-4.97 3.5 3.5 0 0 0-6.8-.6A2.8 2.8 0 0 0 4.5 12.5z" fill="currentColor" opacity="0.85"/></svg></span>',
-  rain: '<span class="w-ico"><svg viewBox="0 0 16 16"><path d="M4.5 12.5h7a2.5 2.5 0 0 0 .4-4.97 3.5 3.5 0 0 0-6.8-.6A2.8 2.8 0 0 0 4.5 12.5z" fill="currentColor" opacity="0.85"/><path d="M5 9.5v1.8M8 9.5v1.8M11 9.5v1.8" stroke="currentColor" stroke-width="1.1" stroke-linecap="round"/></svg></span>',
-  snow: '<span class="w-ico"><svg viewBox="0 0 16 16"><path d="M4.5 12.5h7a2.5 2.5 0 0 0 .4-4.97 3.5 3.5 0 0 0-6.8-.6A2.8 2.8 0 0 0 4.5 12.5z" fill="currentColor" opacity="0.85"/><path d="M6.5 8.6v2M9.5 8.6v2M8 8.2v2" stroke="currentColor" stroke-width="1" stroke-linecap="round"/></svg></span>',
-  thunder: '<span class="w-ico"><svg viewBox="0 0 16 16"><path d="M4.5 12.5h7a2.5 2.5 0 0 0 .4-4.97 3.5 3.5 0 0 0-6.8-.6A2.8 2.8 0 0 0 4.5 12.5z" fill="currentColor" opacity="0.85"/><path d="M8 8.2l-1.5 2.3h1.8L7.4 13l2.4-2.6H8z" fill="currentColor"/></svg></span>',
-  fog: '<span class="w-ico"><svg viewBox="0 0 16 16"><path d="M4.5 12.5h7a2.5 2.5 0 0 0 .4-4.97 3.5 3.5 0 0 0-6.8-.6A2.8 2.8 0 0 0 4.5 12.5z" fill="currentColor" opacity="0.85"/><path d="M4 9.5h8M5 8h6" stroke="currentColor" stroke-width="1.1" stroke-linecap="round"/></svg></span>'
+  cloud: '<span class="w-ico cloud"><svg viewBox="0 0 16 16"><path d="M4.5 12.5h7a2.5 2.5 0 0 0 .4-4.97 3.5 3.5 0 0 0-6.8-.6A2.8 2.8 0 0 0 4.5 12.5z" fill="currentColor" opacity="0.85"/></svg></span>',
+  rain: '<span class="w-ico rain"><svg viewBox="0 0 16 16"><path d="M4.5 12.5h7a2.5 2.5 0 0 0 .4-4.97 3.5 3.5 0 0 0-6.8-.6A2.8 2.8 0 0 0 4.5 12.5z" fill="currentColor" opacity="0.85"/><path d="M5 9.5v1.8M8 9.5v1.8M11 9.5v1.8" stroke="currentColor" stroke-width="1.1" stroke-linecap="round"/></svg></span>',
+  snow: '<span class="w-ico snow"><svg viewBox="0 0 16 16"><path d="M4.5 12.5h7a2.5 2.5 0 0 0 .4-4.97 3.5 3.5 0 0 0-6.8-.6A2.8 2.8 0 0 0 4.5 12.5z" fill="currentColor" opacity="0.85"/><path d="M6.5 8.6v2M9.5 8.6v2M8 8.2v2" stroke="currentColor" stroke-width="1" stroke-linecap="round"/></svg></span>',
+  thunder: '<span class="w-ico thunder"><svg viewBox="0 0 16 16"><path d="M4.5 12.5h7a2.5 2.5 0 0 0 .4-4.97 3.5 3.5 0 0 0-6.8-.6A2.8 2.8 0 0 0 4.5 12.5z" fill="currentColor" opacity="0.85"/><path d="M8 8.2l-1.5 2.3h1.8L7.4 13l2.4-2.6H8z" fill="currentColor"/></svg></span>',
+  fog: '<span class="w-ico fog"><svg viewBox="0 0 16 16"><path d="M4.5 12.5h7a2.5 2.5 0 0 0 .4-4.97 3.5 3.5 0 0 0-6.8-.6A2.8 2.8 0 0 0 4.5 12.5z" fill="currentColor" opacity="0.85"/><path d="M4 9.5h8M5 8h6" stroke="currentColor" stroke-width="1.1" stroke-linecap="round"/></svg></span>'
 };
 
 const WMO_TEXT = {
