@@ -4,7 +4,7 @@
  * ============================================================ */
 
 /* 构建标记：显示在页面右下角，用于确认浏览器跑的是最新代码 */
-const BUILD = '20260805-18';
+const BUILD = '20260805-19';
 
 /* ---------- 小工具 ---------- */
 function el(id) { return document.getElementById(id); }
@@ -344,24 +344,23 @@ function dsInit() {
     dsRevealed = !dsRevealed;
     renderDsBalance();
   });
-  // 每日消费图表面板（开关式：再点一次收回，带关闭动画）
+  // 每日消费图表：卡片下方就地展开（开关式）
   el('dsChart').addEventListener('click', () => {
-    const p = el('dsPanel');
-    if (!p.classList.contains('hidden')) { closePanel(p); return; }
+    const wrap = el('dsChartWrap');
+    if (wrap.classList.contains('open')) { wrap.classList.remove('open'); return; }
     dsRenderChart();
-    p.classList.remove('hidden');
+    wrap.classList.add('open');
   });
-  el('dsPanelClose').addEventListener('click', () => closePanel(el('dsPanel')));
   document.addEventListener('click', e => {
-    const p = el('dsPanel');
-    if (p.classList.contains('hidden')) return;
-    if (e.target.closest('#dsPanel') || e.target.closest('#dsChart')) return;
-    closePanel(p);
+    const wrap = el('dsChartWrap');
+    if (!wrap.classList.contains('open')) return;
+    if (e.target.closest('#dsChartWrap') || e.target.closest('#dsChart')) return;
+    wrap.classList.remove('open');
   });
   setInterval(dsFetch, 24 * 60 * 60 * 1000);   // 页面常驻时每天兜底刷新一次（新开标签页另有 24h 过期判断）
 }
 
-/* 侧边面板关闭：先播放淡出动画再隐藏 */
+/* 侧边面板（7天天气等）关闭：先播放淡出动画再隐藏 */
 function closePanel(panel) {
   if (panel.classList.contains('hidden') || panel.classList.contains('closing')) return;
   panel.classList.add('closing');

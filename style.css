@@ -674,13 +674,34 @@ html::-webkit-scrollbar { display: none; }  /* Edge/Chrome 隐藏滚动条 */
 #dsBalance { cursor: pointer; user-select: none; letter-spacing: 0.5px; }
 #dsBalance:hover { color: var(--primary); }
 
-/* 每日消费柱状图 */
+/* 每日消费柱状图：卡片下方就地展开 */
+.ds-chart-wrap {
+  margin-top: 8px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 0 10px 10px;
+  overflow: hidden;
+  max-height: 0;
+  opacity: 0;
+  transition: max-height .22s ease, opacity .18s ease;
+}
+
+.ds-chart-wrap.open { max-height: 250px; opacity: 1; }
+
+.ds-chart-head {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text);
+  padding: 10px 2px 2px;
+}
+
 .ds-chart {
   display: flex;
   align-items: flex-end;
-  gap: 8px;
-  height: 200px;
-  padding: 22px 6px 0;
+  gap: 4px;
+  height: 180px;
+  padding: 18px 2px 0;
 }
 
 .ds-bar-col {
