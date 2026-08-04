@@ -700,6 +700,12 @@ function setupPageNav() {
   obs.observe(pageWork);
   obs.observe(pagePrivate);
 
+  // 工具B侧边栏本体：源头截断滚轮事件（不冒泡到翻页逻辑），栏内原生滚动不受影响
+  const leftCol = pagePrivate.querySelector('.col-left');
+  if (leftCol) {
+    leftCol.addEventListener('wheel', e => e.stopPropagation(), { passive: true });
+  }
+
   // 纯翻页模式：滚轮只做整页翻转（页面永远停在两页之一）
   let lock = false;
   window.addEventListener('wheel', e => {
