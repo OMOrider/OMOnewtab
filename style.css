@@ -557,6 +557,7 @@ html::-webkit-scrollbar { display: none; }  /* Edge/Chrome 隐藏滚动条 */
 }
 
 .page-work .page-inner { max-width: 1080px; }
+.page-private .page-inner { max-width: 1080px; }
 
 .page-work { align-items: center; }
 .page-private { align-items: flex-start; }
@@ -570,6 +571,19 @@ html::-webkit-scrollbar { display: none; }  /* Edge/Chrome 隐藏滚动条 */
 }
 
 .col-main { min-width: 0; text-align: center; }
+.page-private .col-main { text-align: left; }   /* 收藏夹列表保持左对齐 */
+
+/* 私人页左侧栏：工具B 标题与列表左对齐 */
+.page-private .col-left .tool-head { justify-content: flex-start; }
+.page-private .col-left .tool-list { max-width: none; }
+
+.empty-hint.side {
+  padding: 14px 4px;
+  font-size: 12px;
+  text-align: left;
+  color: var(--text-sub);
+  opacity: 0.8;
+}
 
 @media (max-width: 860px) {
   .cols { grid-template-columns: 1fr; gap: 18px; }

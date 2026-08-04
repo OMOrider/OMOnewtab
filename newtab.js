@@ -42,6 +42,9 @@ const WORK_TOOLS = [
  * 工作页就会自动显示其中内容；找不到该文件夹时回退到上面的固定列表 */
 const WORK_FOLDER = '工具A';
 
+/* 私人页左侧栏自动同步的收藏夹名称（同上逻辑，找不到时显示提示） */
+const PRIVATE_FOLDER = '工具B';
+
 /* ---------- SVG 图标（静态标记，无内联脚本） ---------- */
 const SVG = {
   chevron: '<svg viewBox="0 0 16 16"><path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>',
@@ -638,6 +641,26 @@ function renderWorkFolder() {
   items.forEach(c => grid.appendChild(makeSyncCard(c)));
 }
 
+/* 私人页左侧栏：同步收藏夹「工具B」，找不到时显示提示 */
+function renderPrivateFolder() {
+  const box = el('privateTools');
+  if (!bookmarksTree) {
+    chrome.bookmarks.getTree().then(t => { bookmarksTree = t[0]; renderPrivateFolder(); });
+    return;
+  }
+  const folder = findFolder(bookmarksTree, PRIVATE_FOLDER);
+  const items = folder && folder.children ? folder.children.filter(c => c.url) : [];
+  box.innerHTML = '';
+  if (!items.length) {
+    const hint = document.createElement('div');
+    hint.className = 'empty-hint side';
+    hint.textContent = '未找到「' + PRIVATE_FOLDER + '」文件夹';
+    box.appendChild(hint);
+    return;
+  }
+  items.forEach(c => box.appendChild(makeSyncCard(c)));
+}
+
 function setupPageNav() {
   const pageWork = el('pageWork');
   const pagePrivate = el('pagePrivate');
@@ -767,7 +790,7 @@ function bindEvents() {
   let timer = null;
   const schedule = () => {
     clearTimeout(timer);
-    timer = setTimeout(() => { renderTree(); renderWorkFolder(); }, 250);
+    timer = setTimeout(() => { renderTree(); renderWorkFolder(); renderPrivateFolder(); }, 250);
   };
   chrome.bookmarks.onCreated.addListener(schedule);
   chrome.bookmarks.onRemoved.addListener(schedule);
@@ -780,6 +803,7 @@ updateClock();
 setInterval(updateClock, 1000);
 bindEvents();
 renderWorkFolder();
+renderPrivateFolder();
 setupPageNav();
 fetchWeather();
 renderTree();
