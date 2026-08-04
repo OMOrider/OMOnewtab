@@ -700,52 +700,45 @@ function setupPageNav() {
   obs.observe(pageWork);
   obs.observe(pagePrivate);
 
-  // 翻页式滑动：滚一下（累计约 30px）整页跳转，页内长列表仍可正常滚动
+  // 纯翻页模式：滚轮只做整页翻转（页面永远停在两页之一）
   let lock = false;
-  let acc = 0;
   window.addEventListener('wheel', e => {
     if (lock) return;
 
-    // 工具B侧边栏区域：按水平带判定（含列表下方空白、顶部留白），区域内任何位置都不翻页
-    if (e.target.closest('.page-private .col-left')) return;
-    const leftCol = pagePrivate.querySelector('.col-left');
-    if (leftCol) {
-      const r = leftCol.getBoundingClientRect();
-      if (e.clientX >= r.left - 8 && e.clientX <= r.right + 8) return;
-    }
-
-    // 其他可滚动容器（7天天气面板等）该方向还能滚 → 交给容器自己滚，不翻页
+    // 可滚动容器（收藏列表/天气面板等）该方向还能滚 → 交给容器自己滚，不翻页
+    let scrollable = null;
     let node = e.target;
     while (node && node !== document.body) {
       const st = getComputedStyle(node);
       if ((st.overflowY === 'auto' || st.overflowY === 'scroll') && node.scrollHeight > node.clientHeight) {
-        const canUp = node.scrollTop > 0 && e.deltaY < 0;
-        const canDown = node.scrollTop < node.scrollHeight - node.clientHeight - 1 && e.deltaY > 0;
-        if (canUp || canDown) return;
-        break;   // 容器已滚到头 → 允许翻页逻辑接管
+        scrollable = node;
+        break;
       }
       node = node.parentElement;
     }
+    if (scrollable) {
+      const canUp = scrollable.scrollTop > 0 && e.deltaY < 0;
+      const canDown = scrollable.scrollTop < scrollable.scrollHeight - scrollable.clientHeight - 1 && e.deltaY > 0;
+      if (canUp || canDown) return;            // 容器自己滚
+      if (scrollable.closest('.page-private .col-left')) return;  // 工具B滚到头也不翻页
+      // 其他容器滚到头 → 继续走翻页
+    } else if (e.target.closest('.page-private .col-left') ||
+               (() => {
+                 const leftCol = pagePrivate.querySelector('.col-left');
+                 if (!leftCol) return false;
+                 const r = leftCol.getBoundingClientRect();
+                 return e.clientX >= r.left - 8 && e.clientX <= r.right + 8;
+               })()) {
+      return;                                  // 工具B水平带（含空白）不翻页
+    }
 
+    // 当前所在页 → 决定翻页方向
     const y = window.scrollY;
     const p2Top = pagePrivate.offsetTop;
-    const atWorkTop = y < 60;                       // 工作页顶部附近
-    const atPrivTop = Math.abs(y - p2Top) < 60;     // 私人页顶部附近
-    if (!atWorkTop && !atPrivTop) { acc = 0; return; }  // 列表内部 → 正常滚动
-
-    acc += e.deltaY;
-    if (Math.abs(acc) < 30) return;
-
-    if (acc > 0 && atWorkTop) {           // 工作页顶部向下滚 → 翻到私人页
-      e.preventDefault();
-      acc = 0;
-      jump(pagePrivate);
-    } else if (acc < 0 && atPrivTop) {    // 私人页顶部向上滚 → 翻回工作页
-      e.preventDefault();
-      acc = 0;
-      jump(pageWork);
-    } else {
-      acc = 0;                            // 方向不对，丢弃
+    if (y < p2Top / 2) {                       // 在工作页 → 向下滚翻到私人页
+      if (e.deltaY > 0) { e.preventDefault(); jump(pagePrivate); }
+    } else {                                   // 在私人页 → 向上滚翻回工作页
+      if (e.deltaY < 0) { e.preventDefault(); jump(pageWork); }
     }
   }, { passive: false });
 

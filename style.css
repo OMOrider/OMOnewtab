@@ -228,6 +228,15 @@ body {
 /* ===== 收藏列表 ===== */
 .bm-list { min-height: 60px; }
 
+/* 私人页收藏列表：独立滚动容器（页内滚动，滚到头才翻页） */
+.page-private .bm-list {
+  max-height: calc(100vh - 320px);
+  overflow-y: auto;
+  scrollbar-width: none;
+  padding-right: 2px;
+}
+.page-private .bm-list::-webkit-scrollbar { display: none; }
+
 .bm-section {
   margin-bottom: 12px;
   background: var(--card);
