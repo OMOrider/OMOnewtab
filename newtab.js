@@ -689,7 +689,10 @@ function setupPageNav() {
   window.addEventListener('wheel', e => {
     if (lock) return;
 
-    // 滚轮目标在可滚动容器内（工具B侧边栏、7天天气面板等）且该方向还能滚 → 交给容器自己滚，不翻页
+    // 工具B侧边栏：滚轮完全由栏内接管，任何情况都不翻页
+    if (e.target.closest('.page-private .col-left')) return;
+
+    // 其他可滚动容器（7天天气面板等）该方向还能滚 → 交给容器自己滚，不翻页
     let node = e.target;
     while (node && node !== document.body) {
       const st = getComputedStyle(node);
