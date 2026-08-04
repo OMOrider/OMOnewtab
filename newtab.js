@@ -4,7 +4,84 @@
  * ============================================================ */
 
 /* 构建标记：显示在页面右下角，用于确认浏览器跑的是最新代码 */
-const BUILD = '20260805-3';
+const BUILD = '20260805-4';
+
+/* ===== 调试模式：可视化滚轮判定区域（定位问题后移除） =====
+ * 绿色带 = 侧边栏区域（滚轮不翻页）
+ * 红色淡层 = 翻页区域
+ * 左上角徽标 = 鼠标当前位置的判定 + 最近滚轮事件日志 */
+const DEBUG_WHEEL = true;
+
+function initWheelDebug() {
+  if (!DEBUG_WHEEL) return;
+  const style = document.createElement('style');
+  style.textContent =
+    '#debugBadge{position:fixed;left:8px;top:8px;z-index:9999;background:rgba(17,24,39,.88);color:#fff;' +
+    'font-size:11px;padding:8px 10px;border-radius:8px;font-family:monospace;max-width:360px;pointer-events:none}' +
+    '#dbStatus{font-weight:700;margin-bottom:4px;white-space:nowrap}' +
+    '#dbLog{opacity:.9;line-height:1.5}' +
+    '#debugBand{position:fixed;z-index:9998;background:rgba(46,125,50,.14);' +
+    'box-shadow:inset 0 0 0 2px rgba(46,125,50,.65);pointer-events:none}' +
+    '#debugFlip{position:fixed;inset:0;z-index:9997;background:rgba(211,47,47,.05);pointer-events:none}';
+  document.head.appendChild(style);
+
+  const badge = document.createElement('div');
+  badge.id = 'debugBadge';
+  badge.innerHTML = '<div id="dbStatus">初始化…</div><div id="dbLog"></div>';
+  document.body.appendChild(badge);
+
+  const band = document.createElement('div');
+  band.id = 'debugBand';
+  document.body.appendChild(band);
+  const flip = document.createElement('div');
+  flip.id = 'debugFlip';
+  document.body.appendChild(flip);
+
+  const pPriv = () => document.getElementById('pagePrivate');
+  const leftCol = () => document.querySelector('.page-private .col-left');
+
+  function updateBand() {
+    const c = leftCol();
+    if (!c) return;
+    const r = c.getBoundingClientRect();
+    band.style.left = (r.left - 8) + 'px';
+    band.style.top = '0px';
+    band.style.width = (r.right - r.left + 16) + 'px';
+    band.style.height = '100vh';
+  }
+  updateBand();
+  window.addEventListener('resize', updateBand);
+
+  function log(msg) {
+    const box = document.getElementById('dbLog');
+    const div = document.createElement('div');
+    div.textContent = new Date().toTimeString().slice(0, 8) + ' ' + msg;
+    box.prepend(div);
+    while (box.children.length > 6) box.lastChild.remove();
+  }
+  window.__dbLog = log;
+
+  // 鼠标位置 → 实时判定
+  document.addEventListener('mousemove', e => {
+    const onPriv = window.scrollY >= pPriv().offsetTop / 2;
+    const inSide = !!e.target.closest('.page-private .col-left');
+    const r = leftCol().getBoundingClientRect();
+    const inBand = e.clientX >= r.left - 8 && e.clientX <= r.right + 8;
+    let s;
+    if (inSide) s = '⛔ 侧边栏元素内 — 不翻页';
+    else if (onPriv && inBand) s = '⛔ 侧边栏区域(空白) — 不翻页';
+    else if (onPriv) s = '🔄 翻页区 — 向上滚 → 回第1页';
+    else s = '🔄 翻页区 — 向下滚 → 去第2页';
+    document.getElementById('dbStatus').textContent =
+      s + ' | x=' + Math.round(e.clientX) + ' 目标=' + (e.target.className || e.target.tagName).toString().slice(0, 24);
+  });
+
+  // 滚轮事件原始去向（捕获阶段，先于一切监听）
+  window.addEventListener('wheel', e => {
+    const t = (e.target.className || e.target.tagName).toString().slice(0, 36);
+    log('wheel ' + Math.round(e.deltaY) + ' @' + t);
+  }, { capture: true, passive: true });
+}
 
 /* ---------- 小工具 ---------- */
 function el(id) { return document.getElementById(id); }
@@ -718,7 +795,7 @@ function setupPageNav() {
   // 纯翻页模式：滚轮只做整页翻转（页面永远停在两页之一）
   let lock = false;
   window.addEventListener('wheel', e => {
-    if (lock) return;
+    if (lock) { if (window.__dbLog) window.__dbLog('锁定期，忽略'); return; }
 
     // 可滚动容器（收藏列表/天气面板等）该方向还能滚 → 交给容器自己滚，不翻页
     let scrollable = null;
@@ -734,8 +811,8 @@ function setupPageNav() {
     if (scrollable) {
       const canUp = scrollable.scrollTop > 0 && e.deltaY < 0;
       const canDown = scrollable.scrollTop < scrollable.scrollHeight - scrollable.clientHeight - 1 && e.deltaY > 0;
-      if (canUp || canDown) return;            // 容器自己滚
-      if (scrollable.closest('.page-private .col-left')) return;  // 工具B滚到头也不翻页
+      if (canUp || canDown) { if (window.__dbLog) window.__dbLog('拦截：容器内滚动'); return; }
+      if (scrollable.closest('.page-private .col-left')) { if (window.__dbLog) window.__dbLog('拦截：工具B滚到头'); return; }
       // 其他容器滚到头 → 继续走翻页
     } else if (e.target.closest('.page-private .col-left') ||
                (() => {
@@ -744,6 +821,7 @@ function setupPageNav() {
                  const r = leftCol.getBoundingClientRect();
                  return e.clientX >= r.left - 8 && e.clientX <= r.right + 8;
                })()) {
+      if (window.__dbLog) window.__dbLog('拦截：侧边栏区域');
       return;                                  // 工具B水平带（含空白）不翻页
     }
 
@@ -751,9 +829,9 @@ function setupPageNav() {
     const y = window.scrollY;
     const p2Top = pagePrivate.offsetTop;
     if (y < p2Top / 2) {                       // 在工作页 → 向下滚翻到私人页
-      if (e.deltaY > 0) { e.preventDefault(); jump(pagePrivate); }
+      if (e.deltaY > 0) { if (window.__dbLog) window.__dbLog('★ 触发翻页 → 第2页'); e.preventDefault(); jump(pagePrivate); }
     } else {                                   // 在私人页 → 向上滚翻回工作页
-      if (e.deltaY < 0) { e.preventDefault(); jump(pageWork); }
+      if (e.deltaY < 0) { if (window.__dbLog) window.__dbLog('★ 触发翻页 → 第1页'); e.preventDefault(); jump(pageWork); }
     }
   }, { passive: false });
 
@@ -868,6 +946,7 @@ function bindEvents() {
 }
 
 /* ---------- 启动 ---------- */
+initWheelDebug();
 updateClock();
 setInterval(updateClock, 1000);
 bindEvents();
