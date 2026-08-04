@@ -661,6 +661,25 @@ function renderPrivateFolder() {
   items.forEach(c => box.appendChild(makeSyncCard(c)));
 }
 
+/* 搜索框在页面锚点间飞行（FLIP 动画） */
+function syncSearchAnchor(target) {
+  const bar = el('searchWrap');
+  const anchor = target === el('pagePrivate') ? el('anchorPrivate') : el('anchorWork');
+  if (!anchor || bar.parentElement === anchor) return;   // 已在目标锚点
+  const from = bar.getBoundingClientRect();
+  anchor.appendChild(bar);
+  const to = bar.getBoundingClientRect();
+  const dx = from.left - to.left;
+  const dy = from.top - to.top;
+  bar.animate([
+    { transform: 'translate(' + dx + 'px, ' + dy + 'px)' },
+    { transform: 'translate(0, 0)' }
+  ], { duration: 300, easing: 'cubic-bezier(0.25, 0.6, 0.3, 1)' });
+  // 保持输入焦点不丢
+  const input = bar.querySelector('.search');
+  if (document.activeElement === input) input.focus();
+}
+
 function setupPageNav() {
   const pageWork = el('pageWork');
   const pagePrivate = el('pagePrivate');
@@ -668,9 +687,7 @@ function setupPageNav() {
   // 底部指示点：点击跳页，滚动时高亮当前页
   const nav = el('pageNav');
   nav.querySelectorAll('button').forEach(btn => {
-    btn.addEventListener('click', () => {
-      el(btn.dataset.target).scrollIntoView({ behavior: 'smooth' });
-    });
+    btn.addEventListener('click', () => jump(el(btn.dataset.target)));
   });
   const obs = new IntersectionObserver(entries => {
     entries.forEach(en => {
@@ -728,6 +745,7 @@ function setupPageNav() {
   }, { passive: false });
 
   function jump(target) {
+    syncSearchAnchor(target);              // 搜索框飞到目标页锚点
     lock = true;
     target.scrollIntoView({ behavior: 'smooth' });
     setTimeout(() => { lock = false; }, 500);
@@ -735,7 +753,7 @@ function setupPageNav() {
 }
 
 /* ---------- 事件绑定 ---------- */
-/* 搜索框：工作页/私人页各一个，统一绑定（回车搜索 + 清空按钮） */
+/* 搜索框（单一元素，在页面锚点间飞行）：绑定回车搜索 + 清空按钮 */
 function bindSearch(input) {
   const wrap = input.closest('.search-wrap');
   const clearBtn = wrap.querySelector('.search-clear');
