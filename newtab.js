@@ -4,7 +4,7 @@
  * ============================================================ */
 
 /* 构建标记：显示在页面右下角，用于确认浏览器跑的是最新代码 */
-const BUILD = '20260805-35';
+const BUILD = '20260805-36';
 
 /* ---------- 小工具 ---------- */
 function el(id) { return document.getElementById(id); }
@@ -131,7 +131,7 @@ function renderWeatherItboy(d) {
     const max = parseInt(String(f.high).replace(/[^\d]/g, '')) || 0;
     const min = parseInt(String(f.low).replace(/[^\d]/g, '')) || 0;
     html += '<div class="wp-row' + (isToday ? ' today' : '') + '">'
-      + '<span class="wp-name">' + (isToday ? '今天\u3000' : esc(f.week || '')) + '</span>'
+      + '<span class="wp-name">' + esc(f.week || '') + '</span>'   <!-- 统一显示星期，天然对齐 -->
       + '<span class="wp-date">' + md + '</span>'
       + '<span class="wp-ico">' + typeIcon(f.type) + '</span>'
       + '<span class="wp-text">' + esc(f.type || '未知') + '</span>'
