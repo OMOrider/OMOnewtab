@@ -674,20 +674,25 @@ html::-webkit-scrollbar { display: none; }  /* Edge/Chrome 隐藏滚动条 */
 #dsBalance { cursor: pointer; user-select: none; letter-spacing: 0.5px; }
 #dsBalance:hover { color: var(--primary); }
 
-/* 每日消费柱状图：卡片下方就地展开 */
+/* 每日消费柱状图：卡片下方就地展开（滑开动画） */
 .ds-chart-wrap {
   margin-top: 8px;
   background: var(--card);
   border: 1px solid var(--border);
   border-radius: var(--radius);
-  padding: 0 10px 10px;
+  padding: 0 10px;             /* 收起时不留底部缝隙 */
   overflow: hidden;
   max-height: 0;
   opacity: 0;
-  transition: max-height .22s ease, opacity .18s ease;
+  transform: translateY(-6px);
+  transition: max-height .28s ease, opacity .22s ease, transform .28s ease;
 }
 
-.ds-chart-wrap.open { max-height: 250px; opacity: 1; }
+.ds-chart-wrap.open {
+  max-height: 260px;
+  opacity: 1;
+  transform: translateY(0);
+}
 
 .ds-chart-head {
   font-size: 12px;
@@ -701,7 +706,7 @@ html::-webkit-scrollbar { display: none; }  /* Edge/Chrome 隐藏滚动条 */
   align-items: flex-end;
   gap: 4px;
   height: 180px;
-  padding: 18px 2px 0;
+  padding: 16px 2px 10px;
 }
 
 .ds-bar-col {
@@ -721,7 +726,22 @@ html::-webkit-scrollbar { display: none; }  /* Edge/Chrome 隐藏滚动条 */
   min-height: 3px;
   background: var(--primary);
   border-radius: 4px 4px 0 0;
-  transition: height .2s;
+  transform-origin: bottom;
+  animation: dsBarGrow .35s ease both;
+}
+
+/* 柱子错峰生长入场 */
+.ds-bar-col:nth-child(1) .ds-bar { animation-delay: .03s; }
+.ds-bar-col:nth-child(2) .ds-bar { animation-delay: .07s; }
+.ds-bar-col:nth-child(3) .ds-bar { animation-delay: .11s; }
+.ds-bar-col:nth-child(4) .ds-bar { animation-delay: .15s; }
+.ds-bar-col:nth-child(5) .ds-bar { animation-delay: .19s; }
+.ds-bar-col:nth-child(6) .ds-bar { animation-delay: .23s; }
+.ds-bar-col:nth-child(7) .ds-bar { animation-delay: .27s; }
+
+@keyframes dsBarGrow {
+  from { transform: scaleY(0); }
+  to   { transform: scaleY(1); }
 }
 
 .ds-bar-col.today .ds-bar { background: #e8a33d; }
