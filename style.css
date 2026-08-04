@@ -166,7 +166,7 @@ body {
 /* 今天：无背景色，仅文字蓝色加粗高亮（保持列表纯净） */
 .wp-row.today { }
 
-.wp-name { width: 42px; font-size: 13px; font-weight: 500; }   /* 3 字宽：今天+全角空格 与 星期X 对齐 */
+.wp-name { width: 52px; font-size: 13px; font-weight: 500; white-space: nowrap; }   /* 3 字宽（含全角空格对齐），nowrap 防换行 */
 .wp-row.today .wp-name { color: var(--primary); font-weight: 600; }
 .wp-date { width: 38px; font-size: 11px; color: var(--text-sub); }
 .wp-ico { display: inline-flex; }
