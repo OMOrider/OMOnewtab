@@ -4,7 +4,7 @@
  * ============================================================ */
 
 /* 构建标记：显示在页面右下角，用于确认浏览器跑的是最新代码 */
-const BUILD = '20260805-8';
+const BUILD = '20260805-9';
 
 /* ---------- 小工具 ---------- */
 function el(id) { return document.getElementById(id); }
@@ -683,6 +683,30 @@ function syncSearchAnchor(target, dur) {
   if (document.activeElement === input) input.focus();
 }
 
+/* 当前所在页对应的搜索框锚点 */
+function currentPageSide() {
+  return window.scrollY >= el('pagePrivate').offsetTop / 2 ? 'private' : 'work';
+}
+
+/* 无动画地把搜索框同步到当前页（覆盖：启动即在第2页、Edge 恢复滚动位置等场景） */
+function syncSearchToCurrentPage(silent) {
+  const bar = el('searchWrap');
+  const want = currentPageSide() === 'private' ? el('anchorPrivate') : el('anchorWork');
+  if (!want || bar.parentElement === want) return;
+  if (silent) want.appendChild(bar);
+  else syncSearchAnchor(want === el('anchorPrivate') ? el('pagePrivate') : el('pageWork'));
+}
+
+// 页面滚动导致所在页变化时（非翻页逻辑的滚动，如恢复位置/键盘滚动），静默同步搜索框
+let lastSide = null;
+window.addEventListener('scroll', () => {
+  const side = currentPageSide();
+  if (side !== lastSide) {
+    lastSide = side;
+    syncSearchToCurrentPage(true);
+  }
+}, { passive: true });
+
 function setupPageNav() {
   const pageWork = el('pageWork');
   const pagePrivate = el('pagePrivate');
@@ -885,6 +909,7 @@ bindEvents();
 renderWorkFolder();
 renderPrivateFolder();
 setupPageNav();
+syncSearchToCurrentPage(true);   // 启动即同步搜索框到当前页
 fetchWeather();
 renderTree();
 
