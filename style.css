@@ -631,6 +631,50 @@ html::-webkit-scrollbar { display: none; }  /* Edge/Chrome 隐藏滚动条 */
 }
 .page-private .col-left .tool-list { max-width: none; }
 
+/* DeepSeek API 监测卡片（工作页左栏） */
+.page-work .col-left .tool-head { justify-content: flex-start; }
+
+.ds-monitor {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 10px 12px;
+  font-size: 12px;
+}
+
+.ds-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+}
+
+.ds-label { color: var(--text-sub); }
+.ds-val { font-weight: 500; }
+
+.ds-actions {
+  display: flex;
+  gap: 6px;
+  margin-top: 6px;
+}
+
+.ds-edit input {
+  width: 100%;
+  height: 30px;
+  padding: 0 8px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  font-size: 12px;
+  outline: none;
+  margin-bottom: 2px;
+  box-sizing: border-box;
+}
+
+.ds-edit input:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(24, 95, 165, 0.12);
+}
+
 .empty-hint.side {
   padding: 14px 4px;
   font-size: 12px;

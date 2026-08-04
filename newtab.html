@@ -11,7 +11,28 @@
   <section id="pageWork" class="page page-work">
     <div class="page-inner">
       <div class="cols">
-        <aside class="col col-left"></aside>
+        <aside class="col col-left">
+          <div class="tool-block">
+            <div class="tool-head">
+              <span class="list-title">DeepSeek API</span>
+            </div>
+            <div id="dsMonitor" class="ds-monitor">
+              <div class="ds-row"><span class="ds-label">余额</span><span id="dsBalance" class="ds-val">--</span></div>
+              <div class="ds-row"><span class="ds-label">状态</span><span id="dsState" class="ds-val">--</span></div>
+              <div id="dsEdit" class="ds-edit hidden">
+                <input id="dsKeyInput" type="password" placeholder="粘贴 sk- 开头的 API Key" autocomplete="off" spellcheck="false">
+                <div class="ds-actions">
+                  <button id="dsSave" class="btn btn-primary btn-sm" type="button">保存</button>
+                  <button id="dsCancel" class="btn btn-plain btn-sm" type="button">取消</button>
+                </div>
+              </div>
+              <div class="ds-actions">
+                <button id="dsSetup" class="btn btn-plain btn-sm" type="button">设置 Key</button>
+                <button id="dsRefresh" class="btn btn-plain btn-sm" type="button">刷新</button>
+              </div>
+            </div>
+          </div>
+        </aside>
         <main class="col col-main">
           <div id="clock" class="clock">--:--:--</div>
           <div id="date" class="date"></div>

@@ -4,7 +4,7 @@
  * ============================================================ */
 
 /* 构建标记：显示在页面右下角，用于确认浏览器跑的是最新代码 */
-const BUILD = '20260805-11';
+const BUILD = '20260805-12';
 
 /* ---------- 小工具 ---------- */
 function el(id) { return document.getElementById(id); }
@@ -188,6 +188,61 @@ async function fetchWeather() {
     console.error('天气：获取天气数据失败', e);
     if (!cached) hideWeather();
   }
+}
+
+/* ---------- DeepSeek API 余额监测 ----------
+ * Key 仅保存在本机扩展存储（chrome.storage.local），不上传、不进代码。
+ * 官方接口：GET https://api.deepseek.com/user/balance */
+const DS_KEY_STORE = 'deepseek_api_key';
+let dsKey = null;
+
+function setDsState(t) { el('dsState').textContent = t; }
+
+async function dsFetch() {
+  if (!dsKey) { setDsState('未配置 Key'); el('dsBalance').textContent = '--'; return; }
+  setDsState('查询中…');
+  try {
+    const r = await fetch('https://api.deepseek.com/user/balance', {
+      headers: { 'Authorization': 'Bearer ' + dsKey }
+    });
+    if (r.status === 401) { setDsState('Key 无效'); el('dsBalance').textContent = '--'; return; }
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    const d = await r.json();
+    const b = d.balance_infos && d.balance_infos[0];
+    if (!b) throw new Error('响应异常');
+    const sym = b.currency === 'CNY' ? '¥' : '$';
+    el('dsBalance').textContent = sym + Number(b.total_balance).toFixed(2);
+    setDsState(d.is_available ? '可用' : '不可用');
+  } catch (e) {
+    setDsState('获取失败');
+    el('dsBalance').textContent = '--';
+  }
+}
+
+function dsInit() {
+  chrome.storage.local.get(DS_KEY_STORE).then(r => {
+    dsKey = r[DS_KEY_STORE] || null;
+    dsFetch();
+  }).catch(() => setDsState('存储不可用'));
+
+  el('dsSetup').addEventListener('click', () => {
+    el('dsEdit').classList.remove('hidden');
+    el('dsKeyInput').value = dsKey || '';
+    el('dsKeyInput').focus();
+  });
+  el('dsCancel').addEventListener('click', () => el('dsEdit').classList.add('hidden'));
+  el('dsSave').addEventListener('click', () => {
+    const v = el('dsKeyInput').value.trim();
+    if (!v) return;
+    chrome.storage.local.set({ [DS_KEY_STORE]: v }).then(() => {
+      dsKey = v;
+      el('dsEdit').classList.add('hidden');
+      el('dsKeyInput').value = '';
+      dsFetch();
+    });
+  });
+  el('dsRefresh').addEventListener('click', dsFetch);
+  setInterval(dsFetch, 10 * 60 * 1000);   // 每 10 分钟自动刷新
 }
 
 /* ---------- 时钟 / 日期 ---------- */
@@ -936,6 +991,7 @@ renderWorkFolder();
 renderPrivateFolder();
 setupPageNav();
 syncSearchToCurrentPage(true);   // 启动即同步搜索框到当前页
+dsInit();
 fetchWeather();
 renderTree();
 
