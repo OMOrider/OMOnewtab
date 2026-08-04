@@ -104,12 +104,12 @@ body {
 /* 7 天预报：天气行下方就地展开（向下挤压下方元素），卡片质感 */
 .weather-wrap {
   max-width: 600px;
-  margin: 12px auto 0;
+  margin: 12px auto;          /* 上下对称：与天气行、下方元素间距一致 */
   background: linear-gradient(180deg, #ffffff 0%, #fbfcfe 100%);
   border: 1px solid rgba(226, 231, 238, 0.9);
   border-radius: 14px;
   box-shadow: 0 8px 28px rgba(30, 50, 80, 0.08), 0 1px 4px rgba(30, 50, 80, 0.05);
-  padding: 4px 12px 10px;
+  padding: 4px 12px;          /* 上下对称，7 行数据在卡片内垂直居中 */
   overflow: hidden;
   max-height: 0;
   opacity: 0;
