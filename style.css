@@ -122,6 +122,14 @@ body {
   to   { opacity: 1; transform: translateY(-50%) translateX(0); }
 }
 
+/* 关闭动画：先淡出再隐藏（由 JS 控制 .closing 类） */
+.weather-panel.closing { animation: wpOut .16s ease forwards; }
+
+@keyframes wpOut {
+  from { opacity: 1; transform: translateY(-50%) translateX(0); }
+  to   { opacity: 0; transform: translateY(-50%) translateX(18px); }
+}
+
 .wp-head {
   display: flex;
   align-items: center;
