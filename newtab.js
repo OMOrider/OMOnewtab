@@ -4,7 +4,7 @@
  * ============================================================ */
 
 /* 构建标记：显示在页面右下角，用于确认浏览器跑的是最新代码 */
-const BUILD = '20260805-16';
+const BUILD = '20260805-17';
 
 /* ---------- 小工具 ---------- */
 function el(id) { return document.getElementById(id); }
@@ -344,10 +344,12 @@ function dsInit() {
     dsRevealed = !dsRevealed;
     renderDsBalance();
   });
-  // 每日消费图表面板
+  // 每日消费图表面板（开关式：再点一次收回）
   el('dsChart').addEventListener('click', () => {
+    const p = el('dsPanel');
+    if (!p.classList.contains('hidden')) { p.classList.add('hidden'); return; }
     dsRenderChart();
-    el('dsPanel').classList.remove('hidden');
+    p.classList.remove('hidden');
   });
   el('dsPanelClose').addEventListener('click', () => el('dsPanel').classList.add('hidden'));
   document.addEventListener('click', e => {
