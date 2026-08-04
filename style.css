@@ -587,13 +587,11 @@ html::-webkit-scrollbar { display: none; }  /* Edge/Chrome 隐藏滚动条 */
   overflow-y: auto;
   scrollbar-width: none;             /* Firefox 隐藏滚动条 */
   padding-right: 2px;
-  /* 上下边缘渐隐，滚动时不突兀 */
+  /* 底部边缘渐隐（顶部是固定标题，不再需要淡出） */
   -webkit-mask-image: linear-gradient(to bottom,
-      transparent 0, #000 26px,
-      #000 calc(100% - 26px), transparent 100%);
+      #000 0, #000 calc(100% - 26px), transparent 100%);
   mask-image: linear-gradient(to bottom,
-      transparent 0, #000 26px,
-      #000 calc(100% - 26px), transparent 100%);
+      #000 0, #000 calc(100% - 26px), transparent 100%);
 }
 
 .page-private .col-left::-webkit-scrollbar { display: none; }  /* Edge/Chrome 隐藏滚动条 */
@@ -622,8 +620,17 @@ html::-webkit-scrollbar { display: none; }  /* Edge/Chrome 隐藏滚动条 */
 
 .search-anchor .search-wrap { margin: 0; }
 
-/* 私人页左侧栏：工具B 标题与列表左对齐 */
-.page-private .col-left .tool-head { justify-content: flex-start; }
+/* 私人页左侧栏：工具B 标题固定表头（滚动时标题不动）+ 列表左对齐 */
+.page-private .col-left .tool-head {
+  justify-content: flex-start;
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  margin: 0 4px 10px;
+  padding: 12px 4px 10px;
+  background: rgba(246, 248, 251, 0.88);
+  backdrop-filter: blur(6px);
+}
 .page-private .col-left .tool-list { max-width: none; }
 
 .empty-hint.side {
