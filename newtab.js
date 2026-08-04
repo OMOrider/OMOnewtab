@@ -328,10 +328,10 @@ function renderFolderRow(folder, depth) {
   body.appendChild(renderChildren(folder.children || [], depth + 1));
 
   row.addEventListener('click', () => {
-    const isOpen = !body.hidden;
-    body.hidden = isOpen;
-    row.classList.toggle('collapsed', isOpen);
-    if (isOpen) expanded.delete(folder.id); else expanded.add(folder.id);
+    const willOpen = body.hidden;        // 当前收起 → 点击展开
+    body.hidden = !willOpen;
+    row.classList.toggle('arrow-down', willOpen);   // 展开 → 箭头向下；收起 → 横向
+    if (willOpen) expanded.add(folder.id); else expanded.delete(folder.id);
   });
   row.addEventListener('contextmenu', e => {
     e.preventDefault();
@@ -386,10 +386,10 @@ function renderSection(rootChild) {
 
   head.append(chev, ico, name, count);
   head.addEventListener('click', () => {
-    const isOpen = !body.hidden;
-    body.hidden = isOpen;
-    head.classList.toggle('collapsed', isOpen);
-    if (isOpen) expanded.delete(rootChild.id); else expanded.add(rootChild.id);
+    const willOpen = body.hidden;        // 当前收起 → 点击展开
+    body.hidden = !willOpen;
+    head.classList.toggle('arrow-down', willOpen);   // 展开 → 箭头向下；收起 → 横向
+    if (willOpen) expanded.add(rootChild.id); else expanded.delete(rootChild.id);
   });
   head.addEventListener('contextmenu', e => {
     e.preventDefault();
@@ -403,7 +403,7 @@ function renderSection(rootChild) {
   // 按记忆的展开状态渲染
   const defaultOpen = expanded.has(rootChild.id);
   body.hidden = !defaultOpen;
-  head.classList.toggle('collapsed', !defaultOpen);
+  head.classList.toggle('arrow-down', defaultOpen);   // 展开 → 箭头向下；收起 → 横向
 
   section.append(head, body);
   return section;

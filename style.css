@@ -257,7 +257,8 @@ body {
   flex-shrink: 0;
 }
 
-.bm-section-head.collapsed .chevron { transform: rotate(-90deg); }
+.bm-section-head.arrow-down .chevron,
+.bm-folder-row.arrow-down .chevron { transform: rotate(90deg); }   /* 展开 → 箭头向下 */
 
 .bm-section-head .name {
   font-weight: 500;
@@ -386,8 +387,6 @@ body {
   transition: transform .12s;
   flex-shrink: 0;
 }
-
-.bm-folder-row.collapsed .chevron { transform: rotate(-90deg); }
 
 .bm-folder-row .name {
   font-size: 15px;
