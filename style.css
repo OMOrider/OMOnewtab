@@ -69,10 +69,21 @@ body {
   align-items: center;
   gap: 9px;
   margin-top: 18px;
+  padding: 5px 14px;
+  border-radius: 18px;
   font-size: 15px;
   color: var(--text-sub);
   cursor: pointer;
   user-select: none;
+  transition: background .15s, color .15s;
+}
+
+.weather:hover { background: rgba(24, 95, 165, 0.06); }
+
+/* 展开状态：天气行高亮为蓝色胶囊（替代箭头指示） */
+.weather.open {
+  background: rgba(24, 95, 165, 0.10);
+  color: var(--primary);
 }
 
 .weather .w-ico { display: inline-flex; align-items: center; }
@@ -80,23 +91,9 @@ body {
 .weather .w-ico.sun svg { color: #e8a33d; }
 .weather .w-ico svg { color: #6b7280; }
 .weather .w-temp { font-weight: 500; color: var(--text); }
+.weather.open .w-temp { color: var(--primary); }
 .weather .w-city { font-weight: 500; }
 .weather .w-sub { opacity: 0.85; }
-
-.weather .w-caret {
-  display: inline-flex;
-  align-items: center;
-  margin-left: 2px;
-  color: var(--text-sub);
-}
-
-.weather .w-caret svg {
-  width: 12px;
-  height: 12px;
-  transition: transform .15s;
-}
-
-.weather.open .w-caret svg { transform: rotate(180deg); }
 
 /* 7 天预报：天气行下方就地展开（向下挤压下方元素） */
 .weather-wrap {

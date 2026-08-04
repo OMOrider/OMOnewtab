@@ -4,7 +4,7 @@
  * ============================================================ */
 
 /* 构建标记：显示在页面右下角，用于确认浏览器跑的是最新代码 */
-const BUILD = '20260805-21';
+const BUILD = '20260805-22';
 
 /* ---------- 小工具 ---------- */
 function el(id) { return document.getElementById(id); }
@@ -101,8 +101,7 @@ function renderWeather(w) {
     + '<span class="w-temp">' + Math.round(cur.temperature_2m) + '°C</span>'
     + '<span>' + (WMO_TEXT[code] || '未知') + '</span>'
     + '<span class="w-sub">体感 ' + Math.round(cur.apparent_temperature) + '° · 湿度 '
-    + Math.round(cur.relative_humidity_2m) + '%</span>'
-    + '<span class="w-caret"><svg viewBox="0 0 16 16"><path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></span>';
+    + Math.round(cur.relative_humidity_2m) + '%</span>';
   box.classList.remove('hidden');
 
   // 7 天预报：渲染进右侧面板，点击天气行时打开
