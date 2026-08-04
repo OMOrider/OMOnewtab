@@ -4,7 +4,7 @@
  * ============================================================ */
 
 /* 构建标记：显示在页面右下角，用于确认浏览器跑的是最新代码 */
-const BUILD = '20260805-10';
+const BUILD = '20260805-11';
 
 /* ---------- 小工具 ---------- */
 function el(id) { return document.getElementById(id); }
@@ -757,26 +757,37 @@ function setupPageNav() {
   refreshSideRect();
   window.addEventListener('resize', refreshSideRect);
 
+  // 查找事件目标所在的最近可滚动容器
+  function firstScrollable(node) {
+    while (node && node !== document.body) {
+      const st = getComputedStyle(node);
+      if ((st.overflowY === 'auto' || st.overflowY === 'scroll') && node.scrollHeight > node.clientHeight) {
+        return node;
+      }
+      node = node.parentElement;
+    }
+    return null;
+  }
+
   // 纯翻页模式：滚轮只做整页翻转（页面永远停在两页之一）
   let lock = false;
   window.addEventListener('wheel', e => {
-    if (lock) { return; }
+    if (lock) {
+      // 锁定期（翻页动画中）：内部容器照常滚动；其余事件取消默认行为，
+      // 禁止页面原生滚动与动画打架（否则画面抖动）
+      const s = firstScrollable(e.target);
+      if (s && ((s.scrollTop > 0 && e.deltaY < 0) ||
+                (s.scrollTop < s.scrollHeight - s.clientHeight - 1 && e.deltaY > 0))) return;
+      e.preventDefault();
+      return;
+    }
 
     const y = window.scrollY;
     const p2Top = pagePrivate.offsetTop;
     const onPriv = y >= p2Top / 2;             // 当前是否在私人页
 
     // 可滚动容器（收藏列表/天气面板等）该方向还能滚 → 交给容器自己滚，不翻页
-    let scrollable = null;
-    let node = e.target;
-    while (node && node !== document.body) {
-      const st = getComputedStyle(node);
-      if ((st.overflowY === 'auto' || st.overflowY === 'scroll') && node.scrollHeight > node.clientHeight) {
-        scrollable = node;
-        break;
-      }
-      node = node.parentElement;
-    }
+    const scrollable = firstScrollable(e.target);
     if (scrollable) {
       const canUp = scrollable.scrollTop > 0 && e.deltaY < 0;
       const canDown = scrollable.scrollTop < scrollable.scrollHeight - scrollable.clientHeight - 1 && e.deltaY > 0;
