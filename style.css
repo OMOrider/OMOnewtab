@@ -116,6 +116,17 @@ body {
   transform: translateY(0);
 }
 
+/* 天气展开时：被推挤下去的下方元素同步渐隐（与展开动画同节奏），收起时渐显恢复 */
+.weather-wrap ~ .search-anchor,
+.weather-wrap ~ .tool-block {
+  transition: opacity .3s ease;
+}
+
+.weather-wrap.open ~ .search-anchor,
+.weather-wrap.open ~ .tool-block {
+  opacity: 0.22;
+}
+
 .wp-head {
   display: flex;
   align-items: center;
