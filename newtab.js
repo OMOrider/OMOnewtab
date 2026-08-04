@@ -735,24 +735,28 @@ function setupPageNav() {
 }
 
 /* ---------- 事件绑定 ---------- */
-function bindEvents() {
-  el('search').addEventListener('keydown', e => {
+/* 搜索框：工作页/私人页各一个，统一绑定（回车搜索 + 清空按钮） */
+function bindSearch(input) {
+  const wrap = input.closest('.search-wrap');
+  const clearBtn = wrap.querySelector('.search-clear');
+  const updateClear = () => clearBtn.classList.toggle('hidden', input.value.length === 0);
+  input.addEventListener('keydown', e => {
     if (e.key !== 'Enter' || e.isComposing) return;
-    const q = el('search').value.trim();
+    const q = input.value.trim();
     if (!q) return;
     window.open(resolveUrl(q), '_blank');   // 在新标签页打开，当前页保持不动
   });
-
-  // 搜索框清空按钮（有文字才显示）
-  const clearBtn = el('searchClear');
-  const updateClear = () => clearBtn.classList.toggle('hidden', el('search').value.length === 0);
-  el('search').addEventListener('input', updateClear);
+  input.addEventListener('input', updateClear);
   clearBtn.addEventListener('click', () => {
-    el('search').value = '';
+    input.value = '';
     updateClear();
-    el('search').focus();
+    input.focus();
   });
   updateClear();
+}
+
+function bindEvents() {
+  document.querySelectorAll('.search').forEach(bindSearch);
 
   // 天气行：点击打开右侧 7 天预报面板
   const weatherLine = el('weather');

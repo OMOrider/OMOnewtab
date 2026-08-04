@@ -603,6 +603,9 @@ html::-webkit-scrollbar { display: none; }  /* Edge/Chrome 隐藏滚动条 */
 .col-main { min-width: 0; text-align: center; }
 .page-private .col-main { text-align: left; }   /* 收藏夹列表保持左对齐 */
 
+/* 私人页顶部搜索框：紧贴页顶，间距更紧凑 */
+.page-private .search-wrap { margin: 0 auto 22px; }
+
 /* 私人页左侧栏：工具B 标题与列表左对齐 */
 .page-private .col-left .tool-head { justify-content: flex-start; }
 .page-private .col-left .tool-list { max-width: none; }
