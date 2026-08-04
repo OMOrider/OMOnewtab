@@ -661,8 +661,8 @@ function renderPrivateFolder() {
   items.forEach(c => box.appendChild(makeSyncCard(c)));
 }
 
-/* 搜索框在页面锚点间飞行（FLIP 动画） */
-function syncSearchAnchor(target) {
+/* 搜索框在页面锚点间飞行（FLIP 动画），时长与翻页滚动保持一致 */
+function syncSearchAnchor(target, dur) {
   const bar = el('searchWrap');
   const anchor = target === el('pagePrivate') ? el('anchorPrivate') : el('anchorWork');
   if (!anchor || bar.parentElement === anchor) return;   // 已在目标锚点
@@ -674,7 +674,7 @@ function syncSearchAnchor(target) {
   bar.animate([
     { transform: 'translate(' + dx + 'px, ' + dy + 'px)' },
     { transform: 'translate(0, 0)' }
-  ], { duration: 300, easing: 'cubic-bezier(0.25, 0.6, 0.3, 1)' });
+  ], { duration: dur || 300, easing: 'cubic-bezier(0.33, 1, 0.68, 1)' });  // easeOutCubic
   // 保持输入焦点不丢
   const input = bar.querySelector('.search');
   if (document.activeElement === input) input.focus();
@@ -744,11 +744,28 @@ function setupPageNav() {
     }
   }, { passive: false });
 
+  // 翻页：手动缓动滚动 650ms，与搜索框飞行同步（同时开始、同时结束）
+  const JUMP_MS = 650;
   function jump(target) {
-    syncSearchAnchor(target);              // 搜索框飞到目标页锚点
+    syncSearchAnchor(target, JUMP_MS);
     lock = true;
-    target.scrollIntoView({ behavior: 'smooth' });
-    setTimeout(() => { lock = false; }, 500);
+    const htmlEl = document.documentElement;
+    const startY = window.scrollY;
+    const endY = target.offsetTop;
+    const t0 = performance.now();
+    htmlEl.style.scrollSnapType = 'none';      // 动画期间禁用吸附，落点精确
+    function step(now) {
+      const p = Math.min(1, (now - t0) / JUMP_MS);
+      const e = 1 - Math.pow(1 - p, 3);        // easeOutCubic，与搜索框一致
+      window.scrollTo(0, startY + (endY - startY) * e);
+      if (p < 1) {
+        requestAnimationFrame(step);
+      } else {
+        htmlEl.style.scrollSnapType = '';
+        lock = false;
+      }
+    }
+    requestAnimationFrame(step);
   }
 }
 
