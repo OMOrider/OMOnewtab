@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>新标签页</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- 第一页：工作（三区结构，内容居中，右侧弹出面板） -->
+  <section id="pageWork" class="page page-work">
+    <div class="page-inner">
+      <div class="cols">
+        <aside class="col col-left"></aside>
+        <main class="col col-main">
+          <div id="clock" class="clock">--:--:--</div>
+          <div id="date" class="date"></div>
+          <div id="weather" class="weather hidden"></div>
+          <div class="search-anchor" id="anchorWork">
+            <div id="searchWrap" class="search-wrap">
+              <input id="search" class="search" type="text"
+                     placeholder="输入网址或搜索词，回车直达…"
+                     autocomplete="off" spellcheck="false">
+              <button id="searchClear" class="search-clear hidden" type="button" title="清空">
+                <svg viewBox="0 0 16 16"><path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+              </button>
+            </div>
+          </div>
+          <div class="tool-block">
+            <div class="tool-head">
+              <span class="list-title">工作工具</span>
+            </div>
+            <div id="workTools" class="tool-list"></div>
+          </div>
+        </main>
+        <aside class="col col-right"></aside>
+      </div>
+    </div>
+  </section>
+
+  <!-- 第二页：私人（左工具B / 中收藏夹管理 / 右侧预留） -->
+  <section id="pagePrivate" class="page page-private">
+    <div class="page-inner">
+      <div class="cols">
+        <aside class="col col-left">
+          <div class="tool-block">
+            <div class="tool-head">
+              <span class="list-title" id="privateToolsTitle">工具B</span>
+            </div>
+            <div id="privateTools" class="tool-list"></div>
+          </div>
+        </aside>
+        <main class="col col-main">
+          <div class="search-anchor" id="anchorPrivate"></div>
+          <div class="list-head">
+            <span class="list-title">收藏夹</span>
+            <button id="btnNew" class="btn btn-primary btn-sm" type="button">+ 新建</button>
+          </div>
+          <div id="bookmarkList" class="bm-list"></div>
+          <div id="emptyHint" class="empty-hint hidden">这里空空如也，点右上角「+ 新建」或空白处右键添加收藏</div>
+        </main>
+        <aside class="col col-right"></aside>
+      </div>
+    </div>
+  </section>
+
+  <!-- 页面指示点 -->
+  <nav id="pageNav" class="page-dots">
+    <button type="button" data-target="pageWork" class="active" title="工作页"></button>
+    <button type="button" data-target="pagePrivate" title="私人页"></button>
+  </nav>
+
+  <!-- 7 天预报侧边面板 -->
+  <aside id="weatherPanel" class="weather-panel hidden">
+    <div class="wp-head">
+      <span class="wp-title">7 天预报</span>
+      <button id="weatherClose" class="icon-btn" type="button" title="关闭" aria-label="关闭">
+        <svg viewBox="0 0 16 16"><path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+      </button>
+    </div>
+    <div id="weatherPanelBody" class="wp-body"></div>
+  </aside>
+
+  <div id="ctxMenu" class="ctx-menu hidden"></div>
+
+  <div id="modalMask" class="modal-mask hidden">
+    <div class="modal">
+      <h3 id="modalTitle">新建收藏</h3>
+      <div class="form-row" id="modalTypeRow">
+        <label for="fldType">类型</label>
+        <select id="fldType">
+          <option value="bookmark">书签</option>
+          <option value="folder">文件夹</option>
+        </select>
+      </div>
+      <div class="form-row">
+        <label for="fldTitle">名称</label>
+        <input id="fldTitle" type="text" placeholder="收藏名称">
+      </div>
+      <div class="form-row" id="urlRow">
+        <label for="fldUrl">网址</label>
+        <input id="fldUrl" type="text" placeholder="https://example.com">
+      </div>
+      <div class="form-row" id="parentRow">
+        <label for="fldParent">位置</label>
+        <select id="fldParent"></select>
+      </div>
+      <div class="modal-actions">
+        <button id="btnCancel" class="btn btn-plain" type="button">取消</button>
+        <button id="btnSave" class="btn btn-primary" type="button">保存</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="newtab.js"></script>
+</body>
+</html>
