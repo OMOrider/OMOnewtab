@@ -4,7 +4,7 @@
  * ============================================================ */
 
 /* 构建标记：显示在页面右下角，用于确认浏览器跑的是最新代码 */
-const BUILD = '20260805-14';
+const BUILD = '20260805-15';
 
 /* ---------- 小工具 ---------- */
 function el(id) { return document.getElementById(id); }
@@ -206,6 +206,74 @@ function renderDsBalance() {
   b.textContent = dsBalanceValue && dsRevealed ? dsBalanceValue : '¥••••';
 }
 
+/* ---------- 每日消费统计（余额差值法） ----------
+ * 官方无历史消费接口：记录每次余额快照，余额减少量 ≈ 消费金额，
+ * 余额上涨视为充值不计入。数据从启用本功能起开始积累。 */
+const DS_SPEND_KEY = 'ds_spend';      // { 'YYYY-MM-DD': 消费金额 }
+const DS_LASTBAL_KEY = 'ds_lastbal';  // { date, bal } 上次快照
+
+function dsDayKey(d) {
+  return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0')
+       + '-' + String(d.getDate()).padStart(2, '0');
+}
+
+async function dsRecordSpend(balance) {
+  try {
+    const today = dsDayKey(new Date());
+    const data = await chrome.storage.local.get([DS_SPEND_KEY, DS_LASTBAL_KEY]);
+    const spend = data[DS_SPEND_KEY] || {};
+    const last = data[DS_LASTBAL_KEY] || null;
+    if (last && last.date === today) {
+      const diff = last.bal - balance;
+      if (diff > 0.0001) {
+        spend[today] = Math.round(((spend[today] || 0) + diff) * 100) / 100;
+        // 只保留近 30 天记录
+        const cutoff = new Date();
+        cutoff.setDate(cutoff.getDate() - 29);
+        const minKey = dsDayKey(cutoff);
+        for (const k of Object.keys(spend)) {
+          if (k < minKey) delete spend[k];
+        }
+      }
+    }
+    await chrome.storage.local.set({
+      [DS_SPEND_KEY]: spend,
+      [DS_LASTBAL_KEY]: { date: today, bal: balance }
+    });
+  } catch (e) { /* 记录失败不影响展示 */ }
+}
+
+/* 渲染近 7 天柱状图 */
+function dsRenderChart() {
+  const box = el('dsChartBody');
+  chrome.storage.local.get(DS_SPEND_KEY).then(r => {
+    const spend = r[DS_SPEND_KEY] || {};
+    const now = new Date();
+    const days = [];
+    for (let i = 6; i >= 0; i--) {
+      const d = new Date(now.getFullYear(), now.getMonth(), now.getDate() - i);
+      const key = dsDayKey(d);
+      days.push({
+        key: key,
+        label: i === 0 ? '今天' : (d.getMonth() + 1) + '/' + d.getDate(),
+        val: spend[key] || 0
+      });
+    }
+    const max = Math.max(0.01, ...days.map(x => x.val));
+    box.innerHTML = '';
+    for (const d of days) {
+      const h = Math.max(3, Math.round(d.val / max * 100));
+      const col = document.createElement('div');
+      col.className = 'ds-bar-col' + (d.key === days[6].key ? ' today' : '');
+      col.innerHTML =
+        '<div class="ds-bar" style="height:' + h + '%" title="' + d.key + ' · ¥' + d.val.toFixed(2) + '">'
+        + '<span class="ds-bar-val">' + d.val.toFixed(2) + '</span></div>'
+        + '<div class="ds-bar-label">' + d.label + '</div>';
+      box.appendChild(col);
+    }
+  }).catch(() => { box.innerHTML = '<div class="empty-hint side">读取消费记录失败</div>'; });
+}
+
 async function dsFetch() {
   if (!dsKey) { setDsState('未配置 Key'); dsBalanceValue = null; el('dsBalance').textContent = '--'; return; }
   setDsState('查询中…');
@@ -222,6 +290,7 @@ async function dsFetch() {
     dsBalanceValue = sym + Number(b.total_balance).toFixed(2);
     renderDsBalance();
     setDsState(d.is_available ? '可用' : '不可用');
+    dsRecordSpend(Number(b.total_balance));   // 记录消费（余额差值法）
   } catch (e) {
     setDsState('获取失败');
     dsBalanceValue = null;
@@ -257,6 +326,18 @@ function dsInit() {
     if (!dsBalanceValue) return;
     dsRevealed = !dsRevealed;
     renderDsBalance();
+  });
+  // 每日消费图表面板
+  el('dsChart').addEventListener('click', () => {
+    dsRenderChart();
+    el('dsPanel').classList.remove('hidden');
+  });
+  el('dsPanelClose').addEventListener('click', () => el('dsPanel').classList.add('hidden'));
+  document.addEventListener('click', e => {
+    const p = el('dsPanel');
+    if (p.classList.contains('hidden')) return;
+    if (e.target.closest('#dsPanel') || e.target.closest('#dsChart')) return;
+    p.classList.add('hidden');
   });
   setInterval(dsFetch, 10 * 60 * 1000);   // 每 10 分钟自动刷新
 }

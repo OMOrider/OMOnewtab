@@ -666,6 +666,61 @@ html::-webkit-scrollbar { display: none; }  /* Edge/Chrome 隐藏滚动条 */
 #dsBalance { cursor: pointer; user-select: none; letter-spacing: 0.5px; }
 #dsBalance:hover { color: var(--primary); }
 
+/* 每日消费柱状图 */
+.ds-chart {
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+  height: 200px;
+  padding: 22px 6px 0;
+}
+
+.ds-bar-col {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  height: 100%;
+}
+
+.ds-bar {
+  position: relative;
+  width: 100%;
+  max-width: 32px;
+  min-height: 3px;
+  background: var(--primary);
+  border-radius: 4px 4px 0 0;
+  transition: height .2s;
+}
+
+.ds-bar-col.today .ds-bar { background: #e8a33d; }
+
+.ds-bar-val {
+  position: absolute;
+  top: -16px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 10px;
+  color: var(--text-sub);
+  white-space: nowrap;
+}
+
+.ds-bar-label {
+  margin-top: 8px;
+  font-size: 10px;
+  color: var(--text-sub);
+  white-space: nowrap;
+}
+
+.ds-chart-empty {
+  text-align: center;
+  color: var(--text-sub);
+  font-size: 12px;
+  padding: 30px 0;
+}
+
 .ds-actions {
   display: flex;
   gap: 6px;

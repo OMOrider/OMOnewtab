@@ -30,6 +30,9 @@
                 <button id="dsSetup" class="btn btn-plain btn-sm" type="button">设置 Key</button>
                 <button id="dsRefresh" class="btn btn-plain btn-sm" type="button">刷新</button>
               </div>
+              <div class="ds-actions">
+                <button id="dsChart" class="btn btn-plain btn-sm" type="button">📊 每日消费</button>
+              </div>
             </div>
           </div>
         </aside>
@@ -100,6 +103,17 @@
       </button>
     </div>
     <div id="weatherPanelBody" class="wp-body"></div>
+  </aside>
+
+  <!-- DeepSeek 每日消费侧边面板 -->
+  <aside id="dsPanel" class="weather-panel hidden">
+    <div class="wp-head">
+      <span class="wp-title">每日消费 · 近 7 天</span>
+      <button id="dsPanelClose" class="icon-btn" type="button" title="关闭" aria-label="关闭">
+        <svg viewBox="0 0 16 16"><path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+      </button>
+    </div>
+    <div id="dsChartBody" class="ds-chart"></div>
   </aside>
 
   <div id="ctxMenu" class="ctx-menu hidden"></div>
