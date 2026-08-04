@@ -706,8 +706,13 @@ function setupPageNav() {
   window.addEventListener('wheel', e => {
     if (lock) return;
 
-    // 工具B侧边栏：滚轮完全由栏内接管，任何情况都不翻页
+    // 工具B侧边栏区域：按水平带判定（含列表下方空白、顶部留白），区域内任何位置都不翻页
     if (e.target.closest('.page-private .col-left')) return;
+    const leftCol = pagePrivate.querySelector('.col-left');
+    if (leftCol) {
+      const r = leftCol.getBoundingClientRect();
+      if (e.clientX >= r.left - 8 && e.clientX <= r.right + 8) return;
+    }
 
     // 其他可滚动容器（7天天气面板等）该方向还能滚 → 交给容器自己滚，不翻页
     let node = e.target;
