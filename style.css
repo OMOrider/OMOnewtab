@@ -116,16 +116,22 @@ body {
   transform: translateY(0);
 }
 
-/* 天气展开时：被推挤下去的下方元素同步渐隐（与展开动画同节奏），收起时渐显恢复 */
-.weather-wrap ~ .search-anchor,
-.weather-wrap ~ .tool-block {
+/* 天气展开时：屏幕底部边缘渐隐遮罩——被推挤的元素滑入屏幕底边时自然淡出，
+   而不是整块淡化；平时透明不可见，只在展开期间显示 */
+.edge-fade {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 150px;
+  pointer-events: none;      /* 不挡任何点击 */
+  z-index: 50;
+  background: linear-gradient(to bottom, rgba(246, 248, 251, 0), rgba(246, 248, 251, 1));
+  opacity: 0;
   transition: opacity .3s ease;
 }
 
-.weather-wrap.open ~ .search-anchor,
-.weather-wrap.open ~ .tool-block {
-  opacity: 0.22;
-}
+.edge-fade.show { opacity: 1; }
 
 .wp-head {
   display: flex;

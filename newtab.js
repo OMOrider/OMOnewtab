@@ -4,7 +4,7 @@
  * ============================================================ */
 
 /* 构建标记：显示在页面右下角，用于确认浏览器跑的是最新代码 */
-const BUILD = '20260805-27';
+const BUILD = '20260805-28';
 
 /* ---------- 小工具 ---------- */
 function el(id) { return document.getElementById(id); }
@@ -189,6 +189,8 @@ function hideWeather() {
   el('weather').classList.remove('open');
   const w = el('weatherWrap');
   if (w) w.classList.remove('open');
+  const f = el('edgeFade');
+  if (f) f.classList.remove('show');
 }
 
 /* 本地缓存：30 分钟内秒开，后台静默刷新 */
@@ -1113,6 +1115,8 @@ function bindEvents() {
     e.stopPropagation();
     const open = weatherLine.classList.toggle('open');
     weatherWrap.classList.toggle('open', open);
+    const fade = el('edgeFade');
+    if (fade) fade.classList.toggle('show', open);   // 展开期间显示底部边缘渐隐遮罩
   });
 
   el('btnNew').addEventListener('click', () => openNew(null, false));
