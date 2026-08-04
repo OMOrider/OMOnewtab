@@ -163,10 +163,9 @@ body {
 
 .wp-row:hover { background: rgba(24, 95, 165, 0.05); }
 
-/* 今天：渐变高亮 + 左侧蓝色竖条 */
+/* 今天：柔和渐变高亮（左侧蓝色竖条已移除，仅靠渐变与文字色区分） */
 .wp-row.today {
   background: linear-gradient(90deg, rgba(24, 95, 165, 0.10), rgba(24, 95, 165, 0.03));
-  box-shadow: inset 3px 0 0 var(--primary);
 }
 
 .wp-row.today:hover {
