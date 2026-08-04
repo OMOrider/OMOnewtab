@@ -4,7 +4,7 @@
  * ============================================================ */
 
 /* 构建标记：显示在页面右下角，用于确认浏览器跑的是最新代码 */
-const BUILD = '20260805-15';
+const BUILD = '20260805-16';
 
 /* ---------- 小工具 ---------- */
 function el(id) { return document.getElementById(id); }
@@ -223,10 +223,12 @@ async function dsRecordSpend(balance) {
     const data = await chrome.storage.local.get([DS_SPEND_KEY, DS_LASTBAL_KEY]);
     const spend = data[DS_SPEND_KEY] || {};
     const last = data[DS_LASTBAL_KEY] || null;
-    if (last && last.date === today) {
+    if (last) {
       const diff = last.bal - balance;
       if (diff > 0.0001) {
-        spend[today] = Math.round(((spend[today] || 0) + diff) * 100) / 100;
+        // 跨天采样时（如昨天 23:00 采样、今天 08:00 再查），差值记到上次采样的那天
+        const targetDay = last.date === today ? today : last.date;
+        spend[targetDay] = Math.round(((spend[targetDay] || 0) + diff) * 100) / 100;
         // 只保留近 30 天记录
         const cutoff = new Date();
         cutoff.setDate(cutoff.getDate() - 29);
@@ -274,6 +276,8 @@ function dsRenderChart() {
   }).catch(() => { box.innerHTML = '<div class="empty-hint side">读取消费记录失败</div>'; });
 }
 
+const DS_CACHE_KEY = 'ds_cache';   // { bal, state, ts } 最近一次成功查询的缓存
+
 async function dsFetch() {
   if (!dsKey) { setDsState('未配置 Key'); dsBalanceValue = null; el('dsBalance').textContent = '--'; return; }
   setDsState('查询中…');
@@ -289,8 +293,13 @@ async function dsFetch() {
     const sym = b.currency === 'CNY' ? '¥' : '$';
     dsBalanceValue = sym + Number(b.total_balance).toFixed(2);
     renderDsBalance();
-    setDsState(d.is_available ? '可用' : '不可用');
+    const stateText = d.is_available ? '可用' : '不可用';
+    setDsState(stateText);
     dsRecordSpend(Number(b.total_balance));   // 记录消费（余额差值法）
+    // 缓存本次结果，供 24 小时内打开页面直接展示
+    chrome.storage.local.set({
+      [DS_CACHE_KEY]: { bal: dsBalanceValue, state: stateText, ts: Date.now() }
+    }).catch(() => {});
   } catch (e) {
     setDsState('获取失败');
     dsBalanceValue = null;
@@ -299,9 +308,17 @@ async function dsFetch() {
 }
 
 function dsInit() {
-  chrome.storage.local.get(DS_KEY_STORE).then(r => {
+  // 打开页面：有 Key 且 24 小时内查过 → 直接显示缓存，不重复查询
+  chrome.storage.local.get([DS_KEY_STORE, DS_CACHE_KEY]).then(r => {
     dsKey = r[DS_KEY_STORE] || null;
-    dsFetch();
+    const cache = r[DS_CACHE_KEY] || null;
+    if (!dsKey) { setDsState('未配置 Key'); el('dsBalance').textContent = '--'; return; }
+    if (cache) {
+      if (cache.bal) { dsBalanceValue = cache.bal; renderDsBalance(); }
+      if (cache.state) setDsState(cache.state);
+    }
+    const stale = !cache || Date.now() - (cache.ts || 0) > 24 * 60 * 60 * 1000;
+    if (stale) dsFetch();   // 超过 24 小时才自动查询（每天最多一次）
   }).catch(() => setDsState('存储不可用'));
 
   el('dsSetup').addEventListener('click', () => {
@@ -339,7 +356,7 @@ function dsInit() {
     if (e.target.closest('#dsPanel') || e.target.closest('#dsChart')) return;
     p.classList.add('hidden');
   });
-  setInterval(dsFetch, 10 * 60 * 1000);   // 每 10 分钟自动刷新
+  setInterval(dsFetch, 24 * 60 * 60 * 1000);   // 页面常驻时每天兜底刷新一次（新开标签页另有 24h 过期判断）
 }
 
 /* ---------- 时钟 / 日期 ---------- */
