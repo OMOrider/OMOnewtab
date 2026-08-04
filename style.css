@@ -570,6 +570,18 @@ html::-webkit-scrollbar { display: none; }  /* Edge/Chrome 隐藏滚动条 */
   width: 100%;
 }
 
+/* 工具B 侧边栏：粘在视口内、内容超出时栏内独立滚动，不撑高页面 */
+.page-private .col-left {
+  position: sticky;
+  top: 64px;
+  max-height: calc(100vh - 152px);   /* 上下各留 64/88px 内边距 */
+  overflow-y: auto;
+  scrollbar-width: none;             /* Firefox 隐藏滚动条 */
+  padding-right: 2px;
+}
+
+.page-private .col-left::-webkit-scrollbar { display: none; }  /* Edge/Chrome 隐藏滚动条 */
+
 .page-work { align-items: center; }
 .page-private { align-items: flex-start; }
 
