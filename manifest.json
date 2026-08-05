@@ -11,7 +11,7 @@
   "chrome_url_overrides": {
     "newtab": "newtab.html"
   },
-  "permissions": ["bookmarks", "favicon", "storage"],
+  "permissions": ["bookmarks", "favicon", "storage", "system.battery", "system.memory", "system.cpu", "system.storage"],
   "host_permissions": [
     "https://api.open-meteo.com/*",
     "https://geocoding-api.open-meteo.com/*",

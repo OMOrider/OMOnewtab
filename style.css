@@ -598,6 +598,47 @@ html::-webkit-scrollbar { display: none; }  /* Edge/Chrome 隐藏滚动条 */
   margin: 10px auto 0;           /* 卡片内居中 */
 }
 
+/* 电脑状态卡片：电池/内存/磁盘/CPU */
+.sys-status { font-size: 13px; }
+
+.ss-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.ss-row:last-child { margin-bottom: 0; }
+
+.ss-label { color: var(--text-sub); width: 46px; flex-shrink: 0; }
+.ss-val { font-weight: 500; white-space: nowrap; flex-shrink: 0; }
+.ss-cpu {
+  font-size: 12px;
+  font-weight: 400;
+  color: var(--text-sub);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 0;
+}
+
+.ss-bar {
+  flex: 1;
+  height: 6px;
+  border-radius: 3px;
+  background: #e7eaee;
+  overflow: hidden;
+}
+
+.ss-bar-fill {
+  height: 100%;
+  border-radius: 3px;
+  background: var(--primary);
+  transition: width .4s ease;
+}
+
+.ss-bar.high .ss-bar-fill { background: var(--danger); }   /* 内存≥85% / 磁盘≥90% 变红警示 */
+
 /* 私人页：通栏布局，工具B 贴屏幕左侧，收藏夹在剩余空间居中 */
 .page-private .page-inner {
   max-width: none;
