@@ -615,6 +615,28 @@ html::-webkit-scrollbar { display: none; }  /* Edge/Chrome 隐藏滚动条 */
 
 .dash-board .ds-monitor { font-size: 13px; }  /* 表盘页卡片稍大一点的字号 */
 
+/* 信息面板卡片：统一白底圆角容器 */
+.dash-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 14px 16px 6px;
+  margin-bottom: 16px;
+}
+
+.dash-card:last-child { margin-bottom: 0; }
+
+/* 天气卡片：天气行胶囊居中，7 天预报在卡片内展开 */
+.dash-card .weather {
+  margin: 0 auto;
+  display: flex;
+  width: fit-content;
+}
+
+.dash-card .weather-wrap {
+  margin: 10px auto 0;           /* 卡片内居中 */
+}
+
 /* 私人页：通栏布局，工具B 贴屏幕左侧，收藏夹在剩余空间居中 */
 .page-private .page-inner {
   max-width: none;
