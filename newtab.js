@@ -4,7 +4,7 @@
  * ============================================================ */
 
 /* 构建标记：显示在页面右下角，用于确认浏览器跑的是最新代码 */
-const BUILD = '20260805-44';
+const BUILD = '20260805-45';
 
 /* ---------- 小工具 ---------- */
 function el(id) { return document.getElementById(id); }
@@ -1157,79 +1157,6 @@ function bindEvents() {
   chrome.bookmarks.onMoved.addListener(schedule);
 }
 
-/* ---------- 电脑状态监测（chrome.system API） ---------- */
-function fmtGB(bytes) { return (bytes / 1024 / 1024 / 1024).toFixed(1) + ' GB'; }
-
-function renderSysBattery(info) {
-  const row = el('ssBattery');
-  if (!row) return;
-  if (!info || !info.hasBattery) { row.classList.add('hidden'); return; }
-  row.classList.remove('hidden');
-  const level = Math.round(info.level * 100);
-  const state = info.charging ? '充电中' : '未充电';
-  const time = info.charging ? info.chargingTime : info.dischargingTime;
-  let timeTxt = '';
-  if (isFinite(time) && time > 0) {
-    const h = Math.floor(time / 3600);
-    const m = Math.round((time % 3600) / 60);
-    timeTxt = (info.charging ? ' · 充满需 ' : ' · 剩余 ') + h + 'h' + (m ? m + 'm' : '');
-  }
-  el('ssBatteryVal').textContent = level + '%' + (info.charging ? ' ⚡' : '') + ' ' + state + timeTxt;
-}
-
-function renderSysMem(info) {
-  if (!info) return;
-  const total = info.capacity, avail = info.availableCapacity;
-  const used = Math.max(0, total - avail);
-  const pct = total ? Math.round(used / total * 100) : 0;
-  el('ssMemVal').textContent = fmtGB(used) + ' / ' + fmtGB(total) + ' (' + pct + '%)';
-  el('ssMemBar').style.width = pct + '%';
-  el('ssMemBar').parentElement.classList.toggle('high', pct >= 85);
-}
-
-async function renderSysDisk() {
-  try {
-    const units = await chrome.system.storage.getInfo();
-    let cap = 0, avail = 0;
-    for (const u of units) { cap += u.capacity; avail += u.availableCapacity; }
-    const used = Math.max(0, cap - avail);
-    const pct = cap ? Math.round(used / cap * 100) : 0;
-    el('ssDiskVal').textContent = fmtGB(used) + ' / ' + fmtGB(cap) + ' (' + pct + '%)';
-    el('ssDiskBar').style.width = pct + '%';
-    el('ssDiskBar').parentElement.classList.toggle('high', pct >= 90);
-  } catch (e) { el('ssDiskVal').textContent = '--'; }
-}
-
-function renderSysCpu(info) {
-  const name = info && info.modelName ? info.modelName : '';
-  const cores = info && info.numOfProcessors ? ' ' + info.numOfProcessors + ' 核' : '';
-  el('ssCpuVal').textContent = (name + cores).trim() || '--';
-}
-
-function refreshSysStatus() {
-  try { chrome.system.memory.getInfo(renderSysMem); } catch (e) { el('ssMemVal').textContent = '--'; }
-  renderSysDisk();
-  try { chrome.system.cpu.getInfo(renderSysCpu); } catch (e) { el('ssCpuVal').textContent = '--'; }
-}
-
-function initSysStatus() {
-  // 电池：getInfo + 事件监听（电量/充电状态变化时自动更新）
-  try {
-    chrome.system.battery.getInfo(info => {
-      renderSysBattery(info);
-      if (info && info.hasBattery) {
-        if (chrome.system.battery.onLevelChanged) chrome.system.battery.onLevelChanged.addListener(renderSysBattery);
-        if (chrome.system.battery.onChargingStateChanged) chrome.system.battery.onChargingStateChanged.addListener(renderSysBattery);
-      }
-    });
-  } catch (e) {
-    const b = el('ssBattery');
-    if (b) b.classList.add('hidden');
-  }
-  refreshSysStatus();
-  setInterval(refreshSysStatus, 5000);   // 每 5 秒刷新内存/磁盘占用
-}
-
 /* ---------- 启动 ---------- */
 updateClock();
 setInterval(updateClock, 1000);
@@ -1241,7 +1168,6 @@ syncSearchToCurrentPage(true);   // 启动即同步搜索框到当前页
 dsInit();
 fetchWeather();
 renderTree();
-initSysStatus();
 
 /* 页面右下角构建标记（验证是否为最新代码） */
 const foot = document.createElement('div');
