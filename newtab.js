@@ -4,7 +4,7 @@
  * ============================================================ */
 
 /* 构建标记：显示在页面右下角，用于确认浏览器跑的是最新代码 */
-const BUILD = '20260806-8';
+const BUILD = '20260806-9';
 
 /* ---------- 小工具 ---------- */
 function el(id) { return document.getElementById(id); }
@@ -348,6 +348,7 @@ function enterMultiMode(id) {
   if (id) multiSel.add(id);
   document.body.classList.add('multi-mode');
   el('multiBar').classList.remove('hidden');
+  el('btnNew').classList.add('hidden');      // 多选模式替代「新建文件夹」按钮
   updateMultiUI();
 }
 
@@ -356,6 +357,7 @@ function exitMultiMode() {
   multiSel.clear();
   document.body.classList.remove('multi-mode');
   el('multiBar').classList.add('hidden');
+  el('btnNew').classList.remove('hidden');
   updateMultiUI();
 }
 

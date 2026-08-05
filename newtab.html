@@ -53,6 +53,12 @@
           <div class="search-anchor" id="anchorPrivate"></div>
           <div class="list-head">
             <span class="list-title">收藏夹</span>
+            <!-- 多选操作条：多选模式显示，替代「新建文件夹」按钮 -->
+            <span id="multiBar" class="multi-bar hidden">
+              <span id="multiCount" class="multi-count">已选 0 项</span>
+              <button id="multiDelete" class="btn btn-danger btn-sm" type="button">删除</button>
+              <button id="multiExit" class="btn btn-plain btn-sm" type="button">退出</button>
+            </span>
             <button id="btnNew" class="btn btn-primary btn-sm" type="button">+ 新建文件夹</button>
           </div>
           <div id="bookmarkList" class="bm-list"></div>
@@ -70,13 +76,6 @@
   </nav>
 
   <div id="ctxMenu" class="ctx-menu hidden"></div>
-
-  <!-- 多选批量操作条 -->
-  <div id="multiBar" class="multi-bar hidden">
-    <span id="multiCount" class="multi-count">已选 0 项</span>
-    <button id="multiDelete" class="btn btn-danger btn-sm" type="button">删除</button>
-    <button id="multiExit" class="btn btn-plain btn-sm" type="button">退出</button>
-  </div>
 
   <div id="modalMask" class="modal-mask hidden">
     <div class="modal">

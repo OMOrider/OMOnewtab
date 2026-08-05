@@ -581,21 +581,11 @@ html::-webkit-scrollbar { display: none; }  /* Edge/Chrome 隐藏滚动条 */
 .bm-row.multi-selected,
 .bm-folder-row.multi-selected { background: rgba(24, 95, 165, 0.08); }
 
-/* 多选批量操作条：底部居中浮条 */
+/* 多选批量操作条：位于标题栏右侧，与「新建文件夹」按钮同排同风格 */
 .multi-bar {
-  position: fixed;
-  left: 50%;
-  bottom: 24px;
-  transform: translateX(-50%);
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 10px 16px;
-  background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  box-shadow: 0 6px 24px rgba(30, 50, 80, 0.12);
-  z-index: 800;
+  gap: 8px;
 }
 
 .multi-count { font-size: 13px; color: var(--text-sub); }
