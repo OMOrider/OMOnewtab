@@ -4,7 +4,7 @@
  * ============================================================ */
 
 /* 构建标记：显示在页面右下角，用于确认浏览器跑的是最新代码 */
-const BUILD = '20260805-45';
+const BUILD = '20260806-1';
 
 /* ---------- 小工具 ---------- */
 function el(id) { return document.getElementById(id); }
@@ -55,375 +55,6 @@ const SVG = {
   edit: '<svg viewBox="0 0 16 16"><path d="M11.3 2.3a1.1 1.1 0 0 1 1.6 0l.8.8a1.1 1.1 0 0 1 0 1.6L6 12.4 3 13l.6-3z" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/></svg>',
   trash: '<svg viewBox="0 0 16 16"><path d="M3 4h10M6.5 4V2.9c0-.5.4-.9.9-.9h1.2c.5 0 .9.4.9.9V4M4.5 4l.6 8.9c0 .6.5 1.1 1.1 1.1h3.6c.6 0 1.1-.5 1.1-1.1L11.5 4" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/></svg>'
 };
-
-/* ---------- 天气 ----------
- * 主源：中国天气网数据（itboy 免费 JSON，中文、国内权威）
- * WEATHER_CITY_ID 城市代码（德清 101210203，其他城市见 weather.com.cn 页面 URL）
- * 失败时自动回退 Open-Meteo（WEATHER_SEARCH / WEATHER_FALLBACK） */
-const WEATHER_CITY = '德清';
-const WEATHER_CITY_ID = '101210203';
-const WEATHER_SEARCH = 'deqing';
-const WEATHER_FALLBACK = { lat: 30.5426, lon: 119.9775 };
-
-const WMO_ICONS = {
-  sun: '<span class="w-ico sun"><svg viewBox="0 0 16 16"><circle cx="8" cy="8" r="3" fill="currentColor"/><path d="M8 1v2M8 13v2M1 8h2M13 8h2M2.9 2.9l1.4 1.4M11.7 11.7l1.4 1.4M13.1 2.9l-1.4 1.4M4.3 11.7l-1.4 1.4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg></span>',
-  cloud: '<span class="w-ico cloud"><svg viewBox="0 0 16 16"><path d="M4.5 12.5h7a2.5 2.5 0 0 0 .4-4.97 3.5 3.5 0 0 0-6.8-.6A2.8 2.8 0 0 0 4.5 12.5z" fill="currentColor" opacity="0.85"/></svg></span>',
-  rain: '<span class="w-ico rain"><svg viewBox="0 0 16 16"><path d="M4.5 12.5h7a2.5 2.5 0 0 0 .4-4.97 3.5 3.5 0 0 0-6.8-.6A2.8 2.8 0 0 0 4.5 12.5z" fill="currentColor" opacity="0.85"/><path d="M5 9.5v1.8M8 9.5v1.8M11 9.5v1.8" stroke="currentColor" stroke-width="1.1" stroke-linecap="round"/></svg></span>',
-  snow: '<span class="w-ico snow"><svg viewBox="0 0 16 16"><path d="M4.5 12.5h7a2.5 2.5 0 0 0 .4-4.97 3.5 3.5 0 0 0-6.8-.6A2.8 2.8 0 0 0 4.5 12.5z" fill="currentColor" opacity="0.85"/><path d="M6.5 8.6v2M9.5 8.6v2M8 8.2v2" stroke="currentColor" stroke-width="1" stroke-linecap="round"/></svg></span>',
-  thunder: '<span class="w-ico thunder"><svg viewBox="0 0 16 16"><path d="M4.5 12.5h7a2.5 2.5 0 0 0 .4-4.97 3.5 3.5 0 0 0-6.8-.6A2.8 2.8 0 0 0 4.5 12.5z" fill="currentColor" opacity="0.85"/><path d="M8 8.2l-1.5 2.3h1.8L7.4 13l2.4-2.6H8z" fill="currentColor"/></svg></span>',
-  fog: '<span class="w-ico fog"><svg viewBox="0 0 16 16"><path d="M4.5 12.5h7a2.5 2.5 0 0 0 .4-4.97 3.5 3.5 0 0 0-6.8-.6A2.8 2.8 0 0 0 4.5 12.5z" fill="currentColor" opacity="0.85"/><path d="M4 9.5h8M5 8h6" stroke="currentColor" stroke-width="1.1" stroke-linecap="round"/></svg></span>'
-};
-
-const WMO_TEXT = {
-  0: '晴', 1: '晴间多云', 2: '多云', 3: '阴',
-  45: '雾', 48: '雾凇', 51: '毛毛雨', 53: '毛毛雨', 55: '毛毛雨',
-  56: '冻雨', 57: '冻雨', 61: '小雨', 63: '中雨', 65: '大雨',
-  66: '冻雨', 67: '冻雨', 71: '小雪', 73: '中雪', 75: '大雪', 77: '雪粒',
-  80: '阵雨', 81: '阵雨', 82: '强阵雨', 85: '阵雪', 86: '阵雪',
-  95: '雷阵雨', 96: '雷阵雨', 99: '强雷暴'
-};
-
-function wmoIcon(code) {
-  if (code === 0 || code === 1) return WMO_ICONS.sun;
-  if (code === 2 || code === 3) return WMO_ICONS.cloud;
-  if (code >= 45 && code <= 48) return WMO_ICONS.fog;
-  if ((code >= 51 && code <= 67) || (code >= 80 && code <= 82)) return WMO_ICONS.rain;
-  if (code >= 71 && code <= 77 || code >= 85 && code <= 86) return WMO_ICONS.snow;
-  if (code >= 95) return WMO_ICONS.thunder;
-  return WMO_ICONS.cloud;
-}
-
-/* 中文天气类型 → 图标 */
-function typeIcon(t) {
-  const s = t || '';
-  if (s.indexOf('雷') >= 0) return WMO_ICONS.thunder;
-  if (s.indexOf('雨') >= 0) return WMO_ICONS.rain;
-  if (s.indexOf('雪') >= 0) return WMO_ICONS.snow;
-  if (s.indexOf('雾') >= 0) return WMO_ICONS.fog;
-  if (s.indexOf('晴') >= 0) return WMO_ICONS.sun;
-  return WMO_ICONS.cloud;
-}
-
-/* 中国天气网数据（itboy）渲染 */
-function renderWeatherItboy(d) {
-  const data = d.data;
-  const box = el('weather');
-  const cur = data.forecast && data.forecast[0] ? data.forecast[0] : null;
-  const type = cur ? cur.type : '';
-  const tempText = data.wendu ? Math.round(Number(data.wendu)) + '°C' : '';
-  box.innerHTML = typeIcon(type)
-    + '<span class="w-city">' + esc(WEATHER_CITY) + '</span>'
-    + '<span class="w-temp">' + tempText + '</span>'
-    + '<span>' + esc(type || '未知') + '</span>'
-    + '<span class="w-sub">湿度 ' + esc(data.shidu || '--') + (cur && cur.fx ? ' · ' + esc(cur.fx) : '') + '</span>';
-  box.classList.remove('hidden');
-
-  // 7 天预报：天气行下方就地展开
-  const body = el('weatherPanelBody');
-  const todayStr = new Date().toISOString().slice(0, 10);   // YYYY-MM-DD
-  let html = '';
-  const days = (data.forecast || []).slice(0, 7);
-  for (let i = 0; i < days.length; i++) {
-    const f = days[i];
-    const isToday = f.ymd === todayStr;
-    const md = (f.ymd || '').slice(5).replace('-', '/');
-    // itboy 的 high/low 形如「高温 34℃」「低温 27℃」，需提取数字
-    const max = parseInt(String(f.high).replace(/[^\d]/g, '')) || 0;
-    const min = parseInt(String(f.low).replace(/[^\d]/g, '')) || 0;
-    html += '<div class="wp-row' + (isToday ? ' today' : '') + '">'
-      + '<span class="wp-name">' + esc(f.week || '') + '</span>'   <!-- 统一显示星期，天然对齐 -->
-      + '<span class="wp-date">' + md + '</span>'
-      + '<span class="wp-ico">' + typeIcon(f.type) + '</span>'
-      + '<span class="wp-text">' + esc(f.type || '未知') + '</span>'
-      + '<span class="wp-temp"><span class="max">' + max + '°</span>'
-      + '<span class="min">' + min + '°</span></span>'
-      + '</div>';
-  }
-  body.innerHTML = html;
-}
-
-function renderWeather(w) {
-  const cur = w.current;
-  const code = cur.weather_code;
-  const box = el('weather');
-  box.innerHTML = wmoIcon(code)
-    + '<span class="w-city">' + esc(WEATHER_CITY) + '</span>'
-    + '<span class="w-temp">' + Math.round(cur.temperature_2m) + '°C</span>'
-    + '<span>' + (WMO_TEXT[code] || '未知') + '</span>'
-    + '<span class="w-sub">体感 ' + Math.round(cur.apparent_temperature) + '° · 湿度 '
-    + Math.round(cur.relative_humidity_2m) + '%</span>';
-  box.classList.remove('hidden');
-
-  // 7 天预报：渲染进右侧面板，点击天气行时打开
-  const body = el('weatherPanelBody');
-  const days = w.daily.time;
-  const codes = w.daily.weather_code;
-  const maxs = w.daily.temperature_2m_max;
-  const mins = w.daily.temperature_2m_min;
-  let html = '';
-  for (let i = 0; i < days.length; i++) {
-    const d = new Date(days[i] + 'T00:00:00');
-    const name = i === 0 ? '今天' : WEEK[d.getDay()];
-    const md = (d.getMonth() + 1) + '/' + d.getDate();
-    html += '<div class="wp-row' + (i === 0 ? ' today' : '') + '">'
-      + '<span class="wp-name">' + name + '</span>'
-      + '<span class="wp-date">' + md + '</span>'
-      + '<span class="wp-ico">' + wmoIcon(codes[i]) + '</span>'
-      + '<span class="wp-text">' + (WMO_TEXT[codes[i]] || '未知') + '</span>'
-      + '<span class="wp-temp"><span class="max">' + Math.round(maxs[i]) + '°</span>'
-      + '<span class="min">' + Math.round(mins[i]) + '°</span></span>'
-      + '</div>';
-  }
-  body.innerHTML = html;
-}
-
-/* 骨架屏：先占位再替换，避免页面跳动 */
-function showWeatherSkeleton() {
-  const box = el('weather');
-  box.innerHTML = '<span class="w-city">' + esc(WEATHER_CITY) + '</span><span class="sk-pill"></span>';
-  box.classList.remove('hidden');
-}
-
-function hideWeather() {
-  el('weather').classList.add('hidden');
-}
-
-/* 本地缓存：30 分钟内秒开，后台静默刷新 */
-const WEATHER_CACHE_KEY = 'newtab_weather_cache';
-const WEATHER_CACHE_TTL = 30 * 60 * 1000;
-
-function getCachedWeather() {
-  try {
-    const raw = localStorage.getItem(WEATHER_CACHE_KEY);
-    if (!raw) return null;
-    const c = JSON.parse(raw);
-    if (Date.now() - c.ts > WEATHER_CACHE_TTL) return null;
-    return c.data;
-  } catch (e) { return null; }
-}
-
-function setCachedWeather(w) {
-  try {
-    localStorage.setItem(WEATHER_CACHE_KEY, JSON.stringify({ ts: Date.now(), data: w }));
-  } catch (e) { /* 缓存失败不影响 */ }
-}
-
-async function fetchWeather() {
-  showWeatherSkeleton();
-  const cached = getCachedWeather();
-  if (cached) {
-    if (cached.data && cached.data.forecast) renderWeatherItboy(cached);
-    else renderWeather(cached);
-  }
-
-  // 主源：中国天气网数据（itboy）
-  try {
-    const r = await fetch('http://t.weather.itboy.net/api/weather/city/' + WEATHER_CITY_ID, { cache: 'no-store' });
-    if (!r.ok) throw new Error('HTTP ' + r.status);
-    const d = await r.json();
-    if (!d || d.status !== 200 || !d.data || !d.data.forecast) throw new Error('响应异常');
-    renderWeatherItboy(d);
-    setCachedWeather(d);
-    return;
-  } catch (e) {
-    console.error('天气：itboy 获取失败，回退 Open-Meteo', e);
-  }
-
-  // 回退源：Open-Meteo
-  try {
-    let lat = WEATHER_FALLBACK.lat;
-    let lon = WEATHER_FALLBACK.lon;
-    try {
-      const geoRes = await fetch('https://geocoding-api.open-meteo.com/v1/search?name='
-        + encodeURIComponent(WEATHER_SEARCH) + '&count=1');
-      const geo = await geoRes.json();
-      const place = geo.results && geo.results[0];
-      if (place) { lat = place.latitude; lon = place.longitude; }
-    } catch (e2) {
-      console.error('天气：城市定位失败，使用默认坐标', e2);
-    }
-    const wRes = await fetch('https://api.open-meteo.com/v1/forecast?latitude=' + lat
-      + '&longitude=' + lon
-      + '&current=temperature_2m,relative_humidity_2m,apparent_temperature,weather_code'
-      + '&daily=weather_code,temperature_2m_max,temperature_2m_min&forecast_days=7&timezone=auto');
-    const w = await wRes.json();
-    renderWeather(w);
-    setCachedWeather(w);
-  } catch (e3) {
-    console.error('天气：获取天气数据失败', e3);
-    if (!cached) hideWeather();
-  }
-}
-
-/* ---------- API 余额监测（当前支持 DeepSeek） ----------
- * Key 仅保存在本机扩展存储（chrome.storage.local），不上传、不进代码。
- * 官方接口：GET https://api.deepseek.com/user/balance */
-const DS_KEY_STORE = 'deepseek_api_key';
-let dsKey = null;
-let dsBalanceValue = null;   // 真实余额文本
-let dsRevealed = false;      // 是否已点击显示
-
-function setDsState(t) { el('dsState').textContent = t; }
-
-/* 余额渲染：常态打码为 ¥••••，点击后显示真实金额 */
-function renderDsBalance() {
-  const b = el('dsBalance');
-  b.textContent = dsBalanceValue && dsRevealed ? dsBalanceValue : '¥••••';
-}
-
-/* ---------- 每日消费统计（余额差值法） ----------
- * 官方无历史消费接口：记录每次余额快照，余额减少量 ≈ 消费金额，
- * 余额上涨视为充值不计入。数据从启用本功能起开始积累。 */
-const DS_SPEND_KEY = 'ds_spend';      // { 'YYYY-MM-DD': 消费金额 }
-const DS_LASTBAL_KEY = 'ds_lastbal';  // { date, bal } 上次快照
-
-function dsDayKey(d) {
-  return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0')
-       + '-' + String(d.getDate()).padStart(2, '0');
-}
-
-async function dsRecordSpend(balance) {
-  try {
-    const today = dsDayKey(new Date());
-    const data = await chrome.storage.local.get([DS_SPEND_KEY, DS_LASTBAL_KEY]);
-    const spend = data[DS_SPEND_KEY] || {};
-    const last = data[DS_LASTBAL_KEY] || null;
-    if (last) {
-      const diff = last.bal - balance;
-      if (diff > 0.0001) {
-        // 跨天采样时（如昨天 23:00 采样、今天 08:00 再查），差值记到上次采样的那天
-        const targetDay = last.date === today ? today : last.date;
-        spend[targetDay] = Math.round(((spend[targetDay] || 0) + diff) * 100) / 100;
-        // 只保留近 30 天记录
-        const cutoff = new Date();
-        cutoff.setDate(cutoff.getDate() - 29);
-        const minKey = dsDayKey(cutoff);
-        for (const k of Object.keys(spend)) {
-          if (k < minKey) delete spend[k];
-        }
-      }
-    }
-    await chrome.storage.local.set({
-      [DS_SPEND_KEY]: spend,
-      [DS_LASTBAL_KEY]: { date: today, bal: balance }
-    });
-  } catch (e) { /* 记录失败不影响展示 */ }
-}
-
-/* 渲染近 7 天柱状图 */
-function dsRenderChart() {
-  const box = el('dsChartBody');
-  chrome.storage.local.get(DS_SPEND_KEY).then(r => {
-    const spend = r[DS_SPEND_KEY] || {};
-    const now = new Date();
-    const days = [];
-    for (let i = 6; i >= 0; i--) {
-      const d = new Date(now.getFullYear(), now.getMonth(), now.getDate() - i);
-      const key = dsDayKey(d);
-      days.push({
-        key: key,
-        label: i === 0 ? '今天' : (d.getMonth() + 1) + '/' + d.getDate(),
-        val: spend[key] || 0
-      });
-    }
-    const max = Math.max(0.01, ...days.map(x => x.val));
-    box.innerHTML = '';
-    for (const d of days) {
-      const h = Math.max(3, Math.round(d.val / max * 100));
-      const col = document.createElement('div');
-      col.className = 'ds-bar-col' + (d.key === days[6].key ? ' today' : '');
-      col.innerHTML =
-        '<div class="ds-bar" style="height:' + h + '%" title="' + d.key + ' · ¥' + d.val.toFixed(2) + '">'
-        + '<span class="ds-bar-val">' + d.val.toFixed(2) + '</span></div>'
-        + '<div class="ds-bar-label">' + d.label + '</div>';
-      box.appendChild(col);
-    }
-  }).catch(() => { box.innerHTML = '<div class="empty-hint side">读取消费记录失败</div>'; });
-}
-
-const DS_CACHE_KEY = 'ds_cache';   // { bal, state, ts } 最近一次成功查询的缓存
-
-async function dsFetch() {
-  if (!dsKey) { setDsState('未配置 Key'); dsBalanceValue = null; el('dsBalance').textContent = '--'; return; }
-  setDsState('查询中…');
-  try {
-    const r = await fetch('https://api.deepseek.com/user/balance', {
-      headers: { 'Authorization': 'Bearer ' + dsKey }
-    });
-    if (r.status === 401) { setDsState('Key 无效'); dsBalanceValue = null; el('dsBalance').textContent = '--'; return; }
-    if (!r.ok) throw new Error('HTTP ' + r.status);
-    const d = await r.json();
-    const b = d.balance_infos && d.balance_infos[0];
-    if (!b) throw new Error('响应异常');
-    const sym = b.currency === 'CNY' ? '¥' : '$';
-    dsBalanceValue = sym + Number(b.total_balance).toFixed(2);
-    renderDsBalance();
-    const stateText = d.is_available ? '可用' : '不可用';
-    setDsState(stateText);
-    dsRecordSpend(Number(b.total_balance));   // 记录消费（余额差值法）
-    // 缓存本次结果，供 24 小时内打开页面直接展示
-    chrome.storage.local.set({
-      [DS_CACHE_KEY]: { bal: dsBalanceValue, state: stateText, ts: Date.now() }
-    }).catch(() => {});
-  } catch (e) {
-    setDsState('获取失败');
-    dsBalanceValue = null;
-    el('dsBalance').textContent = '--';
-  }
-}
-
-function dsInit() {
-  // 打开页面：有 Key 且 24 小时内查过 → 直接显示缓存，不重复查询
-  chrome.storage.local.get([DS_KEY_STORE, DS_CACHE_KEY]).then(r => {
-    dsKey = r[DS_KEY_STORE] || null;
-    const cache = r[DS_CACHE_KEY] || null;
-    if (!dsKey) { setDsState('未配置 Key'); el('dsBalance').textContent = '--'; return; }
-    if (cache) {
-      if (cache.bal) { dsBalanceValue = cache.bal; renderDsBalance(); }
-      if (cache.state) setDsState(cache.state);
-    }
-    const stale = !cache || Date.now() - (cache.ts || 0) > 24 * 60 * 60 * 1000;
-    if (stale) dsFetch();   // 超过 24 小时才自动查询（每天最多一次）
-  }).catch(() => setDsState('存储不可用'));
-
-  el('dsSetup').addEventListener('click', () => {
-    el('dsEdit').classList.remove('hidden');
-    el('dsKeyInput').value = dsKey || '';
-    el('dsKeyInput').focus();
-  });
-  el('dsCancel').addEventListener('click', () => el('dsEdit').classList.add('hidden'));
-  el('dsSave').addEventListener('click', () => {
-    const v = el('dsKeyInput').value.trim();
-    if (!v) return;
-    chrome.storage.local.set({ [DS_KEY_STORE]: v }).then(() => {
-      dsKey = v;
-      el('dsEdit').classList.add('hidden');
-      el('dsKeyInput').value = '';
-      dsFetch();
-    });
-  });
-  el('dsRefresh').addEventListener('click', dsFetch);
-  // 点击余额：切换显示/隐藏
-  el('dsBalance').addEventListener('click', () => {
-    if (!dsBalanceValue) return;
-    dsRevealed = !dsRevealed;
-    renderDsBalance();
-  });
-  // 每日消费图表：卡片下方就地展开（开关式）
-  el('dsChart').addEventListener('click', () => {
-    const wrap = el('dsChartWrap');
-    if (wrap.classList.contains('open')) { wrap.classList.remove('open'); return; }
-    dsRenderChart();
-    wrap.classList.add('open');
-  });
-  document.addEventListener('click', e => {
-    const wrap = el('dsChartWrap');
-    if (!wrap.classList.contains('open')) return;
-    if (e.target.closest('#dsChartWrap') || e.target.closest('#dsChart')) return;
-    wrap.classList.remove('open');
-  });
-  setInterval(dsFetch, 24 * 60 * 60 * 1000);   // 页面常驻时每天兜底刷新一次（新开标签页另有 24h 过期判断）
-}
 
 /* ---------- 时钟 / 日期 ---------- */
 const WEEK = ['日', '一', '二', '三', '四', '五', '六'];
@@ -899,9 +530,9 @@ function renderPrivateFolder() {
   items.forEach(c => box.appendChild(makeSyncCard(c)));
 }
 
-/* ---------- 三页结构：工作页 / 表盘页 / 私人页 ---------- */
-const PAGES = ['pageWork', 'pageDashboard', 'pagePrivate'];
-const ANCHORS = { pageWork: 'anchorWork', pageDashboard: 'anchorDash', pagePrivate: 'anchorPrivate' };
+/* ---------- 两页结构：工作页 / 私人页 ---------- */
+const PAGES = ['pageWork', 'pagePrivate'];
+const ANCHORS = { pageWork: 'anchorWork', pagePrivate: 'anchorPrivate' };
 
 /* 搜索框在页面锚点间飞行（FLIP 动画），时长与翻页滚动保持一致 */
 function syncSearchAnchor(target, dur) {
@@ -968,7 +599,6 @@ window.addEventListener('scroll', () => {
 
 function setupPageNav() {
   const pageWork = el('pageWork');
-  const pageDashboard = el('pageDashboard');
   const pagePrivate = el('pagePrivate');
 
   // 底部指示点：点击跳页，滚动时高亮当前页
@@ -985,7 +615,6 @@ function setupPageNav() {
     });
   }, { threshold: 0.4 });
   obs.observe(pageWork);
-  obs.observe(pageDashboard);
   obs.observe(pagePrivate);
 
   // 侧边栏滚轮统一处理（捕获阶段）：源头截断 + 滚到头时取消默认行为
@@ -1165,8 +794,6 @@ renderWorkFolder();
 renderPrivateFolder();
 setupPageNav();
 syncSearchToCurrentPage(true);   // 启动即同步搜索框到当前页
-dsInit();
-fetchWeather();
 renderTree();
 
 /* 页面右下角构建标记（验证是否为最新代码） */

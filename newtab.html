@@ -37,54 +37,6 @@
     </div>
   </section>
 
-  <!-- 第二页：表盘（信息面板：天气 + API 余额，可继续扩展卡片） -->
-  <section id="pageDashboard" class="page page-dashboard">
-    <div class="page-inner">
-      <div class="search-anchor" id="anchorDash"></div>
-      <div class="dash-board">
-        <!-- 天气卡片：当前天气 + 7 天预报（始终显示） -->
-        <div class="dash-card">
-          <div class="tool-head">
-            <span class="list-title">天气</span>
-          </div>
-          <div id="weather" class="weather hidden"></div>
-          <div id="weatherWrap" class="weather-wrap">
-            <div id="weatherPanelBody" class="wp-body"></div>
-          </div>
-        </div>
-        <!-- API 余额卡片 -->
-        <div class="dash-card">
-          <div class="tool-head">
-            <span class="list-title">API 余额</span>
-          </div>
-          <div id="dsMonitor" class="ds-monitor">
-            <div class="ds-row"><span class="ds-label">余额</span><span id="dsBalance" class="ds-val">--</span></div>
-            <div class="ds-row"><span class="ds-label">状态</span><span id="dsState" class="ds-val">--</span></div>
-            <div id="dsEdit" class="ds-edit hidden">
-              <input id="dsKeyInput" type="password" placeholder="粘贴 sk- 开头的 API Key" autocomplete="off" spellcheck="false">
-              <div class="ds-actions">
-                <button id="dsSave" class="btn btn-primary btn-sm" type="button">保存</button>
-                <button id="dsCancel" class="btn btn-plain btn-sm" type="button">取消</button>
-              </div>
-            </div>
-            <div class="ds-actions">
-              <button id="dsSetup" class="btn btn-plain btn-sm" type="button">设置 Key</button>
-              <button id="dsRefresh" class="btn btn-plain btn-sm" type="button">刷新</button>
-            </div>
-            <div class="ds-actions">
-              <button id="dsChart" class="btn btn-plain btn-sm" type="button">📊 每日消费</button>
-            </div>
-          </div>
-          <!-- 每日消费图表：卡片下方就地展开 -->
-          <div id="dsChartWrap" class="ds-chart-wrap">
-            <div class="ds-chart-head">近 7 天每日消费</div>
-            <div id="dsChartBody" class="ds-chart"></div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
   <!-- 第二页：私人（左工具B / 中收藏夹管理 / 右侧预留） -->
   <section id="pagePrivate" class="page page-private">
     <div class="page-inner">
@@ -114,7 +66,6 @@
   <!-- 页面指示点 -->
   <nav id="pageNav" class="page-dots">
     <button type="button" data-target="pageWork" class="active" title="工作页"></button>
-    <button type="button" data-target="pageDashboard" title="表盘页"></button>
     <button type="button" data-target="pagePrivate" title="私人页"></button>
   </nav>
 
