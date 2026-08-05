@@ -4,7 +4,7 @@
  * ============================================================ */
 
 /* 构建标记：显示在页面右下角，用于确认浏览器跑的是最新代码 */
-const BUILD = '20260805-41';
+const BUILD = '20260805-42';
 
 /* ---------- 小工具 ---------- */
 function el(id) { return document.getElementById(id); }
@@ -186,11 +186,6 @@ function showWeatherSkeleton() {
 
 function hideWeather() {
   el('weather').classList.add('hidden');
-  el('weather').classList.remove('open');
-  const w = el('weatherWrap');
-  if (w) w.classList.remove('open');
-  const f = el('edgeFade');
-  if (f) f.classList.remove('show');
 }
 
 /* 本地缓存：30 分钟内秒开，后台静默刷新 */
@@ -1122,17 +1117,7 @@ function bindSearch(input) {
 function bindEvents() {
   document.querySelectorAll('.search').forEach(bindSearch);
 
-  // 天气行：点击在下方就地展开 7 天预报（向下挤压下方元素）
-  const weatherLine = el('weather');
-  const weatherWrap = el('weatherWrap');
-  weatherLine.title = '点击展开 / 收起 7 天预报';
-  weatherLine.addEventListener('click', e => {
-    e.stopPropagation();
-    const open = weatherLine.classList.toggle('open');
-    weatherWrap.classList.toggle('open', open);
-    const fade = el('edgeFade');
-    if (fade) fade.classList.toggle('show', open);   // 展开期间显示底部边缘渐隐遮罩
-  });
+  // 天气卡片：7 天预报始终显示，无展开/收起交互（天气行仅作展示）
 
   el('btnNew').addEventListener('click', () => openNew(null, false));
 

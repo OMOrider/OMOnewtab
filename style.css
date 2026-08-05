@@ -73,17 +73,7 @@ body {
   border-radius: 18px;
   font-size: 15px;
   color: var(--text-sub);
-  cursor: pointer;
   user-select: none;
-  transition: background .15s, color .15s;
-}
-
-.weather:hover { background: rgba(24, 95, 165, 0.06); }
-
-/* 展开状态：天气行高亮为蓝色胶囊（替代箭头指示） */
-.weather.open {
-  background: rgba(24, 95, 165, 0.10);
-  color: var(--primary);
 }
 
 .weather .w-ico { display: inline-flex; align-items: center; }
@@ -97,11 +87,10 @@ body {
 .w-ico.thunder svg { color: #c7741e; }
 .w-ico.fog svg { color: #9aa4b2; }
 .weather .w-temp { font-weight: 500; color: var(--text); }
-.weather.open .w-temp { color: var(--primary); }
 .weather .w-city { font-weight: 500; }
 .weather .w-sub { opacity: 0.85; }
 
-/* 7 天预报：天气行下方就地展开（向下挤压下方元素），卡片质感 */
+/* 7 天预报：天气卡片内始终显示（无展开/收起） */
 .weather-wrap {
   max-width: 600px;
   margin: 12px auto;          /* 上下对称：与天气行、下方元素间距一致 */
@@ -110,35 +99,7 @@ body {
   border-radius: 14px;
   box-shadow: 0 8px 28px rgba(30, 50, 80, 0.08), 0 1px 4px rgba(30, 50, 80, 0.05);
   padding: 4px 12px;          /* 上下对称，7 行数据在卡片内垂直居中 */
-  overflow: hidden;
-  max-height: 0;
-  opacity: 0;
-  transform: translateY(-6px);
-  transition: max-height .3s ease, opacity .22s ease, transform .3s ease;
 }
-
-.weather-wrap.open {
-  max-height: 380px;
-  opacity: 1;
-  transform: translateY(0);
-}
-
-/* 天气展开时：屏幕底部边缘渐隐遮罩——被推挤的元素滑入屏幕底边时自然淡出，
-   而不是整块淡化；平时透明不可见，只在展开期间显示 */
-.edge-fade {
-  position: fixed;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  height: 150px;
-  pointer-events: none;      /* 不挡任何点击 */
-  z-index: 50;
-  background: linear-gradient(to bottom, rgba(246, 248, 251, 0), rgba(246, 248, 251, 1));
-  opacity: 0;
-  transition: opacity .3s ease;
-}
-
-.edge-fade.show { opacity: 1; }
 
 .wp-head {
   display: flex;
