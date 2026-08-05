@@ -593,21 +593,25 @@ html::-webkit-scrollbar { display: none; }  /* Edge/Chrome 隐藏滚动条 */
 .btn-danger { background: #d9534f; color: #fff; }
 .btn-danger:hover { background: #c9302c; }
 
-/* 平铺排序下拉：与按钮同排 */
+/* 平铺排序下拉：与按钮体系统一（无边框、圆角6、透明底、hover 浅灰） */
 .sort-select {
-  height: 30px;
-  padding: 0 6px;
-  font-size: 12px;
+  padding: 7px 10px;            /* 与 btn-sm 同高 */
+  font-size: 14px;
   font-family: inherit;
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  background: var(--card);
-  color: var(--text);
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--text-sub);
   outline: none;
   cursor: pointer;
+  transition: background .12s;
 }
 
-.sort-select:hover { border-color: var(--primary); }
+.sort-select:hover,
+.sort-select:focus {
+  background: rgba(0, 0, 0, 0.06);
+  color: var(--text);
+}
 
 /* 私人页左侧栏：工具B 标题固定表头（滚动时标题不动）+ 列表左对齐 */
 .page-private .col-left .tool-head {
