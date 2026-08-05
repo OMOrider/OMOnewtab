@@ -35,8 +35,8 @@
 
 | 常量 | 作用 | 默认值 |
 |---|---|---|
-| `WEATHER_CITY` | 天气显示的城市名 | 湖州 |
-| `WEATHER_CITY_ID` | 城市代码（weather.com.cn URL 里的数字） | 101210201 |
+| `WEATHER_CITY` | 天气显示的城市名 | 德清 |
+| `WEATHER_CITY_ID` | 城市代码（weather.com.cn URL 里的数字） | 101210203 |
 | `WORK_FOLDER` | 工作页工具文件夹名 | 工具A |
 | `PRIVATE_FOLDER` | 私人页侧边栏文件夹名 | 工具B |
 | `WORK_TOOLS` | 回退内置工具列表（找不到「工具A」时用） | 邮箱/日历/会议… |
