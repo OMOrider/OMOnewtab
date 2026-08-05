@@ -4,7 +4,7 @@
  * ============================================================ */
 
 /* 构建标记：显示在页面右下角，用于确认浏览器跑的是最新代码 */
-const BUILD = '20260806-5';
+const BUILD = '20260806-6';
 
 /* ---------- 小工具 ---------- */
 function el(id) { return document.getElementById(id); }
@@ -140,6 +140,10 @@ function renderBookmarkRow(node, depth) {
   img.addEventListener('error', () => fallbackToCdn(img, node.url), { once: true });
   icoWrap.appendChild(img);
 
+  const check = document.createElement('span');
+  check.className = 'bm-check';
+  check.textContent = '✓';
+
   const title = document.createElement('span');
   title.className = 'bm-title';
   title.textContent = node.title || hostname(node.url) || node.url;
@@ -157,15 +161,21 @@ function renderBookmarkRow(node, depth) {
   actions.querySelector('.edit').addEventListener('click', e => { e.stopPropagation(); openEdit(node); });
   actions.querySelector('.del').addEventListener('click', e => { e.stopPropagation(); deleteNode(node); });
 
-  row.append(icoWrap, title, domain, actions);
-  row.addEventListener('click', e => openNode(node, e));
+  row.append(check, icoWrap, title, domain, actions);
+  row.addEventListener('click', e => {
+    if (multiMode) { toggleSel(node.id); return; }
+    openNode(node, e);
+  });
   row.addEventListener('auxclick', e => { if (e.button === 1) { e.preventDefault(); openNode(node, e); } });
   row.addEventListener('contextmenu', e => {
     e.preventDefault();
     e.stopPropagation();
+    if (multiMode) { toggleSel(node.id); return; }   // 多选模式：右键也切换选中
     showMenu(e.clientX, e.clientY, [
       { label: '打开', action: () => { window.location.href = node.url; } },
       { label: '在新标签页打开', action: () => { window.open(node.url, '_blank'); } },
+      '-',
+      { label: '多选', action: () => enterMultiMode(node.id) },
       '-',
       { label: '编辑', action: () => openEdit(node) },
       { label: '删除', action: () => deleteNode(node), danger: true }
@@ -187,6 +197,9 @@ function renderFolderRow(folder, depth) {
   const chev = document.createElement('span');
   chev.className = 'chevron';
   chev.innerHTML = SVG.chevron;
+  const check = document.createElement('span');
+  check.className = 'bm-check';
+  check.textContent = '✓';
   const ico = document.createElement('span');
   ico.className = 'bm-folder-ico';
   ico.innerHTML = SVG.folder;
@@ -204,6 +217,7 @@ function renderFolderRow(folder, depth) {
   body.appendChild(renderChildren(folder.children || [], depth + 1));
 
   row.addEventListener('click', () => {
+    if (multiMode) { toggleSel(folder.id); return; }   // 多选模式：切换选中
     const willOpen = body.hidden;        // 当前收起 → 点击展开
     body.hidden = !willOpen;
     row.classList.toggle('arrow-down', willOpen);   // 展开 → 箭头向下；收起 → 横向
@@ -212,15 +226,18 @@ function renderFolderRow(folder, depth) {
   row.addEventListener('contextmenu', e => {
     e.preventDefault();
     e.stopPropagation();
+    if (multiMode) { toggleSel(folder.id); return; }   // 多选模式：右键也切换选中
     showMenu(e.clientX, e.clientY, [
       { label: '在此新建文件夹', action: () => openNew(folder.id) },
+      '-',
+      { label: '多选', action: () => enterMultiMode(folder.id) },
       '-',
       { label: '重命名', action: () => openEdit(folder) },
       { label: '删除文件夹', action: () => deleteNode(folder), danger: true }
     ]);
   });
 
-  row.append(chev, ico, name, count);
+  row.append(check, chev, ico, name, count);
   wrap.append(row, body);
   return wrap;
 }
@@ -319,6 +336,51 @@ function deleteNode(node) {
   if (!confirm(msg)) return;
   if (node.url) chrome.bookmarks.remove(node.id);
   else chrome.bookmarks.removeTree(node.id);
+}
+
+/* ---------- 多选模式（批量勾选 + 批量删除） ---------- */
+let multiMode = false;
+const multiSel = new Set();
+
+function enterMultiMode(id) {
+  multiMode = true;
+  multiSel.clear();
+  if (id) multiSel.add(id);
+  document.body.classList.add('multi-mode');
+  el('multiBar').classList.remove('hidden');
+  updateMultiUI();
+}
+
+function exitMultiMode() {
+  multiMode = false;
+  multiSel.clear();
+  document.body.classList.remove('multi-mode');
+  el('multiBar').classList.add('hidden');
+  updateMultiUI();
+}
+
+function toggleSel(id) {
+  if (multiSel.has(id)) multiSel.delete(id);
+  else multiSel.add(id);
+  updateMultiUI();
+}
+
+function updateMultiUI() {
+  el('multiCount').textContent = '已选 ' + multiSel.size + ' 项';
+  document.querySelectorAll('.bm-row, .bm-folder-row').forEach(r => {
+    r.classList.toggle('multi-selected', multiSel.has(r.dataset.id));
+  });
+}
+
+function multiDelete() {
+  if (!multiSel.size) return;
+  if (!confirm('确定删除选中的 ' + multiSel.size + ' 项？文件夹会连同其中的内容一起删除。')) return;
+  multiSel.forEach(id => {
+    const n = findNodeById(bookmarksTree, id);
+    if (n && n.url) chrome.bookmarks.remove(id);
+    else chrome.bookmarks.removeTree(id);
+  });
+  exitMultiMode();
 }
 
 const modalState = { mode: 'new', id: null, parentId: '2', isFolder: false };
@@ -759,7 +821,13 @@ function bindEvents() {
 
   document.addEventListener('click', hideMenu);
   document.addEventListener('scroll', hideMenu, true);
-  document.addEventListener('keydown', e => { if (e.key === 'Escape') { hideMenu(); closeModal(); } });
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') { hideMenu(); closeModal(); if (multiMode) exitMultiMode(); }
+  });
+
+  // 多选批量操作条
+  el('multiDelete').addEventListener('click', multiDelete);
+  el('multiExit').addEventListener('click', exitMultiMode);
 
   // 收藏夹变化 → 自动刷新（防抖）
   let timer = null;
