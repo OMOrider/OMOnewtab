@@ -118,6 +118,15 @@ body {
   margin: 8px 4px 10px;
 }
 
+/* 右侧操作区：整体右对齐，显示/隐藏控件不改变按钮位置 */
+.head-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: auto;
+  flex-shrink: 0;
+}
+
 .list-title {
   font-size: 15px;
   font-weight: 500;
