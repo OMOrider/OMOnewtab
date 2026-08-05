@@ -4,7 +4,7 @@
  * ============================================================ */
 
 /* 构建标记：显示在页面右下角，用于确认浏览器跑的是最新代码 */
-const BUILD = '20260806-4';
+const BUILD = '20260806-5';
 
 /* ---------- 小工具 ---------- */
 function el(id) { return document.getElementById(id); }
@@ -747,8 +747,9 @@ function bindEvents() {
   el('modalMask').addEventListener('click', e => { if (e.target === e.currentTarget) closeModal(); });
   el('fldTitle').addEventListener('keydown', e => { if (e.key === 'Enter') saveModal(); });
 
-  // 空白处右键 → 新建
+  // 空白处右键 → 新建文件夹（仅第二页收藏区；第一页不拦截右键，保持浏览器默认菜单）
   document.addEventListener('contextmenu', e => {
+    if (e.target.closest('#pageWork')) return;   // 第一页：无自定义右键
     e.preventDefault();
     if (e.target.closest('.bm-row') || e.target.closest('.bm-folder-row') || e.target.closest('.bm-section-head')) return;
     showMenu(e.clientX, e.clientY, [
