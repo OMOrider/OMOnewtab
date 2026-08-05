@@ -4,7 +4,7 @@
  * ============================================================ */
 
 /* 构建标记：显示在页面右下角，用于确认浏览器跑的是最新代码 */
-const BUILD = '20260806-7';
+const BUILD = '20260806-8';
 
 /* ---------- 小工具 ---------- */
 function el(id) { return document.getElementById(id); }
@@ -673,10 +673,10 @@ function setupPageNav() {
   obs.observe(pageWork);
   obs.observe(pagePrivate);
 
-  // 侧边栏/收藏夹栏滚轮统一处理（捕获阶段）：源头截断 + 滚到头时取消默认行为
+  // 侧边栏/收藏夹列表滚轮统一处理（捕获阶段）：源头截断 + 滚到头时取消默认行为
   // （关键：不 preventDefault 时浏览器会把滚动「链式传导」到页面，绕过所有 JS 逻辑）
   window.addEventListener('wheel', e => {
-    const side = e.target.closest('.page-private .col-left, .page-private .col-main');
+    const side = e.target.closest('.page-private .col-left, .page-private .bm-list');
     if (!side) return;
     e.stopImmediatePropagation();
     const canUp = side.scrollTop > 0 && e.deltaY < 0;
@@ -727,7 +727,7 @@ function setupPageNav() {
       const canDown = scrollable.scrollTop < scrollable.scrollHeight - scrollable.clientHeight - 1 && e.deltaY > 0;
       if (canUp || canDown) { return; }
       if (scrollable.closest('.page-private .col-left') ||
-          scrollable.closest('.page-private .col-main')) {
+          scrollable.closest('.page-private .bm-list')) {
         e.preventDefault();   // 禁止滚动链
         return;
       }
