@@ -4,7 +4,7 @@
  * ============================================================ */
 
 /* 构建标记：显示在页面右下角，用于确认浏览器跑的是最新代码 */
-const BUILD = '20260805-36';
+const BUILD = '20260805-37';
 
 /* ---------- 小工具 ---------- */
 function el(id) { return document.getElementById(id); }
@@ -260,7 +260,7 @@ async function fetchWeather() {
   }
 }
 
-/* ---------- DeepSeek API 余额监测 ----------
+/* ---------- API 余额监测（当前支持 DeepSeek） ----------
  * Key 仅保存在本机扩展存储（chrome.storage.local），不上传、不进代码。
  * 官方接口：GET https://api.deepseek.com/user/balance */
 const DS_KEY_STORE = 'deepseek_api_key';
