@@ -587,16 +587,25 @@ html::-webkit-scrollbar { display: none; }  /* Edge/Chrome 隐藏滚动条 */
 
 .dash-card:last-child { margin-bottom: 0; }
 
-/* 天气卡片：天气行胶囊居中，7 天预报在卡片内展开 */
+/* 天气卡片：与电脑状态/API 余额卡片风格统一（去胶囊、去嵌套卡片） */
 .dash-card .weather {
-  margin: 0 auto;
+  margin: 0 auto 2px;
   display: flex;
   width: fit-content;
+  padding: 0;                    /* 去掉胶囊底 */
+  border-radius: 0;
+  font-size: 14px;               /* 与卡片内其他文字统一 */
 }
 
 .dash-card .weather-wrap {
-  margin: 10px auto 0;           /* 卡片内居中 */
+  margin: 8px auto 0;
+  background: transparent;       /* 去掉嵌套白卡，直接铺在卡片内 */
+  border: none;
+  box-shadow: none;
+  padding: 0;
 }
+
+.dash-card .wp-row { padding: 7px 6px; }   /* 行距与系统卡片协调 */
 
 /* 电脑状态卡片：电池/内存/磁盘/CPU */
 .sys-status { font-size: 13px; }
