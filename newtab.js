@@ -4,7 +4,7 @@
  * ============================================================ */
 
 /* 构建标记：显示在页面右下角，用于确认浏览器跑的是最新代码 */
-const BUILD = '20260806-10';
+const BUILD = '20260806-11';
 
 /* ---------- 小工具 ---------- */
 function el(id) { return document.getElementById(id); }
@@ -303,15 +303,25 @@ function renderSection(rootChild) {
 
 /* 显示模式：group=分组（文件夹结构）/ flat=平铺（所有书签扁平列出） */
 let viewMode = localStorage.getItem('newtab_view_mode') === 'flat' ? 'flat' : 'group';
+/* 平铺排序：default=树顺序 / name=名称 / time=时间（最新在前） */
+let sortMode = localStorage.getItem('newtab_sort_mode') || 'default';
 
 function updateViewBtn() {
   el('btnView').textContent = viewMode === 'flat' ? '分组' : '平铺';
+  el('sortSel').classList.toggle('hidden', viewMode !== 'flat');   // 排序仅平铺模式可用
+  el('sortSel').value = sortMode;
 }
 
 function toggleViewMode() {
   viewMode = viewMode === 'flat' ? 'group' : 'flat';
   try { localStorage.setItem('newtab_view_mode', viewMode); } catch (e) { /* 忽略 */ }
   updateViewBtn();
+  renderTree();
+}
+
+function setSortMode(mode) {
+  sortMode = mode;
+  try { localStorage.setItem('newtab_sort_mode', sortMode); } catch (e) { /* 忽略 */ }
   renderTree();
 }
 
@@ -324,6 +334,17 @@ function collectAllBookmarks(node, out) {
   return out;
 }
 
+/* 平铺排序：默认（树顺序）/ 名称 / 时间（最新在前） */
+function sortFlatItems(items) {
+  if (sortMode === 'name') {
+    return items.slice().sort((a, b) => (a.title || a.url || '').localeCompare(b.title || b.url || '', 'zh'));
+  }
+  if (sortMode === 'time') {
+    return items.slice().sort((a, b) => (b.dateAdded || 0) - (a.dateAdded || 0));
+  }
+  return items;   // default：保持树顺序
+}
+
 function renderTree() {
   chrome.bookmarks.getTree().then(tree => {
     bookmarksTree = tree[0];
@@ -333,7 +354,7 @@ function renderTree() {
     let total = 0;
     if (viewMode === 'flat') {
       // 平铺视图：所有书签扁平列出，无文件夹结构
-      const items = collectAllBookmarks(bookmarksTree, []);
+      const items = sortFlatItems(collectAllBookmarks(bookmarksTree, []));
       total = items.length;
       for (const n of items) frag.appendChild(renderBookmarkRow(n, 0));
     } else {
@@ -837,6 +858,7 @@ function bindEvents() {
 
   el('btnNew').addEventListener('click', () => openNew(null));   // 新建文件夹
   el('btnView').addEventListener('click', toggleViewMode);       // 分组/平铺切换
+  el('sortSel').addEventListener('change', e => setSortMode(e.target.value));   // 平铺排序
 
   el('btnSave').addEventListener('click', saveModal);
   el('btnCancel').addEventListener('click', closeModal);

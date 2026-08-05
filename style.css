@@ -593,6 +593,22 @@ html::-webkit-scrollbar { display: none; }  /* Edge/Chrome 隐藏滚动条 */
 .btn-danger { background: #d9534f; color: #fff; }
 .btn-danger:hover { background: #c9302c; }
 
+/* 平铺排序下拉：与按钮同排 */
+.sort-select {
+  height: 30px;
+  padding: 0 6px;
+  font-size: 12px;
+  font-family: inherit;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--card);
+  color: var(--text);
+  outline: none;
+  cursor: pointer;
+}
+
+.sort-select:hover { border-color: var(--primary); }
+
 /* 私人页左侧栏：工具B 标题固定表头（滚动时标题不动）+ 列表左对齐 */
 .page-private .col-left .tool-head {
   justify-content: flex-start;
