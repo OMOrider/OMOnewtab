@@ -53,7 +53,7 @@
           <div class="search-anchor" id="anchorPrivate"></div>
           <div class="list-head">
             <span class="list-title">收藏夹</span>
-            <button id="btnNew" class="btn btn-primary btn-sm" type="button">+ 新建</button>
+            <button id="btnNew" class="btn btn-primary btn-sm" type="button">+ 新建文件夹</button>
           </div>
           <div id="bookmarkList" class="bm-list"></div>
           <div id="emptyHint" class="empty-hint hidden">这里空空如也，点右上角「+ 新建」或空白处右键添加收藏</div>
@@ -73,17 +73,10 @@
 
   <div id="modalMask" class="modal-mask hidden">
     <div class="modal">
-      <h3 id="modalTitle">新建收藏</h3>
-      <div class="form-row" id="modalTypeRow">
-        <label for="fldType">类型</label>
-        <select id="fldType">
-          <option value="bookmark">书签</option>
-          <option value="folder">文件夹</option>
-        </select>
-      </div>
+      <h3 id="modalTitle">新建文件夹</h3>
       <div class="form-row">
         <label for="fldTitle">名称</label>
-        <input id="fldTitle" type="text" placeholder="收藏名称">
+        <input id="fldTitle" type="text" placeholder="文件夹名称">
       </div>
       <div class="form-row" id="urlRow">
         <label for="fldUrl">网址</label>

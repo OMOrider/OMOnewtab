@@ -4,7 +4,7 @@
  * ============================================================ */
 
 /* 构建标记：显示在页面右下角，用于确认浏览器跑的是最新代码 */
-const BUILD = '20260806-1';
+const BUILD = '20260806-2';
 
 /* ---------- 小工具 ---------- */
 function el(id) { return document.getElementById(id); }
@@ -209,8 +209,7 @@ function renderFolderRow(folder, depth) {
     e.preventDefault();
     e.stopPropagation();
     showMenu(e.clientX, e.clientY, [
-      { label: '在此新建收藏', action: () => openNew(folder.id, false) },
-      { label: '在此新建文件夹', action: () => openNew(folder.id, true) },
+      { label: '在此新建文件夹', action: () => openNew(folder.id) },
       '-',
       { label: '重命名', action: () => openEdit(folder) },
       { label: '删除文件夹', action: () => deleteNode(folder), danger: true }
@@ -267,8 +266,7 @@ function renderSection(rootChild) {
     e.preventDefault();
     e.stopPropagation();
     showMenu(e.clientX, e.clientY, [
-      { label: '在此新建收藏', action: () => openNew(rootChild.id, false) },
-      { label: '在此新建文件夹', action: () => openNew(rootChild.id, true) }
+      { label: '在此新建文件夹', action: () => openNew(rootChild.id) }
     ]);
   });
 
@@ -355,24 +353,21 @@ function fillParentOptions() {
 
 function syncModal() {
   const isNew = modalState.mode === 'new';
-  el('modalTypeRow').classList.toggle('hidden', !isNew);
   el('parentRow').classList.toggle('hidden', !isNew);
-  el('urlRow').classList.toggle('hidden', modalState.isFolder);
-  if (isNew) {
-    el('fldType').value = modalState.isFolder ? 'folder' : 'bookmark';
-    fillParentOptions();
-  }
+  el('urlRow').classList.toggle('hidden', modalState.isFolder);   // 新建文件夹/编辑文件夹时隐藏网址
+  if (isNew) fillParentOptions();
 }
 
 function openModal() { el('modalMask').classList.remove('hidden'); }
 function closeModal() { el('modalMask').classList.add('hidden'); }
 
-function openNew(parentId, isFolder) {
+/* 新建：仅支持新建文件夹 */
+function openNew(parentId) {
   modalState.mode = 'new';
   modalState.id = null;
   modalState.parentId = parentId || '2';
-  modalState.isFolder = !!isFolder;
-  el('modalTitle').textContent = isFolder ? '新建文件夹' : '新建收藏';
+  modalState.isFolder = true;
+  el('modalTitle').textContent = '新建文件夹';
   el('fldTitle').value = '';
   el('fldUrl').value = '';
   syncModal();
@@ -402,16 +397,10 @@ function normalizeUrl(raw) {
 function saveModal() {
   const title = el('fldTitle').value.trim();
   if (modalState.mode === 'new') {
-    const isFolder = el('fldType').value === 'folder';
+    // 新建：仅文件夹
     if (!title) { alert('请填写名称'); return; }
     const parentId = el('fldParent').value;
-    if (isFolder) {
-      chrome.bookmarks.create({ parentId: parentId, title: title });
-    } else {
-      const url = normalizeUrl(el('fldUrl').value);
-      if (!url) { alert('请填写网址'); return; }
-      chrome.bookmarks.create({ parentId: parentId, title: title, url: url });
-    }
+    chrome.bookmarks.create({ parentId: parentId, title: title });
   } else {
     const patch = { title: title };
     if (!modalState.isFolder) {
@@ -746,14 +735,7 @@ function bindSearch(input) {
 function bindEvents() {
   document.querySelectorAll('.search').forEach(bindSearch);
 
-  // 天气卡片：7 天预报始终显示，无展开/收起交互（天气行仅作展示）
-
-  el('btnNew').addEventListener('click', () => openNew(null, false));
-
-  el('fldType').addEventListener('change', () => {
-    modalState.isFolder = el('fldType').value === 'folder';
-    el('urlRow').classList.toggle('hidden', modalState.isFolder);
-  });
+  el('btnNew').addEventListener('click', () => openNew(null));   // 新建文件夹
 
   el('btnSave').addEventListener('click', saveModal);
   el('btnCancel').addEventListener('click', closeModal);
@@ -765,8 +747,7 @@ function bindEvents() {
     e.preventDefault();
     if (e.target.closest('.bm-row') || e.target.closest('.bm-folder-row') || e.target.closest('.bm-section-head')) return;
     showMenu(e.clientX, e.clientY, [
-      { label: '新建收藏', action: () => openNew(null, false) },
-      { label: '新建文件夹', action: () => openNew(null, true) }
+      { label: '新建文件夹', action: () => openNew(null) }
     ]);
   });
 
