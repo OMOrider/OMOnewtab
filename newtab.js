@@ -4,7 +4,7 @@
  * ============================================================ */
 
 /* 构建标记：显示在页面右下角，用于确认浏览器跑的是最新代码 */
-const BUILD = '20260806-9';
+const BUILD = '20260806-10';
 
 /* ---------- 小工具 ---------- */
 function el(id) { return document.getElementById(id); }
@@ -301,6 +301,29 @@ function renderSection(rootChild) {
   return section;
 }
 
+/* 显示模式：group=分组（文件夹结构）/ flat=平铺（所有书签扁平列出） */
+let viewMode = localStorage.getItem('newtab_view_mode') === 'flat' ? 'flat' : 'group';
+
+function updateViewBtn() {
+  el('btnView').textContent = viewMode === 'flat' ? '分组' : '平铺';
+}
+
+function toggleViewMode() {
+  viewMode = viewMode === 'flat' ? 'group' : 'flat';
+  try { localStorage.setItem('newtab_view_mode', viewMode); } catch (e) { /* 忽略 */ }
+  updateViewBtn();
+  renderTree();
+}
+
+/* 递归收集所有书签（按树顺序，跨文件夹） */
+function collectAllBookmarks(node, out) {
+  for (const c of (node.children || [])) {
+    if (c.url) out.push(c);
+    else collectAllBookmarks(c, out);
+  }
+  return out;
+}
+
 function renderTree() {
   chrome.bookmarks.getTree().then(tree => {
     bookmarksTree = tree[0];
@@ -308,11 +331,18 @@ function renderTree() {
     list.innerHTML = '';
     const frag = document.createDocumentFragment();
     let total = 0;
-    for (const child of (bookmarksTree.children || [])) {
-      if (child.id === '3') continue; // 跳过「移动端书签」
-      if (child.children && child.children.length) {
-        frag.appendChild(renderSection(child));
-        total += countBookmarks(child);
+    if (viewMode === 'flat') {
+      // 平铺视图：所有书签扁平列出，无文件夹结构
+      const items = collectAllBookmarks(bookmarksTree, []);
+      total = items.length;
+      for (const n of items) frag.appendChild(renderBookmarkRow(n, 0));
+    } else {
+      for (const child of (bookmarksTree.children || [])) {
+        if (child.id === '3') continue; // 跳过「移动端书签」
+        if (child.children && child.children.length) {
+          frag.appendChild(renderSection(child));
+          total += countBookmarks(child);
+        }
       }
     }
     list.appendChild(frag);
@@ -806,6 +836,7 @@ function bindEvents() {
   document.querySelectorAll('.search').forEach(bindSearch);
 
   el('btnNew').addEventListener('click', () => openNew(null));   // 新建文件夹
+  el('btnView').addEventListener('click', toggleViewMode);       // 分组/平铺切换
 
   el('btnSave').addEventListener('click', saveModal);
   el('btnCancel').addEventListener('click', closeModal);
@@ -969,6 +1000,7 @@ function nodeContainsId(node, id) {
 updateClock();
 setInterval(updateClock, 1000);
 bindEvents();
+updateViewBtn();              // 启动时按记忆的模式更新切换按钮文字
 renderWorkFolder();
 renderPrivateFolder();
 setupPageNav();
