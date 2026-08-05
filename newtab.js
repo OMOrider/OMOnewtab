@@ -4,7 +4,7 @@
  * ============================================================ */
 
 /* 构建标记：显示在页面右下角，用于确认浏览器跑的是最新代码 */
-const BUILD = '20260806-2';
+const BUILD = '20260806-3';
 
 /* ---------- 小工具 ---------- */
 function el(id) { return document.getElementById(id); }
@@ -127,6 +127,8 @@ function renderBookmarkRow(node, depth) {
   row.style.paddingLeft = (8 + depth * 16) + 'px';
   row.dataset.id = node.id;
   row.dataset.url = node.url || '';
+  row.dataset.parentId = node.parentId || '';
+  row.draggable = true;      // 支持拖到其他文件夹
 
   const icoWrap = document.createElement('span');
   icoWrap.className = 'bm-ico-wrap';
@@ -180,6 +182,7 @@ function renderFolderRow(folder, depth) {
   row.className = 'bm-folder-row';
   row.style.paddingLeft = (8 + depth * 16) + 'px';
   row.dataset.id = folder.id;
+  row.draggable = true;      // 支持拖到其他文件夹
   const chev = document.createElement('span');
   chev.className = 'chevron';
   chev.innerHTML = SVG.chevron;
@@ -238,6 +241,7 @@ function renderSection(rootChild) {
   const head = document.createElement('div');
   head.className = 'bm-section-head';
   head.dataset.id = rootChild.id;
+  head.draggable = true;     // 支持拖到另一个顶级分组
   const chev = document.createElement('span');
   chev.className = 'chevron';
   chev.innerHTML = SVG.chevron;
@@ -765,6 +769,80 @@ function bindEvents() {
   chrome.bookmarks.onRemoved.addListener(schedule);
   chrome.bookmarks.onChanged.addListener(schedule);
   chrome.bookmarks.onMoved.addListener(schedule);
+
+  // 收藏夹拖放：拖动书签/文件夹到目标文件夹（移动）
+  const bmList = el('bookmarkList');
+  let dragId = null;
+
+  bmList.addEventListener('dragstart', e => {
+    const row = e.target.closest('.bm-row, .bm-folder-row, .bm-section-head');
+    if (!row) return;
+    dragId = row.dataset.id;
+    e.dataTransfer.effectAllowed = 'move';
+    try { e.dataTransfer.setData('text/plain', dragId); } catch (err) { /* 某些环境限制 */ }
+    row.classList.add('dragging');
+  });
+
+  bmList.addEventListener('dragend', () => {
+    dragId = null;
+    bmList.querySelectorAll('.dragging, .drag-over').forEach(n => n.classList.remove('dragging', 'drag-over'));
+  });
+
+  bmList.addEventListener('dragover', e => {
+    if (!dragId) return;
+    const t = dragDropTarget(e.target);
+    if (!t) return;
+    e.preventDefault();                       // 允许放置
+    e.dataTransfer.dropEffect = 'move';
+    bmList.querySelectorAll('.drag-over').forEach(n => n.classList.remove('drag-over'));
+    if (dragValid(dragId, t.folderId)) t.el.classList.add('drag-over');
+  });
+
+  bmList.addEventListener('drop', e => {
+    if (!dragId) return;
+    const t = dragDropTarget(e.target);
+    if (!t || !dragValid(dragId, t.folderId)) return;
+    e.preventDefault();
+    e.stopPropagation();
+    chrome.bookmarks.move(dragId, { parentId: t.folderId });   // onMoved 自动刷新
+  });
+}
+
+/* 拖放目标解析：文件夹行/分组头 → 该文件夹；书签行 → 其父文件夹 */
+function dragDropTarget(node) {
+  const f = node.closest('.bm-folder-row, .bm-section-head');
+  if (f) return { el: f, folderId: f.dataset.id };
+  const b = node.closest('.bm-row');
+  if (b) return { el: b, folderId: b.dataset.parentId };
+  return null;
+}
+
+/* 校验：不能拖到自身；文件夹不能拖进自己的子孙 */
+function dragValid(dragId, targetFolderId) {
+  if (!targetFolderId || dragId === targetFolderId) return false;
+  const node = findNodeById(bookmarksTree, dragId);
+  if (node && !node.url) {
+    if (nodeContainsId(node, targetFolderId)) return false;
+  }
+  return true;
+}
+
+function findNodeById(node, id) {
+  if (!node) return null;
+  if (node.id === id) return node;
+  for (const c of (node.children || [])) {
+    const r = findNodeById(c, id);
+    if (r) return r;
+  }
+  return null;
+}
+
+function nodeContainsId(node, id) {
+  for (const c of (node.children || [])) {
+    if (c.id === id) return true;
+    if (nodeContainsId(c, id)) return true;
+  }
+  return false;
 }
 
 /* ---------- 启动 ---------- */

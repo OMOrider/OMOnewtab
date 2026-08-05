@@ -299,6 +299,19 @@ body {
 
 .bm-folder-row:hover { background: var(--hover); }
 
+/* 拖放状态：拖动中半透明，放置目标虚线高亮 */
+.bm-row.dragging,
+.bm-folder-row.dragging,
+.bm-section-head.dragging { opacity: 0.4; }
+
+.bm-row.drag-over,
+.bm-folder-row.drag-over,
+.bm-section-head.drag-over {
+  background: rgba(24, 95, 165, 0.10);
+  outline: 1.5px dashed var(--primary);
+  outline-offset: -1px;
+}
+
 .bm-folder-row .chevron {
   width: 12px;
   height: 12px;
