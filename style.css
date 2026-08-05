@@ -312,6 +312,19 @@ body {
   outline-offset: -1px;
 }
 
+/* 插入排序指示：上边缘蓝线 = 插到该行前；下边缘 = 插到该行后 */
+.bm-row.drag-before,
+.bm-folder-row.drag-before,
+.bm-section-head.drag-before {
+  box-shadow: inset 0 2px 0 var(--primary);
+}
+
+.bm-row.drag-after,
+.bm-folder-row.drag-after,
+.bm-section-head.drag-after {
+  box-shadow: inset 0 -2px 0 var(--primary);
+}
+
 .bm-folder-row .chevron {
   width: 12px;
   height: 12px;

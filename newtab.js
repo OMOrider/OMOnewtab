@@ -4,7 +4,7 @@
  * ============================================================ */
 
 /* 构建标记：显示在页面右下角，用于确认浏览器跑的是最新代码 */
-const BUILD = '20260806-3';
+const BUILD = '20260806-4';
 
 /* ---------- 小工具 ---------- */
 function el(id) { return document.getElementById(id); }
@@ -182,6 +182,7 @@ function renderFolderRow(folder, depth) {
   row.className = 'bm-folder-row';
   row.style.paddingLeft = (8 + depth * 16) + 'px';
   row.dataset.id = folder.id;
+  row.dataset.parentId = folder.parentId || '';
   row.draggable = true;      // 支持拖到其他文件夹
   const chev = document.createElement('span');
   chev.className = 'chevron';
@@ -770,7 +771,7 @@ function bindEvents() {
   chrome.bookmarks.onChanged.addListener(schedule);
   chrome.bookmarks.onMoved.addListener(schedule);
 
-  // 收藏夹拖放：拖动书签/文件夹到目标文件夹（移动）
+  // 收藏夹拖放：拖动书签/文件夹 → 拖到行边缘=插入排序，拖到文件夹中间=移入
   const bmList = el('bookmarkList');
   let dragId = null;
 
@@ -785,46 +786,93 @@ function bindEvents() {
 
   bmList.addEventListener('dragend', () => {
     dragId = null;
-    bmList.querySelectorAll('.dragging, .drag-over').forEach(n => n.classList.remove('dragging', 'drag-over'));
+    bmList.querySelectorAll('.dragging, .drag-over, .drag-before, .drag-after')
+      .forEach(n => n.classList.remove('dragging', 'drag-over', 'drag-before', 'drag-after'));
   });
 
   bmList.addEventListener('dragover', e => {
     if (!dragId) return;
-    const t = dragDropTarget(e.target);
+    const t = dragDropTarget(e.target, e.clientY);
     if (!t) return;
     e.preventDefault();                       // 允许放置
     e.dataTransfer.dropEffect = 'move';
-    bmList.querySelectorAll('.drag-over').forEach(n => n.classList.remove('drag-over'));
-    if (dragValid(dragId, t.folderId)) t.el.classList.add('drag-over');
+    bmList.querySelectorAll('.drag-over, .drag-before, .drag-after')
+      .forEach(n => n.classList.remove('drag-over', 'drag-before', 'drag-after'));
+    if (dragValid(dragId, t)) {
+      t.el.classList.add(t.mode === 'into' ? 'drag-over' : (t.mode === 'before' ? 'drag-before' : 'drag-after'));
+    }
   });
 
   bmList.addEventListener('drop', e => {
     if (!dragId) return;
-    const t = dragDropTarget(e.target);
-    if (!t || !dragValid(dragId, t.folderId)) return;
+    const t = dragDropTarget(e.target, e.clientY);
+    if (!t || !dragValid(dragId, t)) return;
     e.preventDefault();
     e.stopPropagation();
-    chrome.bookmarks.move(dragId, { parentId: t.folderId });   // onMoved 自动刷新
+    if (t.mode === 'into') {
+      // 移入文件夹
+      chrome.bookmarks.move(dragId, { parentId: t.folderId });
+    } else {
+      // 插入排序（同父排序或跨父定位）
+      const dragNode = findNodeById(bookmarksTree, dragId);
+      const dragParent = dragNode ? dragNode.parentId : null;
+      const targetParent = findNodeById(bookmarksTree, t.parentId);
+      let idx = siblingIndex(targetParent, t.rowId);
+      if (t.mode === 'after') idx += 1;
+      if (dragParent === t.parentId) {         // 同父：移除自身后目标位置前移
+        const di = siblingIndex(targetParent, dragId);
+        if (di >= 0 && di < idx) idx -= 1;
+      }
+      chrome.bookmarks.move(dragId, { parentId: t.parentId, index: Math.max(0, idx) });
+    }
   });
 }
 
-/* 拖放目标解析：文件夹行/分组头 → 该文件夹；书签行 → 其父文件夹 */
-function dragDropTarget(node) {
-  const f = node.closest('.bm-folder-row, .bm-section-head');
-  if (f) return { el: f, folderId: f.dataset.id };
-  const b = node.closest('.bm-row');
-  if (b) return { el: b, folderId: b.dataset.parentId };
+/* 拖放目标解析：
+ * 书签行 → 插入其前/后（同父排序）
+ * 文件夹行 → 上/下边缘=插入其前/后，中间=移入该文件夹
+ * 分组头 → 仅移入该分组 */
+function dragDropTarget(node, clientY) {
+  const head = node.closest('.bm-section-head');
+  if (head) return { el: head, folderId: head.dataset.id, parentId: head.dataset.id, rowId: head.dataset.id, mode: 'into' };
+
+  const folderRow = node.closest('.bm-folder-row');
+  if (folderRow) {
+    const r = folderRow.getBoundingClientRect();
+    const zone = (clientY - r.top) / r.height;   // 0~1
+    if (zone < 0.3) return { el: folderRow, folderId: folderRow.dataset.parentId, parentId: folderRow.dataset.parentId, rowId: folderRow.dataset.id, mode: 'before' };
+    if (zone > 0.7) return { el: folderRow, folderId: folderRow.dataset.parentId, parentId: folderRow.dataset.parentId, rowId: folderRow.dataset.id, mode: 'after' };
+    return { el: folderRow, folderId: folderRow.dataset.id, parentId: folderRow.dataset.id, rowId: folderRow.dataset.id, mode: 'into' };
+  }
+
+  const bm = node.closest('.bm-row');
+  if (bm) {
+    const r = bm.getBoundingClientRect();
+    const zone = (clientY - r.top) / r.height;
+    return {
+      el: bm, folderId: bm.dataset.parentId, parentId: bm.dataset.parentId, rowId: bm.dataset.id,
+      mode: zone < 0.5 ? 'before' : 'after'
+    };
+  }
   return null;
 }
 
 /* 校验：不能拖到自身；文件夹不能拖进自己的子孙 */
-function dragValid(dragId, targetFolderId) {
-  if (!targetFolderId || dragId === targetFolderId) return false;
-  const node = findNodeById(bookmarksTree, dragId);
-  if (node && !node.url) {
-    if (nodeContainsId(node, targetFolderId)) return false;
+function dragValid(dragId, t) {
+  if (!t || dragId === t.rowId) return false;
+  if (t.mode === 'into') {
+    if (!t.folderId || dragId === t.folderId) return false;
+    const node = findNodeById(bookmarksTree, dragId);
+    if (node && !node.url && nodeContainsId(node, t.folderId)) return false;
   }
   return true;
+}
+
+/* 节点在其父 children 中的下标 */
+function siblingIndex(parentNode, childId) {
+  if (!parentNode) return 0;
+  const i = (parentNode.children || []).findIndex(c => c.id === childId);
+  return i < 0 ? 0 : i;
 }
 
 function findNodeById(node, id) {
