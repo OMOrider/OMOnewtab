@@ -4,7 +4,7 @@
  * ============================================================ */
 
 /* 构建标记：显示在页面右下角，用于确认浏览器跑的是最新代码 */
-const BUILD = '20260805-37';
+const BUILD = '20260805-38';
 
 /* ---------- 小工具 ---------- */
 function el(id) { return document.getElementById(id); }
@@ -904,10 +904,14 @@ function renderPrivateFolder() {
   items.forEach(c => box.appendChild(makeSyncCard(c)));
 }
 
+/* ---------- 三页结构：工作页 / 表盘页 / 私人页 ---------- */
+const PAGES = ['pageWork', 'pageDashboard', 'pagePrivate'];
+const ANCHORS = { pageWork: 'anchorWork', pageDashboard: 'anchorDash', pagePrivate: 'anchorPrivate' };
+
 /* 搜索框在页面锚点间飞行（FLIP 动画），时长与翻页滚动保持一致 */
 function syncSearchAnchor(target, dur) {
   const bar = el('searchWrap');
-  const anchor = target === el('pagePrivate') ? el('anchorPrivate') : el('anchorWork');
+  const anchor = el(ANCHORS[target.id] || 'anchorWork');
   if (!anchor || bar.parentElement === anchor) return;   // 已在目标锚点
   const from = bar.getBoundingClientRect();
   anchor.appendChild(bar);
@@ -923,26 +927,33 @@ function syncSearchAnchor(target, dur) {
   if (document.activeElement === input) input.focus();
 }
 
-/* 当前所在页对应的搜索框锚点 */
-function currentPageSide() {
-  return window.scrollY >= el('pagePrivate').offsetTop / 2 ? 'private' : 'work';
+/* 当前所在页（离哪个页顶最近） */
+function currentPage() {
+  let best = PAGES[0];
+  let bestD = Infinity;
+  for (const id of PAGES) {
+    const d = Math.abs(window.scrollY - el(id).offsetTop);
+    if (d < bestD) { bestD = d; best = id; }
+  }
+  return best;
 }
 
-/* 无动画地把搜索框同步到当前页（覆盖：启动即在第2页、Edge 恢复滚动位置等场景） */
+/* 无动画地把搜索框同步到当前页（覆盖：启动即在某页、Edge 恢复滚动位置等场景） */
 function syncSearchToCurrentPage(silent) {
   const bar = el('searchWrap');
-  const want = currentPageSide() === 'private' ? el('anchorPrivate') : el('anchorWork');
+  const cur = currentPage();
+  const want = el(ANCHORS[cur]);
   if (!want || bar.parentElement === want) return;
   if (silent) want.appendChild(bar);
-  else syncSearchAnchor(want === el('anchorPrivate') ? el('pagePrivate') : el('pageWork'));
+  else syncSearchAnchor(el(cur));
 }
 
 // 页面滚动导致所在页变化时（非翻页逻辑的滚动，如恢复位置/键盘滚动），静默同步搜索框；
-// 同时兜底：任何非翻页滚动若停在两页之间，自动吸回最近的页顶（纯翻页模式不允许多余位置）
+// 同时兜底：任何非翻页滚动若停在页之间，自动吸回最近的页顶（纯翻页模式不允许多余位置）
 let lastSide = null;
 let snapTimer = null;
 window.addEventListener('scroll', () => {
-  const side = currentPageSide();
+  const side = currentPage();
   if (side !== lastSide) {
     lastSide = side;
     syncSearchToCurrentPage(true);
@@ -950,15 +961,19 @@ window.addEventListener('scroll', () => {
   if (window.__isJumping) return;              // 翻页动画中不干预
   clearTimeout(snapTimer);
   snapTimer = setTimeout(() => {
-    const p2 = el('pagePrivate').offsetTop;
-    const y = window.scrollY;
-    const target = y < p2 / 2 ? 0 : p2;
-    if (Math.abs(y - target) > 2) window.scrollTo(0, target);
+    const tops = PAGES.map(id => el(id).offsetTop);
+    let target = 0, best = Infinity;
+    for (const t of tops) {
+      const d = Math.abs(window.scrollY - t);
+      if (d < best) { best = d; target = t; }
+    }
+    if (Math.abs(window.scrollY - target) > 2) window.scrollTo(0, target);
   }, 120);
 }, { passive: true });
 
 function setupPageNav() {
   const pageWork = el('pageWork');
+  const pageDashboard = el('pageDashboard');
   const pagePrivate = el('pagePrivate');
 
   // 底部指示点：点击跳页，滚动时高亮当前页
@@ -975,6 +990,7 @@ function setupPageNav() {
     });
   }, { threshold: 0.4 });
   obs.observe(pageWork);
+  obs.observe(pageDashboard);
   obs.observe(pagePrivate);
 
   // 侧边栏滚轮统一处理（捕获阶段）：源头截断 + 滚到头时取消默认行为
@@ -1022,9 +1038,7 @@ function setupPageNav() {
       return;
     }
 
-    const y = window.scrollY;
-    const p2Top = pagePrivate.offsetTop;
-    const onPriv = y >= p2Top / 2;             // 当前是否在私人页
+    const onPriv = currentPage() === 'pagePrivate';   // 当前是否在私人页（用于侧边栏水平带判定）
 
     // 可滚动容器（收藏列表/天气面板等）该方向还能滚 → 交给容器自己滚，不翻页
     const scrollable = firstScrollable(e.target);
@@ -1046,10 +1060,11 @@ function setupPageNav() {
 
     // 当前所在页 → 决定翻页方向（先锁定页面：任何方向都不允许原生滚动）
     e.preventDefault();
-    if (y < p2Top / 2) {                       // 在工作页 → 向下滚翻到私人页
-      if (e.deltaY > 0) { jump(pagePrivate); }
-    } else {                                   // 在私人页 → 向上滚翻回工作页
-      if (e.deltaY < 0) { jump(pageWork); }
+    const curIdx = PAGES.indexOf(currentPage());
+    if (e.deltaY > 0 && curIdx < PAGES.length - 1) {          // 向下滚 → 翻到下一页
+      jump(el(PAGES[curIdx + 1]));
+    } else if (e.deltaY < 0 && curIdx > 0) {                  // 向上滚 → 翻到上一页
+      jump(el(PAGES[curIdx - 1]));
     }
   }, { passive: false });
 
