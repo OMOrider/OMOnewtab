@@ -4,7 +4,7 @@
  * ============================================================ */
 
 /* 构建标记：显示在页面右下角，用于确认浏览器跑的是最新代码 */
-const BUILD = '20260806-14';
+const BUILD = '20260809-1';
 
 /* ---------- 小工具 ---------- */
 function el(id) { return document.getElementById(id); }
@@ -773,7 +773,7 @@ function setupPageNav() {
 
     const onPriv = currentPage() === 'pagePrivate';   // 当前是否在私人页（用于侧边栏水平带判定）
 
-    // 可滚动容器（收藏列表/天气面板等）该方向还能滚 → 交给容器自己滚，不翻页
+    // 可滚动容器（侧边栏/收藏列表等）该方向还能滚 → 交给容器自己滚，不翻页
     const scrollable = firstScrollable(e.target);
     if (scrollable) {
       const canUp = scrollable.scrollTop > 0 && e.deltaY < 0;

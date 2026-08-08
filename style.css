@@ -497,7 +497,7 @@ html::-webkit-scrollbar { display: none; }  /* Edge/Chrome 隐藏滚动条 */
   padding: 64px 24px 88px;
 }
 
-/* 工作页：通栏对称布局，DeepSeek 卡片贴屏幕左侧（与第二页侧边栏对齐），中间内容居中 */
+/* 工作页：三栏对称布局，中间内容居中 */
 .page-work .page-inner {
   max-width: none;
   /* 顶部留白自适应视口高度（原垂直居中的近似效果），但内容不再因高度变化而整体移动 */
@@ -510,7 +510,6 @@ html::-webkit-scrollbar { display: none; }  /* Edge/Chrome 隐藏滚动条 */
   width: 100%;
 }
 
-/* 表盘页：信息面板（暂放 API 余额卡片，可扩展其他 widget） */
 /* 私人页：通栏布局，工具B 贴屏幕左侧，收藏夹在剩余空间居中 */
 .page-private .page-inner {
   max-width: none;
@@ -540,7 +539,7 @@ html::-webkit-scrollbar { display: none; }  /* Edge/Chrome 隐藏滚动条 */
 
 .page-private .col-left::-webkit-scrollbar { display: none; }  /* Edge/Chrome 隐藏滚动条 */
 
-.page-work { align-items: flex-start; }   /* 顶部对齐：展开内容时天气行不因 flex 居中而移动 */
+.page-work { align-items: flex-start; }   /* 顶部对齐：内容固定，不随 flex 居中移动 */
 .page-private { align-items: flex-start; }
 
 /* 三区布局：左右预留（右侧为面板弹出区），中间内容居中且占比最大 */
