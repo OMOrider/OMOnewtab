@@ -4,7 +4,7 @@
  * ============================================================ */
 
 /* 构建标记：显示在页面右下角，用于确认浏览器跑的是最新代码 */
-const BUILD = '20260809-1';
+const BUILD = '20260809-2';
 
 /* ---------- 小工具 ---------- */
 function el(id) { return document.getElementById(id); }
@@ -307,7 +307,7 @@ let viewMode = localStorage.getItem('newtab_view_mode') === 'flat' ? 'flat' : 'g
 let sortMode = localStorage.getItem('newtab_sort_mode') || 'default';
 
 function updateViewBtn() {
-  el('btnView').textContent = viewMode === 'flat' ? '分组' : '平铺';
+  el('btnView').textContent = viewMode === 'flat' ? '平铺' : '分组';   // 显示当前模式
   el('sortSel').classList.toggle('hidden', viewMode !== 'flat');   // 排序仅平铺模式可用
   el('sortSel').value = sortMode;
 }
