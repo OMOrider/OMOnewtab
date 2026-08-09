@@ -548,20 +548,30 @@ html::-webkit-scrollbar { display: none; }  /* Edge/Chrome 隐藏滚动条 */
   width: 100%;
 }
 
-/* 工具B 侧边栏：粘在视口内、内容超出时栏内独立滚动，不撑高页面 */
+/* 左侧栏容器：纵向分两个独立区块（工具B / 工具C），各自独立滚动 */
 .page-private .col-left {
   position: sticky;
   top: 88px;
   max-height: calc(100vh - 176px);   /* 上下各留 88/88px 内边距 */
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* 独立区块：均分高度、各自滚动 + 底部渐隐 */
+.page-private .col-left .side-block {
+  flex: 1 1 0;
+  min-height: 0;
   overflow-y: auto;
-  scrollbar-width: none;             /* Firefox 隐藏滚动条 */
+  scrollbar-width: none;
   padding-right: 2px;
-  /* 底部边缘渐隐（顶部是固定标题，不再需要淡出） */
   -webkit-mask-image: linear-gradient(to bottom,
       #000 0, #000 calc(100% - 26px), transparent 100%);
   mask-image: linear-gradient(to bottom,
       #000 0, #000 calc(100% - 26px), transparent 100%);
 }
+
+.page-private .col-left .side-block::-webkit-scrollbar { display: none; }
 
 .page-private .col-left::-webkit-scrollbar { display: none; }  /* Edge/Chrome 隐藏滚动条 */
 
@@ -683,9 +693,6 @@ html::-webkit-scrollbar { display: none; }  /* Edge/Chrome 隐藏滚动条 */
   background: rgba(246, 248, 251, 0.88);
   backdrop-filter: blur(6px);
 }
-
-/* 工具C 标题：sticky 贴在工具B 标题（约 46px 高）正下方 */
-.page-private .col-left #privateToolsCHead { top: 46px; }
 
 .page-private .col-left .tool-list,
 .page-private .col-right .tool-list { max-width: none; }

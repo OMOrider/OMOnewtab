@@ -4,7 +4,7 @@
  * ============================================================ */
 
 /* 构建标记：显示在页面右下角，用于确认浏览器跑的是最新代码 */
-const BUILD = '20260810-14';
+const BUILD = '20260810-15';
 
 /* ---------- 小工具 ---------- */
 function el(id) { return document.getElementById(id); }
@@ -815,7 +815,7 @@ function setupPageNav() {
   // 侧边栏/收藏夹列表/右侧栏滚轮统一处理（捕获阶段）：源头截断 + 滚到头时取消默认行为
   // （关键：不 preventDefault 时浏览器会把滚动「链式传导」到页面，绕过所有 JS 逻辑）
   window.addEventListener('wheel', e => {
-    const side = e.target.closest('.page-private .col-left, .page-private .bm-list, .page-private .col-right');
+    const side = e.target.closest('.page-private .col-left .side-block, .page-private .bm-list, .page-private .col-right');
     if (!side) return;
     e.stopImmediatePropagation();
     if (lock) { e.preventDefault(); return; }   // 翻页动画中：内部容器也不滚（否则落地时列表已被误滚）
@@ -874,7 +874,7 @@ function setupPageNav() {
                (onPriv && sideRect &&
                 e.clientX >= sideRect.left - 8 && e.clientX <= sideRect.right + 8)) {
       e.preventDefault();   // 禁止滚动链：空白区域也不能带动页面
-      return;                                  // 工具B水平带（含空白）不翻页
+      return;                                  // 左侧栏水平带（含空白）不翻页
     }
 
     // 当前所在页 → 决定翻页方向（先锁定页面：任何方向都不允许原生滚动）
