@@ -513,7 +513,7 @@ html::-webkit-scrollbar { display: none; }  /* Edge/Chrome 隐藏滚动条 */
 /* 私人页：通栏布局，工具B 贴屏幕左侧，收藏夹在剩余空间居中 */
 .page-private .page-inner {
   max-width: none;
-  padding: 64px 28px 88px 64px;   /* 左侧留出翻页指示点位置 */
+  padding: 76px 28px 88px 64px;   /* 左侧留出翻页指示点位置 */
 }
 .page-private .cols { grid-template-columns: 260px minmax(0, 1fr) 260px; }   /* 左右对称，中间轨道居中 */
 .page-private .col-main {
@@ -525,8 +525,8 @@ html::-webkit-scrollbar { display: none; }  /* Edge/Chrome 隐藏滚动条 */
 /* 工具B 侧边栏：粘在视口内、内容超出时栏内独立滚动，不撑高页面 */
 .page-private .col-left {
   position: sticky;
-  top: 64px;
-  max-height: calc(100vh - 152px);   /* 上下各留 64/88px 内边距 */
+  top: 76px;
+  max-height: calc(100vh - 164px);   /* 上下各留 76/88px 内边距 */
   overflow-y: auto;
   scrollbar-width: none;             /* Firefox 隐藏滚动条 */
   padding-right: 2px;
@@ -542,8 +542,8 @@ html::-webkit-scrollbar { display: none; }  /* Edge/Chrome 隐藏滚动条 */
 /* 右侧栏：与左侧对称——粘在视口内、内容超出时栏内独立滚动 + 底部渐隐 */
 .page-private .col-right {
   position: sticky;
-  top: 64px;
-  max-height: calc(100vh - 152px);
+  top: 76px;
+  max-height: calc(100vh - 164px);
   overflow-y: auto;
   scrollbar-width: none;
   padding-right: 2px;
