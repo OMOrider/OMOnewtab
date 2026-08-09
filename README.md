@@ -1,7 +1,8 @@
 # OMOnewtab（Edge 插件）
 
 [![AI Generated](https://img.shields.io/badge/AI-Generated-185fa5)](https://github.com/OMOrider/OMOnewtab)
-[![Built With DeepSeek & Kimi](https://img.shields.io/badge/Built%20With-DeepSeek%20%26%20Kimi-4d6bfe)](https://github.com/OMOrider/OMOnewtab)
+[![Built With DeepSeek](https://img.shields.io/badge/Built%20With-DeepSeek-4d6bfe)](https://deepseek.com)
+[![Built With Kimi](https://img.shields.io/badge/Built%20With-Kimi-2d7df6)](https://kimi.moonshot.cn)
 
 > **🤖 AI 开发声明**：本项目**完全由 AI 开发**。
 > 全部代码、样式、图标与文档均由 AI 助手协作生成（WorkBuddy + DeepSeek + Kimi）；人类仅提出需求与体验反馈，**未手写任何一行代码**。
