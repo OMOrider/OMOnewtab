@@ -4,7 +4,7 @@
  * ============================================================ */
 
 /* 构建标记：显示在页面右下角，用于确认浏览器跑的是最新代码 */
-const BUILD = '20260809-3';
+const BUILD = '20260809-4';
 
 /* ---------- 小工具 ---------- */
 function el(id) { return document.getElementById(id); }
@@ -762,7 +762,10 @@ function navigateTo(id) {
 }
 
 function renderRightPanel() {
-  if (!bookmarksTree) return;
+  if (!bookmarksTree) {   // 收藏数据未就绪：加载完成后自动重调（与工具A/B模块一致）
+    chrome.bookmarks.getTree().then(t => { bookmarksTree = t[0]; renderRightPanel(); });
+    return;
+  }
   renderRecent();
   renderStats();
   renderNav();
