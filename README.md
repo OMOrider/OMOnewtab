@@ -1,10 +1,10 @@
 # OMOnewtab（Edge 插件）
 
 [![AI Generated](https://img.shields.io/badge/AI-Generated-185fa5)](https://github.com/OMOrider/OMOnewtab)
-[![Built With DeepSeek](https://img.shields.io/badge/Built%20With-DeepSeek-4d6bfe)](https://deepseek.com)
+[![Built With DeepSeek & Kimi](https://img.shields.io/badge/Built%20With-DeepSeek%20%26%20Kimi-4d6bfe)](https://deepseek.com)
 
 > **🤖 AI 开发声明**：本项目**完全由 AI 开发**。
-> 全部代码、样式、图标与文档均由 AI 助手（WorkBuddy + DeepSeek）生成；人类仅提出需求与体验反馈，**未手写任何一行代码**。
+> 全部代码、样式、图标与文档均由 AI 助手协作生成（WorkBuddy + DeepSeek + Kimi）；人类仅提出需求与体验反馈，**未手写任何一行代码**。
 > 代码未经人工逐行审查，以实际使用体验为准——如发现任何问题，欢迎提 Issue。
 
 一个**双页新标签页**插件：第一页「工作页」集中工作相关功能（大时钟/搜索/工作工具），第二页「私人页」管理浏览器**原生收藏夹**（含「工具B」「工具C」双工具侧边栏）。收藏数据存在浏览器里，随你的微软账号自动同步到所有电脑。
