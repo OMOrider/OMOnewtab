@@ -4,7 +4,7 @@
  * ============================================================ */
 
 /* 构建标记：显示在页面右下角，用于确认浏览器跑的是最新代码 */
-const BUILD = '20260809-4';
+const BUILD = '20260809-5';
 
 /* ---------- 小工具 ---------- */
 function el(id) { return document.getElementById(id); }
@@ -680,95 +680,12 @@ function renderRecent() {
   box.appendChild(list);
 }
 
-/* 收藏统计：书签数 / 文件夹数 / 本周新增 / 分组数 */
-function renderStats() {
-  const box = el('rightStats');
-  let bm = 0, fd = 0, week = 0;
-  const now = Date.now(), wk = 7 * 24 * 3600 * 1000;
-  (function walk(node) {
-    for (const c of (node.children || [])) {
-      if (c.url) {
-        bm++;
-        if ((c.dateAdded || 0) > now - wk) week++;
-      } else {
-        fd++;
-        walk(c);
-      }
-    }
-  })(bookmarksTree);
-  box.innerHTML =
-    '<div class="tool-head"><span class="list-title">收藏统计</span></div>' +
-    '<div class="stat-grid">' +
-      '<div class="stat-cell"><div class="stat-num">' + bm + '</div><div class="stat-label">书签</div></div>' +
-      '<div class="stat-cell"><div class="stat-num">' + fd + '</div><div class="stat-label">文件夹</div></div>' +
-      '<div class="stat-cell"><div class="stat-num">' + week + '</div><div class="stat-label">本周新增</div></div>' +
-      '<div class="stat-cell"><div class="stat-num">' + (bookmarksTree.children || []).length + '</div><div class="stat-label">分组</div></div>' +
-    '</div>';
-}
-
-/* 文件夹导航树：点击定位到中间列表对应文件夹 */
-function renderNav() {
-  const box = el('rightNav');
-  box.innerHTML = '<div class="tool-head"><span class="list-title">文件夹导航</span></div>';
-  const list = document.createElement('div');
-  (function walk(node, depth) {
-    for (const c of (node.children || [])) {
-      if (c.url) continue;
-      const item = document.createElement('div');
-      item.className = 'nav-item';
-      item.style.paddingLeft = (8 + depth * 14) + 'px';
-      const chev = document.createElement('span');
-      chev.className = 'chevron';
-      chev.innerHTML = SVG.chevron;
-      const ico = document.createElement('span');
-      ico.className = 'bm-folder-ico';
-      ico.innerHTML = SVG.folder;
-      const name = document.createElement('span');
-      name.textContent = c.title || '未命名文件夹';
-      item.append(chev, ico, name);
-      item.addEventListener('click', () => navigateTo(c.id));
-      list.appendChild(item);
-      walk(c, depth + 1);
-    }
-  })(bookmarksTree, 0);
-  box.appendChild(list);
-}
-
-/* 查找节点到根部的路径（含自身） */
-function findPath(node, id, path) {
-  if (node.id === id) { path.push(node); return true; }
-  for (const c of (node.children || [])) {
-    if (findPath(c, id, path)) { path.push(node); return true; }
-  }
-  return false;
-}
-
-/* 导航定位：切到分组视图 → 展开祖先链 → 滚动到对应行 */
-function navigateTo(id) {
-  const path = [];
-  findPath(bookmarksTree, id, path);
-  path.forEach(n => expanded.add(n.id));   // 展开全部祖先，保证目标行可见
-  if (viewMode !== 'group') {
-    viewMode = 'group';
-    try { localStorage.setItem('newtab_view_mode', 'group'); } catch (e) { /* 忽略 */ }
-    updateViewBtn();
-  }
-  renderTree();
-  setTimeout(() => {
-    const row = document.querySelector(
-      '.bm-section-head[data-id="' + id + '"], .bm-folder-row[data-id="' + id + '"], .bm-section[data-id="' + id + '"]');
-    if (row) row.scrollIntoView({ behavior: 'smooth', block: 'center' });
-  }, 300);   // 等 getTree 异步渲染完成
-}
-
 function renderRightPanel() {
   if (!bookmarksTree) {   // 收藏数据未就绪：加载完成后自动重调（与工具A/B模块一致）
     chrome.bookmarks.getTree().then(t => { bookmarksTree = t[0]; renderRightPanel(); });
     return;
   }
   renderRecent();
-  renderStats();
-  renderNav();
 }
 
 /* ---------- 两页结构：工作页 / 私人页 ---------- */
