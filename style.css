@@ -549,10 +549,12 @@ html::-webkit-scrollbar { display: none; }  /* Edge/Chrome 隐藏滚动条 */
 }
 
 /* 左侧栏容器：纵向分两个独立区块（工具B / 工具C），各自独立滚动 */
+/* 注意：必须用固定 height（不是 max-height）——grid 行高由内容决定，
+ * 子区块 flex-basis 0 会反向把内容高度算成 0，整列塌陷 */
 .page-private .col-left {
   position: sticky;
   top: 88px;
-  max-height: calc(100vh - 176px);   /* 上下各留 88/88px 内边距 */
+  height: calc(100vh - 176px);   /* 上下各留 88/88px 内边距 */
   display: flex;
   flex-direction: column;
   gap: 12px;
