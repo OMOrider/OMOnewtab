@@ -575,7 +575,7 @@ html::-webkit-scrollbar { display: none; }  /* Edge/Chrome 隐藏滚动条 */
 .recent-row .bm-ico-fallback { width: 16px; height: 16px; font-size: 10px; border-radius: 4px; }
 
 .recent-row .recent-title {
-  font-size: 13px;
+  font-size: 14px;              /* 与左侧工具B 行文字（tool-name 14px）一致 */
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
