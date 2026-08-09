@@ -555,15 +555,7 @@ html::-webkit-scrollbar { display: none; }  /* Edge/Chrome 隐藏滚动条 */
 
 .page-private .col-right::-webkit-scrollbar { display: none; }
 
-/* 右侧栏模块：卡片容器（与收藏夹分组卡片同风格） */
-.page-private .col-right .tool-block {
-  margin-bottom: 12px;
-  background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 2px 6px 8px;
-}
-
+/* 右侧栏：与左侧工具B 一致的裸列表风格（无卡片，只有中间收藏夹用卡片） */
 .page-private .col-right .tool-head {
   justify-content: flex-start;
   margin: 0 4px 6px;
@@ -679,14 +671,6 @@ html::-webkit-scrollbar { display: none; }  /* Edge/Chrome 隐藏滚动条 */
   color: var(--text);
 }
 
-/* 私人页左侧栏：工具B 卡片化（与右侧最近添加统一卡片语言） */
-.page-private .col-left .tool-block {
-  background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 2px 6px 8px;
-}
-
 /* 私人页左侧栏：工具B 标题固定表头（滚动时标题不动）+ 列表左对齐 */
 .page-private .col-left .tool-head {
   justify-content: flex-start;
@@ -695,7 +679,7 @@ html::-webkit-scrollbar { display: none; }  /* Edge/Chrome 隐藏滚动条 */
   z-index: 2;
   margin: 0 4px 10px;
   padding: 12px 4px 10px;
-  background: rgba(255, 255, 255, 0.92);
+  background: rgba(246, 248, 251, 0.88);
   backdrop-filter: blur(6px);
 }
 .page-private .col-left .tool-list { max-width: none; }
