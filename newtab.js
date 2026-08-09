@@ -4,7 +4,7 @@
  * ============================================================ */
 
 /* 构建标记：显示在页面右下角，用于确认浏览器跑的是最新代码 */
-const BUILD = '20260810-8';
+const BUILD = '20260810-9';
 
 /* ---------- 小工具 ---------- */
 function el(id) { return document.getElementById(id); }
@@ -662,21 +662,8 @@ function renderRecent() {
     return;
   }
   for (const n of items) {
-    const row = document.createElement('div');
-    row.className = 'recent-row';
-    const img = document.createElement('img');
-    img.className = 'bm-ico';
-    img.alt = '';
-    img.loading = 'lazy';
-    img.src = faviconSrc(n.url);
-    img.addEventListener('error', () => fallbackToCdn(img, n.url), { once: true });
-    const t = document.createElement('span');
-    t.className = 'recent-title';
-    t.textContent = n.title || hostname(n.url) || n.url;
-    t.title = n.title || n.url;
-    row.append(img, t);
-    row.addEventListener('click', () => window.open(n.url, '_blank'));
-    list.appendChild(row);
+    // 与左侧工具B 完全同款的行组件（40px 大图标 + 同间距同悬停）
+    list.appendChild(makeToolItem(n.url, n.title || hostname(n.url) || n.url));
   }
   box.appendChild(list);
 }
