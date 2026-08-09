@@ -4,7 +4,7 @@
  * ============================================================ */
 
 /* 构建标记：显示在页面右下角，用于确认浏览器跑的是最新代码 */
-const BUILD = '20260810-10';
+const BUILD = '20260810-11';
 
 /* ---------- 小工具 ---------- */
 function el(id) { return document.getElementById(id); }
@@ -643,21 +643,20 @@ function renderPrivateFolder() {
   items.forEach(c => box.appendChild(makeSyncCard(c)));
 }
 
-/* ---------- 右侧栏：最近添加 / 收藏统计 / 文件夹导航 ---------- */
-const RECENT_MAX = 8;
+/* ---------- 右侧栏：最近添加（近一个月内收藏的书签） ---------- */
+const RECENT_DAYS = 30;
 
-/* 最近添加：按添加时间取前 8 条 */
 function renderRecent() {
   const box = el('rightRecent');
   box.innerHTML = '<div class="tool-head"><span class="list-title">最近添加</span></div>';
+  const since = Date.now() - RECENT_DAYS * 24 * 3600 * 1000;   // 30 天时间窗
   const items = collectAllBookmarks(bookmarksTree, [])
-    .filter(b => b.url)
-    .sort((a, b) => (b.dateAdded || 0) - (a.dateAdded || 0))
-    .slice(0, RECENT_MAX);
+    .filter(b => b.url && (b.dateAdded || 0) >= since)
+    .sort((a, b) => (b.dateAdded || 0) - (a.dateAdded || 0));   // 最新在前
   const list = document.createElement('div');
   list.className = 'tool-list';   // 与左侧工具B 列表同款
   if (!items.length) {
-    list.innerHTML = '<div class="empty-hint side">暂无收藏</div>';
+    list.innerHTML = '<div class="empty-hint side">近一个月暂无收藏</div>';
     box.appendChild(list);
     return;
   }
