@@ -4,7 +4,7 @@
  * ============================================================ */
 
 /* 构建标记：显示在页面右下角，用于确认浏览器跑的是最新代码 */
-const BUILD = '20260809-2';
+const BUILD = '20260809-3';
 
 /* ---------- 小工具 ---------- */
 function el(id) { return document.getElementById(id); }
@@ -213,7 +213,6 @@ function renderFolderRow(folder, depth) {
 
   const body = document.createElement('div');
   body.className = 'bm-folder-body';
-  body.hidden = true;
   body.appendChild(renderChildren(folder.children || [], depth + 1));
 
   row.addEventListener('click', () => {
@@ -236,6 +235,11 @@ function renderFolderRow(folder, depth) {
       { label: '删除文件夹', action: () => deleteNode(folder), danger: true }
     ]);
   });
+
+  // 按记忆的展开状态渲染（与顶层分组一致，刷新后保持）
+  const defaultOpen = expanded.has(folder.id);
+  body.hidden = !defaultOpen;
+  row.classList.toggle('arrow-down', defaultOpen);
 
   row.append(check, chev, ico, name, count);
   wrap.append(row, body);
@@ -639,6 +643,131 @@ function renderPrivateFolder() {
   items.forEach(c => box.appendChild(makeSyncCard(c)));
 }
 
+/* ---------- 右侧栏：最近添加 / 收藏统计 / 文件夹导航 ---------- */
+const RECENT_MAX = 8;
+
+/* 最近添加：按添加时间取前 8 条 */
+function renderRecent() {
+  const box = el('rightRecent');
+  box.innerHTML = '<div class="tool-head"><span class="list-title">最近添加</span></div>';
+  const items = collectAllBookmarks(bookmarksTree, [])
+    .filter(b => b.url)
+    .sort((a, b) => (b.dateAdded || 0) - (a.dateAdded || 0))
+    .slice(0, RECENT_MAX);
+  const list = document.createElement('div');
+  if (!items.length) {
+    list.innerHTML = '<div class="empty-hint side">暂无收藏</div>';
+    box.appendChild(list);
+    return;
+  }
+  for (const n of items) {
+    const row = document.createElement('div');
+    row.className = 'recent-row';
+    const img = document.createElement('img');
+    img.className = 'bm-ico';
+    img.alt = '';
+    img.loading = 'lazy';
+    img.src = faviconSrc(n.url);
+    img.addEventListener('error', () => fallbackToCdn(img, n.url), { once: true });
+    const t = document.createElement('span');
+    t.className = 'recent-title';
+    t.textContent = n.title || hostname(n.url) || n.url;
+    t.title = n.title || n.url;
+    row.append(img, t);
+    row.addEventListener('click', () => window.open(n.url, '_blank'));
+    list.appendChild(row);
+  }
+  box.appendChild(list);
+}
+
+/* 收藏统计：书签数 / 文件夹数 / 本周新增 / 分组数 */
+function renderStats() {
+  const box = el('rightStats');
+  let bm = 0, fd = 0, week = 0;
+  const now = Date.now(), wk = 7 * 24 * 3600 * 1000;
+  (function walk(node) {
+    for (const c of (node.children || [])) {
+      if (c.url) {
+        bm++;
+        if ((c.dateAdded || 0) > now - wk) week++;
+      } else {
+        fd++;
+        walk(c);
+      }
+    }
+  })(bookmarksTree);
+  box.innerHTML =
+    '<div class="tool-head"><span class="list-title">收藏统计</span></div>' +
+    '<div class="stat-grid">' +
+      '<div class="stat-cell"><div class="stat-num">' + bm + '</div><div class="stat-label">书签</div></div>' +
+      '<div class="stat-cell"><div class="stat-num">' + fd + '</div><div class="stat-label">文件夹</div></div>' +
+      '<div class="stat-cell"><div class="stat-num">' + week + '</div><div class="stat-label">本周新增</div></div>' +
+      '<div class="stat-cell"><div class="stat-num">' + (bookmarksTree.children || []).length + '</div><div class="stat-label">分组</div></div>' +
+    '</div>';
+}
+
+/* 文件夹导航树：点击定位到中间列表对应文件夹 */
+function renderNav() {
+  const box = el('rightNav');
+  box.innerHTML = '<div class="tool-head"><span class="list-title">文件夹导航</span></div>';
+  const list = document.createElement('div');
+  (function walk(node, depth) {
+    for (const c of (node.children || [])) {
+      if (c.url) continue;
+      const item = document.createElement('div');
+      item.className = 'nav-item';
+      item.style.paddingLeft = (8 + depth * 14) + 'px';
+      const chev = document.createElement('span');
+      chev.className = 'chevron';
+      chev.innerHTML = SVG.chevron;
+      const ico = document.createElement('span');
+      ico.className = 'bm-folder-ico';
+      ico.innerHTML = SVG.folder;
+      const name = document.createElement('span');
+      name.textContent = c.title || '未命名文件夹';
+      item.append(chev, ico, name);
+      item.addEventListener('click', () => navigateTo(c.id));
+      list.appendChild(item);
+      walk(c, depth + 1);
+    }
+  })(bookmarksTree, 0);
+  box.appendChild(list);
+}
+
+/* 查找节点到根部的路径（含自身） */
+function findPath(node, id, path) {
+  if (node.id === id) { path.push(node); return true; }
+  for (const c of (node.children || [])) {
+    if (findPath(c, id, path)) { path.push(node); return true; }
+  }
+  return false;
+}
+
+/* 导航定位：切到分组视图 → 展开祖先链 → 滚动到对应行 */
+function navigateTo(id) {
+  const path = [];
+  findPath(bookmarksTree, id, path);
+  path.forEach(n => expanded.add(n.id));   // 展开全部祖先，保证目标行可见
+  if (viewMode !== 'group') {
+    viewMode = 'group';
+    try { localStorage.setItem('newtab_view_mode', 'group'); } catch (e) { /* 忽略 */ }
+    updateViewBtn();
+  }
+  renderTree();
+  setTimeout(() => {
+    const row = document.querySelector(
+      '.bm-section-head[data-id="' + id + '"], .bm-folder-row[data-id="' + id + '"], .bm-section[data-id="' + id + '"]');
+    if (row) row.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }, 300);   // 等 getTree 异步渲染完成
+}
+
+function renderRightPanel() {
+  if (!bookmarksTree) return;
+  renderRecent();
+  renderStats();
+  renderNav();
+}
+
 /* ---------- 两页结构：工作页 / 私人页 ---------- */
 const PAGES = ['pageWork', 'pagePrivate'];
 const ANCHORS = { pageWork: 'anchorWork', pagePrivate: 'anchorPrivate' };
@@ -726,10 +855,10 @@ function setupPageNav() {
   obs.observe(pageWork);
   obs.observe(pagePrivate);
 
-  // 侧边栏/收藏夹列表滚轮统一处理（捕获阶段）：源头截断 + 滚到头时取消默认行为
+  // 侧边栏/收藏夹列表/右侧栏滚轮统一处理（捕获阶段）：源头截断 + 滚到头时取消默认行为
   // （关键：不 preventDefault 时浏览器会把滚动「链式传导」到页面，绕过所有 JS 逻辑）
   window.addEventListener('wheel', e => {
-    const side = e.target.closest('.page-private .col-left, .page-private .bm-list');
+    const side = e.target.closest('.page-private .col-left, .page-private .bm-list, .page-private .col-right');
     if (!side) return;
     e.stopImmediatePropagation();
     const canUp = side.scrollTop > 0 && e.deltaY < 0;
@@ -780,7 +909,8 @@ function setupPageNav() {
       const canDown = scrollable.scrollTop < scrollable.scrollHeight - scrollable.clientHeight - 1 && e.deltaY > 0;
       if (canUp || canDown) { return; }
       if (scrollable.closest('.page-private .col-left') ||
-          scrollable.closest('.page-private .bm-list')) {
+          scrollable.closest('.page-private .bm-list') ||
+          scrollable.closest('.page-private .col-right')) {
         e.preventDefault();   // 禁止滚动链
         return;
       }
@@ -889,7 +1019,7 @@ function bindEvents() {
   let timer = null;
   const schedule = () => {
     clearTimeout(timer);
-    timer = setTimeout(() => { renderTree(); renderWorkFolder(); renderPrivateFolder(); }, 250);
+    timer = setTimeout(() => { renderTree(); renderWorkFolder(); renderPrivateFolder(); renderRightPanel(); }, 250);
   };
   chrome.bookmarks.onCreated.addListener(schedule);
   chrome.bookmarks.onRemoved.addListener(schedule);
@@ -1025,6 +1155,7 @@ bindEvents();
 updateViewBtn();              // 启动时按记忆的模式更新切换按钮文字
 renderWorkFolder();
 renderPrivateFolder();
+renderRightPanel();           // 右侧栏：最近添加 / 统计 / 导航
 setupPageNav();
 syncSearchToCurrentPage(true);   // 启动即同步搜索框到当前页
 renderTree();

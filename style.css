@@ -539,6 +539,129 @@ html::-webkit-scrollbar { display: none; }  /* Edge/Chrome 隐藏滚动条 */
 
 .page-private .col-left::-webkit-scrollbar { display: none; }  /* Edge/Chrome 隐藏滚动条 */
 
+/* 右侧栏：与左侧对称——粘在视口内、内容超出时栏内独立滚动 + 底部渐隐 */
+.page-private .col-right {
+  position: sticky;
+  top: 64px;
+  max-height: calc(100vh - 152px);
+  overflow-y: auto;
+  scrollbar-width: none;
+  padding-right: 2px;
+  -webkit-mask-image: linear-gradient(to bottom,
+      #000 0, #000 calc(100% - 26px), transparent 100%);
+  mask-image: linear-gradient(to bottom,
+      #000 0, #000 calc(100% - 26px), transparent 100%);
+}
+
+.page-private .col-right::-webkit-scrollbar { display: none; }
+
+/* 右侧栏模块：卡片容器（与收藏夹分组卡片同风格） */
+.page-private .col-right .tool-block {
+  margin-bottom: 12px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 2px 6px 8px;
+}
+
+.page-private .col-right .tool-head {
+  justify-content: flex-start;
+  margin: 0 4px 6px;
+  padding: 10px 4px 8px;
+}
+
+/* 最近添加行 */
+.recent-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 34px;
+  padding: 0 8px;
+  border-radius: 6px;
+  cursor: pointer;
+  overflow: hidden;
+}
+
+.recent-row:hover { background: var(--hover); }
+
+.recent-row .bm-ico { width: 16px; height: 16px; }
+.recent-row .bm-ico-fallback { width: 16px; height: 16px; font-size: 10px; border-radius: 4px; }
+
+.recent-row .recent-title {
+  font-size: 13px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
+}
+
+.recent-row:hover .recent-title { color: var(--primary); }
+
+/* 收藏统计 */
+.stat-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+  padding: 2px 4px 4px;
+}
+
+.stat-cell {
+  text-align: center;
+  padding: 8px 4px;
+  border-radius: 8px;
+  background: #f4f7fb;
+}
+
+.stat-num {
+  font-size: 20px;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  color: var(--text);
+}
+
+.stat-label {
+  font-size: 11px;
+  color: var(--text-sub);
+  margin-top: 2px;
+}
+
+/* 文件夹导航 */
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  height: 30px;
+  padding: 0 8px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 13px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: var(--text);
+}
+
+.nav-item:hover { background: var(--hover); color: var(--primary); }
+
+.nav-item .chevron {
+  width: 11px;
+  height: 11px;
+  color: var(--text-sub);
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.nav-item .chevron svg {
+  width: 11px;
+  height: 11px;
+  display: block;
+  transform: rotate(90deg);   /* 箭头向右表示"可进入" */
+}
+
+.nav-item .bm-folder-ico { width: 13px; height: 13px; }
+
 .page-work { align-items: flex-start; }   /* 顶部对齐：内容固定，不随 flex 居中移动 */
 .page-private { align-items: flex-start; }
 
