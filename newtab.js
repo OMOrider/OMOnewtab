@@ -4,7 +4,7 @@
  * ============================================================ */
 
 /* 构建标记：显示在页面右下角，用于确认浏览器跑的是最新代码 */
-const BUILD = '20260810-6';
+const BUILD = '20260810-7';
 
 /* ---------- 小工具 ---------- */
 function el(id) { return document.getElementById(id); }
@@ -655,6 +655,7 @@ function renderRecent() {
     .sort((a, b) => (b.dateAdded || 0) - (a.dateAdded || 0))
     .slice(0, RECENT_MAX);
   const list = document.createElement('div');
+  list.className = 'tool-list';   // 与左侧工具B 列表同款
   if (!items.length) {
     list.innerHTML = '<div class="empty-hint side">暂无收藏</div>';
     box.appendChild(list);

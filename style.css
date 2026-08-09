@@ -555,12 +555,7 @@ html::-webkit-scrollbar { display: none; }  /* Edge/Chrome 隐藏滚动条 */
 
 .page-private .col-right::-webkit-scrollbar { display: none; }
 
-/* 右侧栏：与左侧工具B 一致的裸列表风格（无卡片，只有中间收藏夹用卡片） */
-.page-private .col-right .tool-head {
-  justify-content: flex-start;
-  margin: 0 4px 10px;           /* 与左侧 tool-head 完全一致，保证标题/列表同线 */
-  padding: 12px 4px 10px;
-}
+
 
 /* 最近添加行 */
 .recent-row {
@@ -677,8 +672,9 @@ html::-webkit-scrollbar { display: none; }  /* Edge/Chrome 隐藏滚动条 */
   color: var(--text);
 }
 
-/* 私人页左侧栏：工具B 标题固定表头（滚动时标题不动）+ 列表左对齐 */
-.page-private .col-left .tool-head {
+/* 左右侧栏标题：统一固定表头（滚动时标题不动）+ 毛玻璃背景 + 列表左对齐 */
+.page-private .col-left .tool-head,
+.page-private .col-right .tool-head {
   justify-content: flex-start;
   position: sticky;
   top: 0;
@@ -688,7 +684,8 @@ html::-webkit-scrollbar { display: none; }  /* Edge/Chrome 隐藏滚动条 */
   background: rgba(246, 248, 251, 0.88);
   backdrop-filter: blur(6px);
 }
-.page-private .col-left .tool-list { max-width: none; }
+.page-private .col-left .tool-list,
+.page-private .col-right .tool-list { max-width: none; }
 
 .empty-hint.side {
   padding: 14px 4px;
