@@ -539,7 +539,7 @@ html::-webkit-scrollbar { display: none; }  /* Edge/Chrome 隐藏滚动条 */
 /* 私人页：通栏布局，工具B 贴屏幕左侧，收藏夹在剩余空间居中 */
 .page-private .page-inner {
   max-width: none;
-  padding: 88px 28px 88px 64px;   /* 左侧留出翻页指示点位置 */
+  padding: 88px 28px 88px 28px;   /* 左右对称留白 */
 }
 .page-private .cols { grid-template-columns: 260px minmax(0, 1fr) 260px; }   /* 左右对称，中间轨道居中 */
 .page-private .col-main {
@@ -770,15 +770,16 @@ html::-webkit-scrollbar { display: none; }  /* Edge/Chrome 隐藏滚动条 */
 .tool-item:hover .tool-name { color: var(--primary); }
 
 /* 左侧页面指示点（竖排，随状态区） */
+/* 页面指示点（底部居中横排，保持左右对称） */
 .page-dots {
   position: fixed;
-  left: 22px;
-  top: 50%;
-  transform: translateY(-50%);
+  left: 50%;
+  bottom: 16px;
+  transform: translateX(-50%);
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   gap: 12px;
-  padding: 10px 8px;
+  padding: 6px 10px;
   z-index: 900;
 }
 
