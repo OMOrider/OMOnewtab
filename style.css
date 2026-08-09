@@ -613,6 +613,12 @@ html::-webkit-scrollbar { display: none; }  /* Edge/Chrome 隐藏滚动条 */
 
 .search-anchor .search-wrap { margin: 0; }
 
+/* 私人页：搜索框靠上对齐锚点，使三栏（工具B标题/搜索框/最近添加标题）上沿同线 */
+.page-private .search-anchor {
+  align-items: flex-start;
+  padding-top: 12px;
+}
+
 /* 多选模式：复选框（默认隐藏，进入多选后显示） */
 .bm-check {
   display: none;
