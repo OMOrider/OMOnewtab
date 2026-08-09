@@ -4,7 +4,7 @@
  * ============================================================ */
 
 /* 构建标记：显示在页面右下角，用于确认浏览器跑的是最新代码 */
-const BUILD = '20260810-12';
+const BUILD = '20260810-13';
 
 /* ---------- 小工具 ---------- */
 function el(id) { return document.getElementById(id); }
@@ -477,9 +477,11 @@ function fillParentOptions() {
 
 function syncModal() {
   const isNew = modalState.mode === 'new';
-  el('parentRow').classList.toggle('hidden', !isNew);
-  el('urlRow').classList.toggle('hidden', modalState.isFolder);   // 新建文件夹/编辑文件夹时隐藏网址
-  if (isNew) fillParentOptions();
+  const isMove = modalState.mode === 'move';
+  el('parentRow').classList.toggle('hidden', !isNew && !isMove);   // 新建/移动：显示位置选择
+  el('titleRow').classList.toggle('hidden', isMove);               // 移动：隐藏名称行
+  el('urlRow').classList.toggle('hidden', modalState.isFolder || isMove);   // 文件夹/移动：隐藏网址
+  if (isNew || isMove) fillParentOptions();
 }
 
 function openModal() { el('modalMask').classList.remove('hidden'); }
@@ -497,6 +499,19 @@ function openNew(parentId) {
   syncModal();
   openModal();
   el('fldTitle').focus();
+}
+
+/* 批量移动：把多选中的 N 项移到目标文件夹 */
+function openMoveModal() {
+  modalState.mode = 'move';
+  modalState.id = null;
+  modalState.parentId = '2';
+  modalState.isFolder = true;
+  el('modalTitle').textContent = '移动 ' + multiSel.size + ' 项到';
+  el('fldUrl').value = '';
+  syncModal();
+  openModal();
+  el('fldParent').focus();
 }
 
 function openEdit(node) {
@@ -525,6 +540,18 @@ function saveModal() {
     if (!title) { alert('请填写名称'); return; }
     const parentId = el('fldParent').value;
     chrome.bookmarks.create({ parentId: parentId, title: title });
+  } else if (modalState.mode === 'move') {
+    // 批量移动：选中的 N 项移到目标文件夹
+    const parentId = el('fldParent').value;
+    for (const id of multiSel) {
+      const n = findNodeById(bookmarksTree, id);
+      if (n && !n.url && (n.id === parentId || nodeContainsId(n, parentId))) {
+        alert('不能移动到选中的文件夹内部');
+        return;
+      }
+    }
+    multiSel.forEach(id => chrome.bookmarks.move(id, { parentId: parentId }));
+    exitMultiMode();
   } else {
     const patch = { title: title };
     if (!modalState.isFolder) {
@@ -917,6 +944,7 @@ function bindEvents() {
   });
 
   // 多选批量操作条
+  el('multiMove').addEventListener('click', openMoveModal);
   el('multiDelete').addEventListener('click', multiDelete);
   el('multiExit').addEventListener('click', exitMultiMode);
 

@@ -60,6 +60,7 @@
               <!-- 多选操作条：多选模式显示，替代「新建文件夹」按钮 -->
               <span id="multiBar" class="multi-bar hidden">
                 <span id="multiCount" class="multi-count">已选 0 项</span>
+                <button id="multiMove" class="btn btn-plain btn-sm" type="button">移动</button>
                 <button id="multiDelete" class="btn btn-danger btn-sm" type="button">删除</button>
                 <button id="multiExit" class="btn btn-plain btn-sm" type="button">退出</button>
               </span>
@@ -94,7 +95,7 @@
   <div id="modalMask" class="modal-mask hidden">
     <div class="modal">
       <h3 id="modalTitle">新建文件夹</h3>
-      <div class="form-row">
+      <div class="form-row" id="titleRow">
         <label for="fldTitle">名称</label>
         <input id="fldTitle" type="text" placeholder="文件夹名称">
       </div>
