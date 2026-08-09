@@ -21,7 +21,7 @@ button, input, select { font-family: inherit; }
   --primary: #185fa5;
   --primary-hover: #0c447c;
   --danger: #a32d2d;
-  --radius: 8px;
+  --radius: 12px;
 }
 
 html, body {
@@ -212,7 +212,7 @@ body {
   gap: 11px;
   height: 42px;
   padding: 0 12px;
-  border-radius: 6px;
+  border-radius: 8px;
   cursor: pointer;
 }
 
@@ -232,7 +232,7 @@ body {
   justify-content: center;
   width: 20px;
   height: 20px;
-  border-radius: 5px;
+  border-radius: 6px;
   font-size: 12px;
   font-weight: 500;
   color: #fff;
@@ -277,7 +277,7 @@ body {
   height: 24px;
   border: none;
   background: transparent;
-  border-radius: 5px;
+  border-radius: 6px;
   cursor: pointer;
   color: var(--text-sub);
 }
@@ -302,7 +302,7 @@ body {
   gap: 9px;
   height: 42px;
   padding: 0 12px;
-  border-radius: 6px;
+  border-radius: 8px;
   cursor: pointer;
 }
 
@@ -375,7 +375,7 @@ body {
 /* ===== 按钮 ===== */
 .btn {
   border: none;
-  border-radius: 6px;
+  border-radius: 8px;
   padding: 8px 16px;
   font-size: 13px;
   cursor: pointer;
@@ -395,7 +395,7 @@ body {
   min-width: 148px;
   background: var(--card);
   border: 1px solid var(--border);
-  border-radius: 8px;
+  border-radius: 12px;
   padding: 4px;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
 }
@@ -408,7 +408,7 @@ body {
   border: none;
   background: transparent;
   font-size: 13px;
-  border-radius: 5px;
+  border-radius: 6px;
   cursor: pointer;
   color: var(--text);
 }
@@ -458,7 +458,7 @@ body {
   height: 34px;
   padding: 0 10px;
   border: 1px solid var(--border);
-  border-radius: 6px;
+  border-radius: 8px;
   font-size: 13px;
   background: #fff;
   color: var(--text);
@@ -577,7 +577,7 @@ html::-webkit-scrollbar { display: none; }  /* Edge/Chrome 隐藏滚动条 */
   gap: 8px;
   height: 34px;
   padding: 0 8px;
-  border-radius: 6px;
+  border-radius: 8px;
   cursor: pointer;
   overflow: hidden;
 }
@@ -629,7 +629,7 @@ html::-webkit-scrollbar { display: none; }  /* Edge/Chrome 隐藏滚动条 */
   align-items: center;
   justify-content: center;
   border: 1.5px solid #c9cdd3;
-  border-radius: 4px;
+  border-radius: 6px;
   font-size: 10px;
   color: #fff;
   flex-shrink: 0;
@@ -665,7 +665,7 @@ html::-webkit-scrollbar { display: none; }  /* Edge/Chrome 隐藏滚动条 */
   font-size: 14px;
   font-family: inherit;
   border: none;
-  border-radius: 6px;
+  border-radius: 8px;
   background: transparent;
   color: var(--text-sub);
   outline: none;
@@ -679,6 +679,14 @@ html::-webkit-scrollbar { display: none; }  /* Edge/Chrome 隐藏滚动条 */
   color: var(--text);
 }
 
+/* 私人页左侧栏：工具B 卡片化（与右侧最近添加统一卡片语言） */
+.page-private .col-left .tool-block {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 2px 6px 8px;
+}
+
 /* 私人页左侧栏：工具B 标题固定表头（滚动时标题不动）+ 列表左对齐 */
 .page-private .col-left .tool-head {
   justify-content: flex-start;
@@ -687,7 +695,7 @@ html::-webkit-scrollbar { display: none; }  /* Edge/Chrome 隐藏滚动条 */
   z-index: 2;
   margin: 0 4px 10px;
   padding: 12px 4px 10px;
-  background: rgba(246, 248, 251, 0.88);
+  background: rgba(255, 255, 255, 0.92);
   backdrop-filter: blur(6px);
 }
 .page-private .col-left .tool-list { max-width: none; }

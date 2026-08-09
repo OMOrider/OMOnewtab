@@ -4,7 +4,7 @@
  * ============================================================ */
 
 /* 构建标记：显示在页面右下角，用于确认浏览器跑的是最新代码 */
-const BUILD = '20260809-5';
+const BUILD = '20260810-1';
 
 /* ---------- 小工具 ---------- */
 function el(id) { return document.getElementById(id); }
@@ -781,6 +781,7 @@ function setupPageNav() {
     const side = e.target.closest('.page-private .col-left, .page-private .bm-list, .page-private .col-right');
     if (!side) return;
     e.stopImmediatePropagation();
+    if (lock) { e.preventDefault(); return; }   // 翻页动画中：内部容器也不滚（否则落地时列表已被误滚）
     const canUp = side.scrollTop > 0 && e.deltaY < 0;
     const canDown = side.scrollTop < side.scrollHeight - side.clientHeight - 1 && e.deltaY > 0;
     if (!canUp && !canDown) e.preventDefault();   // 滚到头：禁止滚动链，页面不跟着动
@@ -811,11 +812,8 @@ function setupPageNav() {
   let lock = false;
   window.addEventListener('wheel', e => {
     if (lock) {
-      // 锁定期（翻页动画中）：内部容器照常滚动；其余事件取消默认行为，
-      // 禁止页面原生滚动与动画打架（否则画面抖动）
-      const s = firstScrollable(e.target);
-      if (s && ((s.scrollTop > 0 && e.deltaY < 0) ||
-                (s.scrollTop < s.scrollHeight - s.clientHeight - 1 && e.deltaY > 0))) return;
+      // 锁定期（翻页动画中）：全部取消默认行为——页面不滚、内部容器也不滚，
+      // 否则翻页落地时列表已被误滚（分组头被遮住）
       e.preventDefault();
       return;
     }
