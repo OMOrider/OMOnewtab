@@ -4,7 +4,7 @@
  * ============================================================ */
 
 /* 构建标记：显示在页面右下角，用于确认浏览器跑的是最新代码 */
-const BUILD = '20260810-13';
+const BUILD = '20260810-14';
 
 /* ---------- 小工具 ---------- */
 function el(id) { return document.getElementById(id); }
@@ -47,6 +47,9 @@ const WORK_FOLDER = '工具A';
 
 /* 私人页左侧栏自动同步的收藏夹名称（同上逻辑，找不到时显示提示） */
 const PRIVATE_FOLDER = '工具B';
+
+/* 私人页左侧栏第二块（工具B 下方）同步的收藏夹名称 */
+const TOOLC_FOLDER = '工具C';
 
 /* ---------- SVG 图标（静态标记，无内联脚本） ---------- */
 const SVG = {
@@ -670,6 +673,26 @@ function renderPrivateFolder() {
   items.forEach(c => box.appendChild(makeSyncCard(c)));
 }
 
+/* 私人页左侧栏：工具B 下方第二块，同步收藏夹「工具C」 */
+function renderPrivateFolderC() {
+  const box = el('privateToolsC');
+  if (!bookmarksTree) {
+    chrome.bookmarks.getTree().then(t => { bookmarksTree = t[0]; renderPrivateFolderC(); });
+    return;
+  }
+  const folder = findFolder(bookmarksTree, TOOLC_FOLDER);
+  const items = folder && folder.children ? folder.children.filter(c => c.url) : [];
+  box.innerHTML = '';
+  if (!items.length) {
+    const hint = document.createElement('div');
+    hint.className = 'empty-hint side';
+    hint.textContent = '未找到「' + TOOLC_FOLDER + '」文件夹';
+    box.appendChild(hint);
+    return;
+  }
+  items.forEach(c => box.appendChild(makeSyncCard(c)));
+}
+
 /* ---------- 右侧栏：最近添加（近一个月内收藏的书签） ---------- */
 const RECENT_DAYS = 30;
 
@@ -952,7 +975,7 @@ function bindEvents() {
   let timer = null;
   const schedule = () => {
     clearTimeout(timer);
-    timer = setTimeout(() => { renderTree(); renderWorkFolder(); renderPrivateFolder(); renderRightPanel(); }, 250);
+    timer = setTimeout(() => { renderTree(); renderWorkFolder(); renderPrivateFolder(); renderPrivateFolderC(); renderRightPanel(); }, 250);
   };
   chrome.bookmarks.onCreated.addListener(schedule);
   chrome.bookmarks.onRemoved.addListener(schedule);
@@ -1088,7 +1111,8 @@ bindEvents();
 updateViewBtn();              // 启动时按记忆的模式更新切换按钮文字
 renderWorkFolder();
 renderPrivateFolder();
-renderRightPanel();           // 右侧栏：最近添加 / 统计 / 导航
+renderPrivateFolderC();       // 左侧栏第二块：工具C
+renderRightPanel();           // 右侧栏：最近添加
 setupPageNav();
 syncSearchToCurrentPage(true);   // 启动即同步搜索框到当前页
 renderTree();
