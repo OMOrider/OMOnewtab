@@ -4,7 +4,7 @@
  * ============================================================ */
 
 /* 构建标记：显示在页面右下角，用于确认浏览器跑的是最新代码 */
-const BUILD = '20260810-16';
+const BUILD = '20260812-1';
 
 /* ---------- 小工具 ---------- */
 function el(id) { return document.getElementById(id); }
@@ -693,13 +693,13 @@ function renderPrivateFolderC() {
   items.forEach(c => box.appendChild(makeSyncCard(c)));
 }
 
-/* ---------- 右侧栏：最近添加（近一个月内收藏的书签） ---------- */
-const RECENT_DAYS = 30;
+/* ---------- 右侧栏：最近添加（近两周内收藏的书签） ---------- */
+const RECENT_DAYS = 14;
 
 function renderRecent() {
   const box = el('rightRecent');
   box.innerHTML = '<div class="tool-head"><span class="list-title">最近添加</span></div>';
-  const since = Date.now() - RECENT_DAYS * 24 * 3600 * 1000;   // 30 天时间窗
+  const since = Date.now() - RECENT_DAYS * 24 * 3600 * 1000;   // 14 天时间窗（最近两周）
   const items = collectAllBookmarks(bookmarksTree, [])
     .filter(b => b.url && (b.dateAdded || 0) >= since)
     .sort((a, b) => (b.dateAdded || 0) - (a.dateAdded || 0));   // 最新在前
